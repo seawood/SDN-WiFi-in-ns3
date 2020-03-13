@@ -127,11 +127,11 @@ main (int argc, char *argv[])
   
   wifiMac.SetType ("ns3::ApWifiMac",
                    "Ssid", SsidValue (ssid1));
-  apWifiDevs.Add (wifi.Install (wifiPhy, wifiMac, APs.Get(0)));
+  apWifiDevs.Add (wifi.Install (wifiPhy, wifiMac, aps.Get(0)));
   
   wifiMac.SetType ("ns3::ApWifiMac",
                    "Ssid", SsidValue (ssid2));
-  apWifiDevs.Add (wifi.Install (wifiPhy, wifiMac, APs.Get(1)));
+  apWifiDevs.Add (wifi.Install (wifiPhy, wifiMac, aps.Get(1)));
 					 
   // Install the TCP/IP stack into STA nodes
   InternetStackHelper internet;
