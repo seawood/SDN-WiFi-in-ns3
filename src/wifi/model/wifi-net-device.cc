@@ -391,7 +391,7 @@ WifiNetDevice::AddEthernetHeaderTrailer (Ptr<Packet> p, Mac48Address src,
 	EthernetHeader header (false);
 	header.SetSource (src);
 	header.SetDestination (dest);
-	uint16_t lengthType = p->GetSize();
+	uint16_t lengthType = protocolNumber;
 	//
 	// All Ethernet frames must carry a minimum payload of 46 bytes.  The 
     // LLC SNAP header counts as part of this payload.  We need to padd out
@@ -422,7 +422,7 @@ void
 WifiNetDevice::ForwardUp (Ptr<Packet> packet, Mac48Address from, Mac48Address to)
 {
   NS_LOG_FUNCTION (this << packet << from << to);
-  Ptr<Packet> originalPacket = packet->Copy();
+  //Ptr<Packet> originalPacket = packet->Copy();
   LlcSnapHeader llc;
   NetDevice::PacketType type;
   if (to.IsBroadcast ())
@@ -458,7 +458,7 @@ WifiNetDevice::ForwardUp (Ptr<Packet> packet, Mac48Address from, Mac48Address to
 		NS_LOG_INFO ("WifiNetDevice is attached to OFSwitch13Port");
 		uint16_t protocol = llc.GetType();
 		//add Ethernet header and tail
-		AddEthernetHeaderTrailer (originalPacket, from, to, protocol);
+		AddEthernetHeaderTrailer (packet, from, to, protocol);
 		
 		// We forward the original packet (which includes the EthernetHeader) to
       // the OpenFlow receive callback for all kinds of packetType we receive
