@@ -60,6 +60,8 @@ main (int argc, char *argv[])
       LogComponentEnable ("OFSwitch13Helper", LOG_LEVEL_ALL);
       LogComponentEnable ("OFSwitch13InternalHelper", LOG_LEVEL_ALL);
       LogComponentEnable ("WifiNetDevice", LOG_LEVEL_ALL);
+      LogComponentEnable ("CsmaNetDevice", LOG_LEVEL_ALL);
+      LogComponentEnable ("Simulator", LOG_LEVEL_ALL);
     }
 
   // Enable checksum computations (required by OFSwitch13 module)
