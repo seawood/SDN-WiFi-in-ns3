@@ -463,7 +463,7 @@ WifiNetDevice::ForwardUp (Ptr<Packet> packet, Mac48Address from, Mac48Address to
 		// We forward the original packet (which includes the EthernetHeader) to
       // the OpenFlow receive callback for all kinds of packetType we receive
       // (broadcast, multicast, host or other host).
-      m_openFlowRxCallback (this, originalPacket, protocol, from, to, type);
+      m_openFlowRxCallback (this, packet, protocol, from, to, type);
       return;
 	}
 
