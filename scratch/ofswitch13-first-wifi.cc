@@ -122,6 +122,10 @@ main (int argc, char *argv[])
   wifiMac.SetType ("ns3::ApWifiMac",
                    "Ssid", SsidValue (ssid2));
   apWifiDevs.Add (wifi.Install (wifiPhy, wifiMac, aps.Get(1)));
+  
+  MobilityHelper mobility;
+  mobility.Install (aps);
+  mobility.Install (stas);
 
   // Create the controller node
   Ptr<Node> controllerNode = CreateObject<Node> ();
