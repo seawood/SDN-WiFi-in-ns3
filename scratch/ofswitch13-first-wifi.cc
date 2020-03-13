@@ -79,6 +79,7 @@ main (int argc, char *argv[])
   CsmaHelper csmaHelper;
   csmaHelper.SetChannelAttribute ("DataRate", DataRateValue (DataRate ("100Mbps")));
   csmaHelper.SetChannelAttribute ("Delay", TimeValue (MilliSeconds (2)));
+  csmaHelper.SetDeviceAttribute ("EncapsulationMode", EnumValue (LLC));
 
   NetDeviceContainer apDevices;
   NetDeviceContainer switchPorts;
