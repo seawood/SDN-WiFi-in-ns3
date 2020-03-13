@@ -86,22 +86,6 @@ main (int argc, char *argv[])
       switchPorts.Add (link.Get (1));
     }
 
-  // Create the controller node
-  Ptr<Node> controllerNode = CreateObject<Node> ();
-
-  // Configure the OpenFlow network domain
-  Ptr<OFSwitch13InternalHelper> of13Helper = CreateObject<OFSwitch13InternalHelper> ();
-  of13Helper->InstallController (controllerNode);
-  of13Helper->InstallSwitch (switchNode, switchPorts);
-  for (size_t i = 0; i < aps.GetN(); i++)
-  {
-  	  NetDeviceContainer tmp;
-  	  tmp.Add (apDevices.Get (i));
-  	  tmp.Add (apWifiDevs.Get(i));
-	  of13Helper->InstallSwitch (aps.Get (i), tmp);
-  }
-  of13Helper->CreateOpenFlowChannels ();
-
   // Install WifiNetDevice on AP0,AP1,STA0 and STA1, configure the channel
   NodeContainer stas;
   stas.Create (2);
@@ -135,6 +119,22 @@ main (int argc, char *argv[])
   wifiMac.SetType ("ns3::ApWifiMac",
                    "Ssid", SsidValue (ssid2));
   apWifiDevs.Add (wifi.Install (wifiPhy, wifiMac, aps.Get(1)));
+
+  // Create the controller node
+  Ptr<Node> controllerNode = CreateObject<Node> ();
+
+  // Configure the OpenFlow network domain
+  Ptr<OFSwitch13InternalHelper> of13Helper = CreateObject<OFSwitch13InternalHelper> ();
+  of13Helper->InstallController (controllerNode);
+  of13Helper->InstallSwitch (switchNode, switchPorts);
+  for (size_t i = 0; i < aps.GetN(); i++)
+  {
+  	  NetDeviceContainer tmp;
+  	  tmp.Add (apDevices.Get (i));
+  	  tmp.Add (apWifiDevs.Get(i));
+	  of13Helper->InstallSwitch (aps.Get (i), tmp);
+  }
+  of13Helper->CreateOpenFlowChannels ();
 					 
   // Install the TCP/IP stack into STA nodes
   InternetStackHelper internet;
