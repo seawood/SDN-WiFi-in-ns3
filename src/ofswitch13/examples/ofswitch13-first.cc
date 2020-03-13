@@ -120,7 +120,7 @@ main (int argc, char *argv[])
     {
       of13Helper->EnableOpenFlowPcap ("openflow");
       of13Helper->EnableDatapathStats ("switch-stats");
-      csmaHelper.EnablePcap ("switch", switchPorts, true);
+      csmaHelper.EnablePcap ("switch", switchPorts);
       csmaHelper.EnablePcap ("host", hostDevices);
     }
 
