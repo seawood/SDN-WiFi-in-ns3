@@ -30,6 +30,7 @@
 #include <ns3/ofswitch13-module.h>
 #include <ns3/internet-apps-module.h>
 #include <ns3/wifi-module.h>
+#include "ns3/mobility-helper.h"
 
 using namespace ns3;
 
