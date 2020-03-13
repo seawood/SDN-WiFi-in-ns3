@@ -95,7 +95,10 @@ main (int argc, char *argv[])
   of13Helper->InstallSwitch (switchNode, switchPorts);
   for (size_t i = 0; i < aps.GetN(); i++)
   {
-	  of13Helper->InstallSwitch (aps.Get (i), apDevices.Get (i));
+  	  NetDeviceContainer tmp;
+  	  tmp.Add (apDevices.Get (i));
+  	  tmp.Add (apWifiDevs.Get(i));
+	  of13Helper->InstallSwitch (aps.Get (i), tmp);
   }
   of13Helper->CreateOpenFlowChannels ();
 
