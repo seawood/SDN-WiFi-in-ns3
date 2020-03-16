@@ -38,14 +38,16 @@ int
 main (int argc, char *argv[])
 {
   uint16_t simTime = 10;
-  bool verbose = true;
-  bool trace = true;
+  bool verbose = false;
+  bool trace = false;
+  bool SNR = true;
 
   // Configure command line parameters
   CommandLine cmd;
   cmd.AddValue ("simTime", "Simulation time (seconds)", simTime);
   cmd.AddValue ("verbose", "Enable verbose output", verbose);
   cmd.AddValue ("trace", "Enable datapath stats and pcap traces", trace);
+  cmd.AddValue ("SNR", "WifiRemoteStationManager", SNR);
   cmd.Parse (argc, argv);
 
   if (verbose)
@@ -64,6 +66,11 @@ main (int argc, char *argv[])
       LogComponentEnable ("CsmaNetDevice", LOG_LEVEL_ALL);
       LogComponentEnable ("Simulator", LOG_LEVEL_ALL);
     }
+	
+	if (SNR)
+	{
+		LogComponentEnable ("WifiRemoteStationManager", LOG_LEVEL_ALL);
+	}
 
   // Enable checksum computations (required by OFSwitch13 module)
   GlobalValue::Bind ("ChecksumEnabled", BooleanValue (true));
