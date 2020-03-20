@@ -69,7 +69,7 @@ main (int argc, char *argv[])
 	
 	if (SNR)
 	{
-		LogComponentEnable ("WifiRemoteStationManager", LOG_LEVEL_ALL);
+		LogComponentEnable ("WifiRemoteStationManager", LOG_LEVEL_FUNCTION);
 	}
 
   // Enable checksum computations (required by OFSwitch13 module)
