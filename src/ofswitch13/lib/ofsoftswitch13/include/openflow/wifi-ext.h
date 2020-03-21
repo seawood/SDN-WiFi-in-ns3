@@ -11,9 +11,9 @@
 #define WIFI_VENDOR_ID 0x80000001
 
 enum wifi_extension_subtype {
-	WIFI_EXT_GET_CONFIG_REQUEST,
-	WIFI_EXT_GET_CONFIG_REPLY,
-	WIFI_EXT_SET_CONFIG
+	WIFI_EXT_CHANNEL_CONFIG_REQUEST,
+	WIFI_EXT_CHANNEL_CONFIG_REPLY,
+	WIFI_EXT_CHANNEL_SET
 };
 
 struct wifi_extension_header {
@@ -22,6 +22,15 @@ struct wifi_extension_header {
     uint32_t subtype;           /* One of wifi_extension_subtype */
 };
 OFP_ASSERT(sizeof(struct wifi_extension_header) == 16);
+
+struct wifi_channel_header {
+	struct wifi_extension_header header;
+	uint8_t m_channelNumber;
+	uint16_t m_frequency;
+	uint16_t m_channelWidth;
+	uint8_t pad[3];    /* Align to 64-bits */
+};
+OFP_ASSERT(sizeof(struct wifi_channel_header) == 24);
 
 #endif  /*OPENFLOW_WIFI_EXT_H*/
 

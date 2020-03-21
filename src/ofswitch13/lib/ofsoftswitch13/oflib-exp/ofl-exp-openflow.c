@@ -79,12 +79,12 @@ ofl_exp_openflow_msg_pack(struct ofl_msg_experimenter *msg, uint8_t **buf, size_
                 return 0;
             }
             default: {
-                OFL_LOG_WARN(LOG_MODULE, "Trying to print unknown Openflow Experimenter message.");
+                OFL_LOG_WARN(LOG_MODULE, "Trying to pack unknown Openflow Experimenter message.");
                 return -1;
             }
         }
     } else {
-        OFL_LOG_WARN(LOG_MODULE, "Trying to print non-Openflow Experimenter message.");
+        OFL_LOG_WARN(LOG_MODULE, "Trying to pack non-Openflow Experimenter message.");
         return -1;
     }
 }

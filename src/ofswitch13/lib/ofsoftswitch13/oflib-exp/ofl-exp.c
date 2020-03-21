@@ -56,6 +56,9 @@ ofl_exp_msg_pack(struct ofl_msg_experimenter *msg, uint8_t **buf, size_t *buf_le
         case (NX_VENDOR_ID): {
             return ofl_exp_nicira_msg_pack(msg, buf, buf_len);
         }
+		case (WIFI_VENDOR_ID): {
+			return ofl_exp_wifi_msg_pack(msg, buf, buf_len);
+		}
         default: {
             OFL_LOG_WARN(LOG_MODULE, "Trying to pack unknown EXPERIMENTER message (%u).", msg->experimenter_id);
             return -1;
@@ -81,6 +84,9 @@ ofl_exp_msg_unpack(struct ofp_header *oh, size_t *len, struct ofl_msg_experiment
         case (NX_VENDOR_ID): {
             return ofl_exp_nicira_msg_unpack(oh, len, msg);
         }
+		case (WIFI_VENDOR_ID): {
+			return ofl_exp_wifi_msg_unpack(oh, len, msg);
+		}
         default: {
             OFL_LOG_WARN(LOG_MODULE, "Trying to unpack unknown EXPERIMENTER message (%u).", htonl(exp->experimenter));
             return ofl_error(OFPET_BAD_REQUEST, OFPBRC_BAD_EXPERIMENTER);
@@ -97,6 +103,9 @@ ofl_exp_msg_free(struct ofl_msg_experimenter *msg) {
         case (NX_VENDOR_ID): {
             return ofl_exp_nicira_msg_free(msg);
         }
+		case (WIFI_VENDOR_ID): {
+			return ofl_exp_wifi_msg_free(msg);
+		}
         default: {
             OFL_LOG_WARN(LOG_MODULE, "Trying to free unknown EXPERIMENTER message (%u).", msg->experimenter_id);
             free(msg);
@@ -114,6 +123,9 @@ ofl_exp_msg_to_string(struct ofl_msg_experimenter *msg) {
         case (NX_VENDOR_ID): {
             return ofl_exp_nicira_msg_to_string(msg);
         }
+		case (WIFI_VENDOR_ID): {
+			return ofl_exp_wifi_msg_to_string(msg);
+		}
         default: {
             char *str;
             size_t str_size;
