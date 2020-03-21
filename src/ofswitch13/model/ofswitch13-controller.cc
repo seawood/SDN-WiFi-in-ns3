@@ -386,6 +386,8 @@ OFSwitch13Controller::HandleFeaturesReply (
   {
 	  Ptr<WifiAp> ap = Create<WifiAp> (swtch->m_address);
 	  m_wifiApsMap.insert (std::make_pair (swtch->m_address, ap));
+	  
+	  //TODO(xyy): send experimenter msg to query for channel configuration
   }
   ofl_msg_free ((struct ofl_msg_header*)msg, 0);
 
