@@ -78,6 +78,8 @@ struct datapath {
     char  *serial_num;
 
     uint64_t  id;               /* Unique identifier for this datapath. */
+	
+	uint32_t wifi_capability;    /* flag of wifi support*/
 
     struct list remotes;        /* Remote connections. */
 

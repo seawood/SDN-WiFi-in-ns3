@@ -72,6 +72,11 @@ public:
      * \return the datapath ID.
      */
     uint64_t GetDpId (void) const;
+	
+	/**
+	* Get whether this RemoteSwitch support wifi
+	*/
+	uint32_t IsWifiAp (void) const;
 
 private:
     Ptr<OFSwitch13SocketHandler>  m_handler;  //!< Socket handler.
@@ -88,6 +93,7 @@ private:
     uint8_t   m_nTables;      //!< Number of tables supported by datapath.
     uint8_t   m_auxiliaryId;  //!< Identify auxiliary connections.
     uint32_t  m_capabilities; //!< Bitmap of support ofp_capabilities.
+	uint32_t  m_reserved;     //!<Bitmap of support ofp_reserved_capabilities.(>0 means support wifi)
     //\}
 
   };  // class RemoteSwitch

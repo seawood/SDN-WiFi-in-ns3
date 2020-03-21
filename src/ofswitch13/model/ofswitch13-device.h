@@ -141,6 +141,9 @@ public:
    * \return The object TypeId.
    */
   static TypeId GetTypeId (void);
+  
+  uint32_t GetIsWifi (void) const;
+  void SetIsWifi (uint32_t isWifi);
 
   /**
    * Get the OpenFlow datapath ID.
@@ -661,6 +664,8 @@ private:
    * get the object pointer and call member functions.
    */
   static DpIdDevMap_t m_globalSwitchMap;
+  
+  uint32_t m_isWifi; //!< is with WifiNetDeviceAttached
 
 }; // Class OFSwitch13Device
 

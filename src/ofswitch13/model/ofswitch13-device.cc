@@ -192,6 +192,16 @@ OFSwitch13Device::GetTypeId (void)
   ;
   return tid;
 }
+uint32_t
+OFSwitch13Device::GetIsWifi (void) const
+{
+	return m_isWifi;
+}
+void
+OFSwitch13Device::SetIsWifi (uint32_t isWifi)
+{
+	m_isWifi = isWifi;
+}
 
 uint64_t
 OFSwitch13Device::GetDatapathId (void) const
@@ -724,6 +734,8 @@ OFSwitch13Device::DatapathNew ()
   dp->last_timeout = time_now ();
   m_lastTimeout = Simulator::Now ();
   list_init (&dp->remotes);
+  
+  dp->wifi_capability = m_iswifi;
 
   // unused
   dp->generation_id = -1;

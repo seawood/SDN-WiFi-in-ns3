@@ -380,6 +380,7 @@ OFSwitch13Controller::HandleFeaturesReply (
   swtch->m_nTables = msg->n_tables;
   swtch->m_auxiliaryId = msg->auxiliary_id;
   swtch->m_capabilities = msg->capabilities;
+  swtch->m_reserved = msg->reserved;
   ofl_msg_free ((struct ofl_msg_header*)msg, 0);
 
   // Executing any scheduled commands for this OpenFlow datapath ID
@@ -716,6 +717,13 @@ uint64_t
 OFSwitch13Controller::RemoteSwitch::GetDpId (void) const
 {
   return m_dpId;
+}
+
+uint32_t
+OFSwitch13Controller::RemoteSwitch::IsWifiAp (void) const
+{
+	NS_LOG_FUNCTION (this << m_reserved);
+	return m_reserved;
 }
 
 OFSwitch13Controller::EchoInfo::EchoInfo (Ptr<const RemoteSwitch> swtch)

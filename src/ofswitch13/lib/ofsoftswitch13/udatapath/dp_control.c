@@ -77,7 +77,7 @@ handle_control_features_request(struct datapath *dp,
              .n_tables     = dp->pipeline->num_tables,
              .auxiliary_id = sender->conn_id,
              .capabilities = DP_SUPPORTED_CAPABILITIES,
-             .reserved = 0x00000000};
+             .reserved = dp->wifi_capability};
 
     dp_send_message(dp, (struct ofl_msg_header *)&reply, sender);
 
