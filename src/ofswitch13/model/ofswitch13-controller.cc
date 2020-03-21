@@ -33,7 +33,8 @@ OFSwitch13Controller::OFSwitch13Controller ()
   : m_serverSocket (0)
 {
   NS_LOG_FUNCTION (this);
-
+  
+  m_wifiNetworkStatus = WifiNetworkStatus ();
   m_xid = rand () & 0xffffffff;
 }
 
@@ -381,6 +382,11 @@ OFSwitch13Controller::HandleFeaturesReply (
   swtch->m_auxiliaryId = msg->auxiliary_id;
   swtch->m_capabilities = msg->capabilities;
   swtch->m_reserved = msg->reserved;
+  if (swtch->m_reserved)
+  {
+	  Ptr<WifiAp> ap = Create<WifiAp> (swtch->m_address);
+	  m_wifiApsMap.insert (std::make_pair (swtch->m_address, ap));
+  }
   ofl_msg_free ((struct ofl_msg_header*)msg, 0);
 
   // Executing any scheduled commands for this OpenFlow datapath ID

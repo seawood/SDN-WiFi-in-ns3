@@ -97,7 +97,7 @@ private:
     //\}
 
   };  // class RemoteSwitch
-
+  
   /**
    * \ingroup ofswitch13
    * Structure to save echo request metadata used by the controller interface.
@@ -384,6 +384,9 @@ private:
 
   /** Map to store switch info by Address */
   typedef std::map <Address, Ptr<RemoteSwitch> > SwitchsMap_t;
+  
+  /** Map to store Wifi AP info by Address */
+  typedef std::map <Address, Ptr<WifiAp>> WifiApsMap_t;
 
   uint32_t        m_xid;              //!< Global transaction idx.
   uint16_t        m_port;             //!< Local controller tcp port.
@@ -393,6 +396,8 @@ private:
   BarrierMsgMap_t m_barrierMap;       //!< Metadata for barrier requests.
   DpIdCmdMap_t    m_schedCommands;    //!< Scheduled commands for execution.
   SwitchsMap_t    m_switchesMap;      //!< Registered switches metadata's.
+  WifiApsMap_t    m_wifiApsMap;
+  WifiNetworkStatus m_wifiNetworkStatus;
 };
 
 } // namespace ns3
