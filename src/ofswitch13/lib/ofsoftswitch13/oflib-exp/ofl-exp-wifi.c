@@ -2,6 +2,16 @@
  * Author: xie yingying <xyynku@163.com>
 **/
 
+#include <stdlib.h>
+#include <stdio.h>
+#include <string.h>
+#include <netinet/in.h>
+#include "openflow/openflow.h"
+#include "openflow/wifi-ext.h"
+#include "ofl-exp-wifi.h"
+#include "../oflib/ofl-log.h"
+#include "../oflib/ofl-print.h"
+
 #define LOG_MODULE ofl_exp_wifi
 OFL_LOG_INIT(LOG_MODULE)
 
@@ -53,6 +63,51 @@ ofl_err
 ofl_exp_wifi_msg_unpack(struct ofp_header *oh, size_t *len,
 						struct ofl_msg_experimenter **msg)
 {
+	struct wifi_extension_header* exp;
+	if (*len < sizeof(struct wifi_extension_header)) {
+		OFL_LOG_WARN(LOG_MODULE, "Received wifi EXPERIMENTER message has invalid length (%zu).", *len);
+        return ofl_error(OFPET_BAD_REQUEST, OFPBRC_BAD_LEN);
+	}
+	
+	exp = (struct wifi_extension_header*)oh;
+	if (ntohl(exp->vendor == WIFI_VENDOR_ID)) {
+		switch (exp->subtype) {
+			case (WIFI_EXT_CHANNEL_CONFIG_REQUEST): {
+				struct ofl_exp_wifi_msg_channel_req* dst;
+				dst = (struct ofl_exp_wifi_msg_channel_req*)malloc(sizeof(struct ofl_exp_wifi_msg_channel_req));
+				dst->header.header.experimenter_id = ntohl(exp->vendor);
+				dst->header.type = ntohl(exp->subtype);
+				(*msg) = (struct ofl_msg_experimenter*)dst;
+				return 0;
+			}
+			case (WIFI_EXT_CHANNEL_CONFIG_REPLY):
+			case (WIFI_EXT_CHANNEL_SET): {
+				struct wifi_channel_header* src;
+				struct ofl_exp_wifi_msg_channel* dst;
+				if (*len < sizeof(struct wifi_channel_header))
+				{
+					OFL_LOG_WARN(LOG_MODULE, "Received  message WIFI_EXT_CHANNEL_CONFIG_REPLY/WIFI_EXT_CHANNEL_SET has invalid length (%zu).", *len);
+                    return ofl_error(OFPET_BAD_REQUEST, OFPBRC_BAD_LEN);
+				}
+				src = (struct wifi_channel_header*)exp;
+				dst = (struct ofl_exp_wifi_msg_channel*)malloc(sizeof(struct ofl_exp_wifi_msg_channel));
+				dst->header.header.experimenter_id = ntohl(exp->vendor);
+				dst->header.type = ntohl(exp->subtype);
+				dst->channel->m_channelNumber = src->m_channelNumber;
+				dst->channel->m_frequency = src->m_frequency;
+				dst->channel->m_channelWidth = src->m_channelWidth;
+				(*msg) = (struct ofl_msg_experimenter*)dst;
+				return 0;	
+			}
+			default: {
+				OFL_LOG_WARN(LOG_MODULE, "Trying to unpack unknown wifi Experimenter message.");
+                return ofl_error(OFPET_BAD_REQUEST, OFPBRC_BAD_EXPERIMENTER);
+			}
+		}
+	}else {
+		OFL_LOG_WARN(LOG_MODULE, "Trying to unpack non-wifi Experimenter message.");
+		return ofl_error(OFPET_BAD_REQUEST, OFPBRC_BAD_EXPERIMENTER);
+	}
 }
 
 int

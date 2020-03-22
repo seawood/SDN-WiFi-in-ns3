@@ -40,10 +40,13 @@
 #include "oflib/ofl-messages.h"
 #include "oflib-exp/ofl-exp-openflow.h"
 #include "oflib-exp/ofl-exp-nicira.h"
+#include "oflib-exp/ofl-exp-wifi.h"
 #include "openflow/openflow.h"
 #include "openflow/openflow-ext.h"
 #include "openflow/nicira-ext.h"
+#include "openflow/wifi-ext.h"
 #include "vlog.h"
+#include "dp-exp-wifi.h"
 
 #define LOG_MODULE VLM_dp_exp
 
@@ -93,6 +96,24 @@ dp_exp_message(struct datapath *dp,
                 }
             }
         }
+		case (WIFI_VENDOR_ID): {
+			struct ofl_exp_wifi_msg_header* exp = (struct ofl_exp_wifi_msg_header*)msg;
+			switch (exp->type){
+				case (WIFI_EXT_CHANNEL_CONFIG_REQUEST):{
+					return dp_handle_wifi_config_request(dp, (struct ofl_exp_wifi_msg_channel_req*)msg, sender);
+				}
+				case (WIFI_EXT_CHANNEL_CONFIG_REPLY): {
+					return dp_handle_wifi_config_reply(dp, (struct ofl_exp_wifi_msg_channel*)msg, sender);
+				}
+				case (WIFI_EXT_CHANNEL_SET): {
+					return dp_handle_wifi_channel_set(dp, (struct ofl_exp_wifi_msg_channel*)msg, sender);
+				}
+				default: {
+					VLOG_WARN_RL(LOG_MODULE, &rl, "Trying to handle unknown wifi experimenter type (%u).", exp->type);
+                    return ofl_error(OFPET_BAD_REQUEST, OFPBRC_BAD_EXPERIMENTER);
+				}
+			}
+		}
         default: {
             return ofl_error(OFPET_BAD_REQUEST, OFPBRC_BAD_EXPERIMENTER);
         }
