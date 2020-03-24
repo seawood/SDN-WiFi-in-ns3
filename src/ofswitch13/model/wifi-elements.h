@@ -1,6 +1,6 @@
 /* -*- Mode:C++; c-file-style:"gnu"; indent-tabs-mode:nil; -*- */
 /*
- * Copyright (c) 2015 University of Campinas (Unicamp)
+ * Copyright (c) 2020 Peiking University
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License version 2 as
@@ -29,8 +29,9 @@ class WifiAp : public SimpleRefCount<WifiAp>
 {
 public:
 	WifiAp (const Address& address);
-	void SetChannelInfo (const WifiPhyStandard& standard, const uint8_t& channel,
-						const uint16_t& frequency, const uuint16_t& channelWidth);
+	void SetChannelInfo (const uint8_t& channel, const uint16_t& frequency,
+						 const uint16_t& channelWidth,
+						 const WifiPhyStandard& standard = WIFI_PHY_STANDARD_UNSPECIFIED);
 	
 	
 private:

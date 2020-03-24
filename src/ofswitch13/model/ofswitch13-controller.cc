@@ -72,6 +72,27 @@ OFSwitch13Controller::DoDispose ()
   Application::DoDispose ();
 }
 
+Ptr<WifiAp>
+OFSwitch13Controller::GetWifiAp (cosnt Address& address) const
+{
+	NS_LOG_FUNCTION (this);
+	return m_wifiApsMap[address];
+}
+
+Ptr<WifiNetworkStatus>
+OFSwitch13Controller::GetWifiNetworkStatus (void) const
+{
+	NS_LOG_FUNCTION (this);
+	return Create<WifiNetworkStatus>(m_wifiNetworkStatus);
+}
+
+Ptr<WifiApsMap_t>
+OFSwitch13Controller::GetWifiApsMap (void) const
+{
+	NS_LOG_FUNCTION (this);
+	return Create<WifiApsMap_t>(m_wifiApsMap);
+}
+
 int
 OFSwitch13Controller::DpctlExecute (Ptr<const RemoteSwitch> swtch,
                                     const std::string textCmd)
@@ -506,6 +527,17 @@ OFSwitch13Controller::HandleQueueGetConfigReply (
   ofl_msg_free ((struct ofl_msg_header*)msg, 0);
   return 0;
 }
+
+ofl_err
+OFSwitch13Controller::HandleExperimenterMsg (
+	struct ofl_exp_wifi_msg_header *msg, Ptr<const RemoteSwitch> swtch,
+	uint32_t xid)
+{
+	NS_LOG_FUNCTION (this << swtch << xid);
+
+	ofl_msg_free ((struct ofl_msg_header*)msg, 0);
+	return 0;
+}
 // --- END: Handlers functions -------
 
 /********** Private methods **********/
@@ -573,6 +605,8 @@ OFSwitch13Controller::HandleSwitchMsg (
         (struct ofl_msg_queue_get_config_reply*)msg, swtch, xid);
 
     case OFPT_EXPERIMENTER:
+		return HandleExperimenterMsg (
+				   (struct ofl_exp_wifi_msg_header*)msg, swtch, xid);
     default:
       return ofl_error (OFPET_BAD_REQUEST, OFPGMFC_BAD_TYPE);
     }
@@ -732,6 +766,12 @@ OFSwitch13Controller::RemoteSwitch::IsWifiAp (void) const
 {
 	NS_LOG_FUNCTION (this << m_reserved);
 	return m_reserved;
+}
+
+Address
+OFSwitch13Controller::RemoteSwitch::GetAddress (void) const
+{
+	return m_address;
 }
 
 OFSwitch13Controller::EchoInfo::EchoInfo (Ptr<const RemoteSwitch> swtch)

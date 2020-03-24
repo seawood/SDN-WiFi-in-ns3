@@ -175,19 +175,50 @@ ofl_err
 dp_handle_wifi_config_request(struct datapath *dp, struct ofl_exp_wifi_msg_channel_req *msg,
 									  const struct sender *sender)
 {
-	
-}
-
-ofl_err
-dp_handle_wifi_config_reply(struct datapath *dp, struct ofl_exp_wifi_msg_channel *msg,
-									const struct sender *sender)
-{
-	
+	NS_LOG_FUNCTION(this);
+	Ptr<WifiNetDevice> wifiDev = OFSwitch13Device::GetWifiNetDevice(dp->id);
+	ofl_err error = 1;
+	if(wifiDev)
+	{
+		struct ofl_exp_wifi_msg_channel reply;
+		reply.header.header.header.header.type = OFPT_EXPERIMENTER;
+		reply.header.header.header.experimenter_id = WIFI_VENDOR_ID;
+		reply.channel = (struct ofl_channel_info*)malloc(sizeof(struct ofl_channel_info));
+		Ptr<WifiPhy> phy = wifiDev->GetPhy();
+		reply.channel->m_channelNumber = phy->GetChannelNumber();
+		reply.channel->m_frequency = phy->GetFrequency();
+		reply.channel->m_channelWidth = phy->GetChannelWidth();
+		
+		error = dp_send_message(dp, (struct ofl_msg_header*)reply, sender);
+	}
+	else
+	{
+		NS_LOG_ERROR("no wifiNetDevice");
+		error = 1;
+	}
+	return error;
 }
 
 ofl_err
 dp_handle_wifi_channel_set(struct datapath *dp, struct ofl_exp_wifi_msg_channel *msg,
 								   const struct sender *sender)
 {
+	NS_LOG_FUNCTION(this);
+	Ptr<WifiNetDevice> wifiDev = OFSwitch13Device::GetWifiNetDevice(dp->id);
+	ofl_err error = 1;
+	if (wifiDev)
+	{
+		Ptr<WifiPhy> phy = wifiDev->GetPhy();
+		phy->SetChannelNumber(msg->channel->m_channelNumber);
+		phy->SetFrequency(msg->channel->m_frequency);
+		phy->SetChannelWidth(msg->channel->m_channelWidth);
+		error = 0;
+	}
+	else
+	{
+		NS_LOG_ERROR("no wifiNetDevice");
+		error = 1;
+	}
+	return error;
 	
 }

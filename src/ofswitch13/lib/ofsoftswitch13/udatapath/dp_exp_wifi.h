@@ -8,10 +8,7 @@
 
 
 ofl_err dp_handle_wifi_config_request(struct datapath *dp, struct ofl_exp_wifi_msg_channel_req *msg,
-									  const struct sender *sender);
-
-ofl_err dp_handle_wifi_config_reply(struct datapath *dp, struct ofl_exp_wifi_msg_channel *msg,
-				const struct sender *sender);					  
+									  const struct sender *sender);					  
 
 ofl_err dp_handle_wifi_channel_set(struct datapath *dp, struct ofl_exp_wifi_msg_channel *msg,
 									const struct sender *sender);					  

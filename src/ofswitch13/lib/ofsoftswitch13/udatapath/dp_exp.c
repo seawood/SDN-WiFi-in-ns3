@@ -102,9 +102,6 @@ dp_exp_message(struct datapath *dp,
 				case (WIFI_EXT_CHANNEL_CONFIG_REQUEST):{
 					return dp_handle_wifi_config_request(dp, (struct ofl_exp_wifi_msg_channel_req*)msg, sender);
 				}
-				case (WIFI_EXT_CHANNEL_CONFIG_REPLY): {
-					return dp_handle_wifi_config_reply(dp, (struct ofl_exp_wifi_msg_channel*)msg, sender);
-				}
 				case (WIFI_EXT_CHANNEL_SET): {
 					return dp_handle_wifi_channel_set(dp, (struct ofl_exp_wifi_msg_channel*)msg, sender);
 				}

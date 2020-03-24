@@ -203,6 +203,20 @@ OFSwitch13Device::SetIsWifi (uint32_t isWifi)
 	m_isWifi = isWifi;
 }
 
+Ptr<WifiNetDevice>
+GetWifiNetDevice (const uint64_t& dpId)
+{
+	Ptr<OFSwitch13Device> dev = m_globalSwitchMap[dpId];
+	Ptr<NetDevice> tmp = Create<NetDevice>();
+	for (uint32_t i = 0; i < dev->GetNSwitchPorts(); ++i)
+	{
+		tmp = dev->GetSwitchPort(i)->GetPortDevice();
+		if (Ptr<WifiNetDevice>(tmp))
+			break;
+	}
+	return tmp;
+}
+
 uint64_t
 OFSwitch13Device::GetDatapathId (void) const
 {
@@ -735,7 +749,7 @@ OFSwitch13Device::DatapathNew ()
   m_lastTimeout = Simulator::Now ();
   list_init (&dp->remotes);
   
-  dp->wifi_capability = m_iswifi;
+  dp->wifi_capability = m_isWifi;
 
   // unused
   dp->generation_id = -1;

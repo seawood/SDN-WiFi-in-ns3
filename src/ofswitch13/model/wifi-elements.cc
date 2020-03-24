@@ -35,8 +35,9 @@ WifiAp::WifiAp (const Address& address)
 }
 
 void
-WifiAp::SetChannelInfo (const WifiPhyStandard& standard, const uint8_t& channel,
-					 const uint16_t& frequency, const uuint16_t& channelWidth)
+WifiAp::SetChannelInfo (const uint8_t& channel, const uint16_t& frequency,
+						const uint16_t& channelWidth,
+						const WifiPhyStandard& standard = WIFI_PHY_STANDARD_UNSPECIFIED)
 {
 	NS_LOG_FUNCTION (this << standard << channel << frequency << channelWidth);
 	m_standard = standard;

@@ -77,6 +77,8 @@ public:
 	* Get whether this RemoteSwitch support wifi
 	*/
 	uint32_t IsWifiAp (void) const;
+	
+	Address GetAddress (void) const;
 
 private:
     Ptr<OFSwitch13SocketHandler>  m_handler;  //!< Socket handler.
@@ -161,6 +163,11 @@ public:
    */
   virtual void DoDispose ();
 
+  Ptr<WifiAp> GetWifiAp (cosnt Address& address) const;
+  
+  Ptr<WifiNetworkStatus> GetWifiNetworkStatus (void) const;
+  
+  Ptr<WifiApsMap_t> GetWifiApsMap (void) const;
   /**
    * Execute a dpctl command to interact with the remote switch.
    * \param swtch The target remote switch.
@@ -324,6 +331,9 @@ protected:
   virtual ofl_err HandleQueueGetConfigReply (
     struct ofl_msg_queue_get_config_reply *msg, Ptr<const RemoteSwitch> swtch,
     uint32_t xid);
+  virtual ofl_err HandleExperimenterMsg (
+	  struct ofl_exp_wifi_msg_header *msg, Ptr<const RemoteSwitch> swtch,
+	  uint32_t xid);
   //\}
 
 private:

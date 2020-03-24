@@ -144,6 +144,12 @@ public:
   
   uint32_t GetIsWifi (void) const;
   void SetIsWifi (uint32_t isWifi);
+  
+  /**
+   * Get the WifiNetDevice attached to this OFSwitch13Device
+   * \return the pointer to WifiNetDevice, or a null pointer if there is no WifiNetDevice
+   */
+  static Ptr<WifiNetDevice> GetWifiNetDevice (const uint64_t& dpId);
 
   /**
    * Get the OpenFlow datapath ID.
