@@ -305,6 +305,14 @@ public:
    */
   static Time GetPlcpPreambleDuration (WifiTxVector txVector);
   
+  /**
+   * A pair of a ChannelNumber and WifiPhyStandard
+   */
+  typedef std::pair<uint8_t, WifiPhyStandard> ChannelNumberStandardPair;
+  /**
+   * A pair of a center Frequency and a ChannelWidth
+   */
+  typedef std::pair<uint16_t, uint16_t> FrequencyWidthPair;
   typedef std::map<ChannelNumberStandardPair,FrequencyWidthPair> ChannelToFrequencyWidthMap; //!< channel to frequency width map typedef
   static ChannelToFrequencyWidthMap GetChannelToFrequencyWidthMap (void);
   /**
@@ -491,15 +499,6 @@ public:
    * \return true if the channel definition succeeded
    */
   bool DefineChannelNumber (uint8_t channelNumber, WifiPhyStandard standard, uint16_t frequency, uint16_t channelWidth);
-
-  /**
-   * A pair of a ChannelNumber and WifiPhyStandard
-   */
-  typedef std::pair<uint8_t, WifiPhyStandard> ChannelNumberStandardPair;
-  /**
-   * A pair of a center Frequency and a ChannelWidth
-   */
-  typedef std::pair<uint16_t, uint16_t> FrequencyWidthPair;
 
   /**
    * Return the Channel this WifiPhy is connected to.
@@ -1776,6 +1775,7 @@ private:
   uint8_t m_txSpatialStreams;  //!< Number of supported TX spatial streams
   uint8_t m_rxSpatialStreams;  //!< Number of supported RX spatial streams
 
+  
   static ChannelToFrequencyWidthMap m_channelToFrequencyWidth; //!< the channel to frequency width map
 
   std::vector<uint16_t> m_supportedChannelWidthSet; //!< Supported channel width
