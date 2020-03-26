@@ -20,7 +20,7 @@
 
 #include <ns3/object-vector.h>
 #include <ns3/wifi-net-device.h>
-#include <ns-3/ptr.h>
+#include <ns3/ptr.h>
 #include "ofswitch13-device.h"
 #include "ofswitch13-port.h"
 
