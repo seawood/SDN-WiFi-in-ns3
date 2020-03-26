@@ -46,7 +46,7 @@
 #include "openflow/nicira-ext.h"
 #include "openflow/wifi-ext.h"
 #include "vlog.h"
-#include "dp-exp-wifi.h"
+#include "dp_exp_wifi.h"
 
 #define LOG_MODULE VLM_dp_exp
 
