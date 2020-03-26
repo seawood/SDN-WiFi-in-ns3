@@ -184,15 +184,15 @@ dp_handle_wifi_config_request(struct datapath *dp, struct ofl_exp_wifi_msg_chann
 	if(wifiDev)
 	{
 		struct ofl_exp_wifi_msg_channel reply;
-		reply.header.header.header.header.type = OFPT_EXPERIMENTER;
-		reply.header.header.header.experimenter_id = WIFI_VENDOR_ID;
+		reply.header.header.header.type = OFPT_EXPERIMENTER;
+		reply.header.header.experimenter_id = WIFI_VENDOR_ID;
 		reply.channel = (struct ofl_channel_info*)malloc(sizeof(struct ofl_channel_info));
 		Ptr<WifiPhy> phy = wifiDev->GetPhy();
 		reply.channel->m_channelNumber = phy->GetChannelNumber();
 		reply.channel->m_frequency = phy->GetFrequency();
 		reply.channel->m_channelWidth = phy->GetChannelWidth();
 		
-		error = dp_send_message(dp, (struct ofl_msg_header*)reply, sender);
+		error = dp_send_message(dp, (struct ofl_msg_header*)&reply, sender);
 	}
 	else
 	{
