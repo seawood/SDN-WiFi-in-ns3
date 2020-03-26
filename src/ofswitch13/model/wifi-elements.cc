@@ -75,9 +75,9 @@ WifiNetworkStatus::UpdateFrequencyUsed (Address address,
 {
 	NS_LOG_FUNCTION (this << address << frequency << width);
 	FrequencyWidthPair pair(frequency, width);
-	if (m_frequencyUsed.find (pair))
+	if (m_frequencyUsed.find (pair) != m_frequencyUnused.end())
 	{
-		m_frequencyUnused[pair].insert(address);
+		m_frequencyUsed[pair].insert(address);
 	}
 	else
 	{
