@@ -1932,6 +1932,12 @@ WifiPhy::GetPlcpPreambleDuration (WifiTxVector txVector)
     }
 }
 
+ChannelToFrequencyWidthMap
+WifiPhy::GetChannelToFrequencyWidthMap (void)
+{
+	return m_channelToFrequencyWidth;
+}
+
 Time
 WifiPhy::GetPayloadDuration (uint32_t size, WifiTxVector txVector, uint16_t frequency)
 {

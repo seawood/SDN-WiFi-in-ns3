@@ -61,11 +61,11 @@ void
 WifiNetworkStatus::InitializeFrequencyUnused ()
 {
 	NS_LOG_FUNCTION (this);
-	for (auto it : WifiPhy::m_channelToFrequencyWidth)
+	for (auto it : WifiPhy::GetChannelToFrequencyWidthMap())
 	{
-		if (it->first.second == WIFI_PHY_STANDARD_UNSPECIFIED)
+		if (it.first.second == WIFI_PHY_STANDARD_UNSPECIFIED)
 		{
-			m_frequencyUnused.insert (it->second);
+			m_frequencyUnused.insert (it.second);
 		}
 	}
 }
@@ -75,13 +75,13 @@ WifiNetworkStatus::UpdateFrequencyUsed (Address address,
 {
 	NS_LOG_FUNCTION (this << address << frequency << width);
 	FrequencyWidthPair pair(frequency, width);
-	if (auto it = m_frequencyUsed.find (pair))
+	if (m_frequencyUsed.find (pair))
 	{
-		it->second.insert(address);
+		m_frequencyUnused[pair].insert(address);
 	}
 	else
 	{
-		m_frequencyUsed.insert (FrequencyWidthPair (pair, address));
+		m_frequencyUsed.insert (make_pair(pair, address));
 		m_frequencyUnused.erase (pair);
 	}
 	

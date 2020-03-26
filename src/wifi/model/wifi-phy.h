@@ -304,6 +304,8 @@ public:
    * \return the duration of the PLCP preamble
    */
   static Time GetPlcpPreambleDuration (WifiTxVector txVector);
+  
+  static ChannelToFrequencyWidthMap GetChannelToFrequencyWidthMap (void);
   /**
    * \param size the number of bytes in the packet to send
    * \param txVector the TXVECTOR used for the transmission of this packet
