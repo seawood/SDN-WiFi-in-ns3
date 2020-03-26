@@ -2,6 +2,10 @@
  * Author: xie yingying <xyynku@163.com>
 **/
 
+#include "vlog.h"
+#include "dp_exp_wifi.h"
+#include "datapath.h"
+#include "oflib-exp/ofl-exp-wifi.h"
 
 #define LOG_MODULE VLM_dp_exp_wifi
 
