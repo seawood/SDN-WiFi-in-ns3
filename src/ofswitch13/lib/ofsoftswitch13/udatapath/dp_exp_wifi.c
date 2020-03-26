@@ -7,6 +7,8 @@
 #include "datapath.h"
 #include "oflib-exp/ofl-exp-wifi.h"
 
+#define UNUSED __attribute__((__unused__))
+
 #define LOG_MODULE VLM_dp_exp_wifi
 
 #if defined (__GNUC__) && defined (NS3_OFSWITCH13)
@@ -19,15 +21,15 @@
 static struct vlog_rate_limit rl = VLOG_RATE_LIMIT_INIT(60, 60);
 
 ofl_err
-dp_handle_wifi_config_request(struct datapath *dp, struct ofl_exp_wifi_msg_channel_req *msg,
-							  const struct sender *sender) {
+dp_handle_wifi_config_request(struct datapath *dp UNUSED, struct ofl_exp_wifi_msg_channel_req *msg UNUSED,
+							  const struct sender *sender UNUSED) {
 	VLOG_DBG_RL(LOG_MODULE, &rl, "handle WIFI_EXT_CHANNEL_CONFIG_REQUEST msg");
 	return 0;
 }
 
 ofl_err
-dp_handle_wifi_channel_set(struct datapath *dp, struct ofl_exp_wifi_msg_channel *msg,
-						   const struct sender *sender) {
+dp_handle_wifi_channel_set(struct datapath *dp UNUSED, struct ofl_exp_wifi_msg_channel *msg UNUSED,
+						   const struct sender *sender UNUSED) {
 	VLOG_DBG_RL(LOG_MODULE, &rl, "handle WIFI_EXT_CHANNEL_SET msg");
 	return 0;
 }
