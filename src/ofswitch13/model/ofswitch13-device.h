@@ -27,6 +27,7 @@
 #include <ns3/string.h>
 #include <ns3/tcp-header.h>
 #include <ns3/traced-value.h>
+#include <ns3/wifi-net-device.h>
 #include "ofswitch13-interface.h"
 #include "ofswitch13-socket-handler.h"
 
