@@ -25,9 +25,9 @@ OFP_ASSERT(sizeof(struct wifi_extension_header) == 16);
 
 struct wifi_channel_header {
 	struct wifi_extension_header header;
-	uint8_t m_channelNumber;
 	uint16_t m_frequency;
 	uint16_t m_channelWidth;
+	uint8_t m_channelNumber;
 	uint8_t pad[3];    /* Align to 64-bits */
 };
 OFP_ASSERT(sizeof(struct wifi_channel_header) == 24);
