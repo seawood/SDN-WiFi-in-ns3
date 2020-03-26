@@ -207,13 +207,13 @@ OFSwitch13Device::SetIsWifi (uint32_t isWifi)
 Ptr<WifiNetDevice>
 GetWifiNetDevice (const uint64_t& dpId)
 {
-	Ptr<OFSwitch13Device> dev = OFSwitch13Device::m_globalSwitchMap[dpId];
+	Ptr<OFSwitch13Device> dev = OFSwitch13Device::GetDevice(dpId);
 	Ptr<NetDevice> tmp = Create<NetDevice>();
 	Ptr<WifiNetDevice> result = Create<WifiNetDevice>();
 	for (uint32_t i = 0; i < dev->GetNSwitchPorts(); ++i)
 	{
 		tmp = dev->GetSwitchPort(i)->GetPortDevice();
-		if (Ptr<WifiNetDevice>(tmp))
+		if (tmp->GetTypeId() == WifiNetDevice::GetTypeId())
 		{
 			result = tmp;
 			break;
