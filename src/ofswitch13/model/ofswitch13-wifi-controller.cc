@@ -21,6 +21,7 @@
 #ifdef NS3_OFSWITCH13
 
 #include "ofswitch13-wifi-controller.h"
+#include "ofswitch13-controller.h"
 #include "openflow/wifi-ext.h"
 #include "oflib-exp/ofl-exp-wifi.h"
 
