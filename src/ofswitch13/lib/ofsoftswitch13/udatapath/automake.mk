@@ -20,6 +20,8 @@ udatapath_ofdatapath_SOURCES = \
 	udatapath/dp_control.h \
 	udatapath/dp_exp.c \
 	udatapath/dp_exp.h \
+	udatapath/dp_exp_wifi.c \
+	udatapath/dp_exp_wifi.h \
 	udatapath/dp_ports.c \
 	udatapath/dp_ports.h \
 	udatapath/flow_table.c \
@@ -42,7 +44,8 @@ udatapath_ofdatapath_SOURCES = \
     udatapath/packet_handle_std.h \
 	udatapath/pipeline.c \
 	udatapath/pipeline.h \
-	udatapath/udatapath.c
+	udatapath/udatapath.c \
+
 
 udatapath_ofdatapath_LDADD = lib/libopenflow.a oflib/liboflib.a oflib-exp/liboflib_exp.a $(SSL_LIBS) $(FAULT_LIBS)
 udatapath_ofdatapath_CPPFLAGS = $(AM_CPPFLAGS)
