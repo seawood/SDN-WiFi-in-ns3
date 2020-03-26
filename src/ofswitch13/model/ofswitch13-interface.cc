@@ -175,7 +175,7 @@ ofl_err
 dp_handle_wifi_config_request(struct datapath *dp, struct ofl_exp_wifi_msg_channel_req *msg,
 									  const struct sender *sender)
 {
-	NS_LOG_FUNCTION(this);
+	NS_LOG_DEBUG("dp_handle_wifi_config_request");
 	Ptr<WifiNetDevice> wifiDev = OFSwitch13Device::GetWifiNetDevice(dp->id);
 	ofl_err error = 1;
 	if(wifiDev)
@@ -203,7 +203,7 @@ ofl_err
 dp_handle_wifi_channel_set(struct datapath *dp, struct ofl_exp_wifi_msg_channel *msg,
 								   const struct sender *sender)
 {
-	NS_LOG_FUNCTION(this);
+	NS_LOG_DEBUG("dp_handle_wifi_channel_set");
 	Ptr<WifiNetDevice> wifiDev = OFSwitch13Device::GetWifiNetDevice(dp->id);
 	ofl_err error = 1;
 	if (wifiDev)

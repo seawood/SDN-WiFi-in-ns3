@@ -25,6 +25,7 @@
 #include <ns3/socket.h>
 #include "ofswitch13-interface.h"
 #include "ofswitch13-socket-handler.h"
+#include "wifi-elements.h"
 #include <string>
 
 namespace ns3 {
@@ -163,10 +164,12 @@ public:
    */
   virtual void DoDispose ();
 
-  Ptr<WifiAp> GetWifiAp (cosnt Address& address) const;
+  Ptr<WifiAp> GetWifiAp (const Address& address) const;
   
   Ptr<WifiNetworkStatus> GetWifiNetworkStatus (void) const;
   
+  /** Map to store Wifi AP info by Address */
+  typedef std::map <Address, Ptr<WifiAp>> WifiApsMap_t;
   Ptr<WifiApsMap_t> GetWifiApsMap (void) const;
   /**
    * Execute a dpctl command to interact with the remote switch.
@@ -395,8 +398,6 @@ private:
   /** Map to store switch info by Address */
   typedef std::map <Address, Ptr<RemoteSwitch> > SwitchsMap_t;
   
-  /** Map to store Wifi AP info by Address */
-  typedef std::map <Address, Ptr<WifiAp>> WifiApsMap_t;
 
   uint32_t        m_xid;              //!< Global transaction idx.
   uint16_t        m_port;             //!< Local controller tcp port.
