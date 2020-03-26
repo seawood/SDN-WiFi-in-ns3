@@ -45,6 +45,8 @@ public:
 private:
 	void ConfigChannel (const Address& address, const uint8_t& channelNumber,
 						const uint16_t frequency, const uint16_t& channelWidth);
+	
+	std::vector<Address> m_wifiApsAddress;
 };
 
 }  //namespace ns3

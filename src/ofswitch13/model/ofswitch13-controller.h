@@ -176,10 +176,7 @@ public:
   Ptr<WifiAp> GetWifiAp (const Address& address) const;
   
   Ptr<WifiNetworkStatus> GetWifiNetworkStatus (void) const;
-  
-  /** Map to store Wifi AP info by Address */
-  typedef std::map <Address, Ptr<WifiAp>> WifiApsMap_t;
-  Ptr<WifiApsMap_t> GetWifiApsMap (void) const;
+ 
   /**
    * Execute a dpctl command to interact with the remote switch.
    * \param swtch The target remote switch.
@@ -218,6 +215,10 @@ public:
                                  struct ofl_msg_header *msg);
 
 protected:
+	/** Map to store Wifi AP info by Address */
+	typedef std::map <Address, Ptr<WifiAp>> WifiApsMap_t;
+	WifiApsMap_t    m_wifiApsMap;
+	WifiNetworkStatus m_wifiNetworkStatus;
   // inherited from Application
   virtual void StartApplication (void);
   virtual void StopApplication (void);
@@ -409,8 +410,7 @@ private:
   BarrierMsgMap_t m_barrierMap;       //!< Metadata for barrier requests.
   DpIdCmdMap_t    m_schedCommands;    //!< Scheduled commands for execution.
   SwitchsMap_t    m_switchesMap;      //!< Registered switches metadata's.
-  WifiApsMap_t    m_wifiApsMap;
-  WifiNetworkStatus m_wifiNetworkStatus;
+  
 };
 
 } // namespace ns3

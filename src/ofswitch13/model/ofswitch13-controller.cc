@@ -87,13 +87,6 @@ OFSwitch13Controller::GetWifiNetworkStatus (void) const
 	return Create<WifiNetworkStatus>(m_wifiNetworkStatus);
 }
 
-Ptr<WifiApsMap_t>
-OFSwitch13Controller::GetWifiApsMap (void) const
-{
-	NS_LOG_FUNCTION (this);
-	return Create<WifiApsMap_t>(m_wifiApsMap);
-}
-
 int
 OFSwitch13Controller::DpctlExecute (Ptr<const RemoteSwitch> swtch,
                                     const std::string textCmd)

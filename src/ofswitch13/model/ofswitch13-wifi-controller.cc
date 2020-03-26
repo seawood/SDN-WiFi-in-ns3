@@ -34,6 +34,10 @@ NS_OBJECT_ENSURE_REGISTERED (OFSwitch13WifiController);
 OFSwitch13WifiController::OFSwitch13WifiController()
 {
 	NS_LOG_FUNCTION (this);
+	for (auto it = m_wifiApsMap.begin(); it != m_wifiApsMap.end(); ++it)
+	{
+		m_wifiApsAddress.push_back (it->first));
+	}
 }
 
 OFSwitch13WifiController::~OFSwitch13WifiController()
