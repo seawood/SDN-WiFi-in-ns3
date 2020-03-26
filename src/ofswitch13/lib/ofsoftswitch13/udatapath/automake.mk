@@ -44,7 +44,7 @@ udatapath_ofdatapath_SOURCES = \
     udatapath/packet_handle_std.h \
 	udatapath/pipeline.c \
 	udatapath/pipeline.h \
-	udatapath/udatapath.c \
+	udatapath/udatapath.c
 
 
 udatapath_ofdatapath_LDADD = lib/libopenflow.a oflib/liboflib.a oflib-exp/liboflib_exp.a $(SSL_LIBS) $(FAULT_LIBS)
