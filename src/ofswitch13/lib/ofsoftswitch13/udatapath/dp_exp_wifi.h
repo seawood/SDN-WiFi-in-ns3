@@ -7,7 +7,7 @@
 
 #include "datapath.h"
 #include "oflib-exp/ofl-exp-wifi.h"
-#include "ofllib/ofl.h"
+#include "oflib/ofl.h"
 
 
 ofl_err dp_handle_wifi_config_request(struct datapath *dp, struct ofl_exp_wifi_msg_channel_req *msg,
