@@ -22,6 +22,7 @@
 #define OFSWITCH13_WIFI_CONTROLLER_H
 
 #include "ofswitch13-learning-controller.h"
+#include "oflib-exp/ofl-exp-wifi.h"
 
 namespace ns3 {
 

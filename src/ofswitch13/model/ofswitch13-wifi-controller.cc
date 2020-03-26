@@ -21,6 +21,8 @@
 #ifdef NS3_OFSWITCH13
 
 #include "ofswitch13-wifi-controller.h"
+#include "openflow/wifi-ext.h"
+
 NS_LOG_COMPONENT_DEFINE ("OFSwitch13WifiController");
 
 namespace ns3 {
