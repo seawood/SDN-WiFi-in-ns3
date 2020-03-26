@@ -81,7 +81,9 @@ WifiNetworkStatus::UpdateFrequencyUsed (Address address,
 	}
 	else
 	{
-		m_frequencyUsed.insert (make_pair(pair, address));
+		std::set<Address> addr;
+		addr.insert(address);
+		m_frequencyUsed[pair] = addr;
 		m_frequencyUnused.erase (pair);
 	}
 	
