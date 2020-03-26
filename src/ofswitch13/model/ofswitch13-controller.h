@@ -28,6 +28,8 @@
 #include "wifi-elements.h"
 #include <string>
 
+struct ofl_exp_wifi_msg_header;
+
 namespace ns3 {
 
 /**

@@ -216,7 +216,7 @@ GetWifiNetDevice (const uint64_t& dpId)
 		tmp = dev->GetSwitchPort(i)->GetPortDevice();
 		if (tmp->GetTypeId() == WifiNetDevice::GetTypeId())
 		{
-			result = DynamicCast (tmp);
+			result = DynamicCast<WifiNetDevice, NetDevice>(tmp);
 			break;
 		}
 	}
