@@ -105,7 +105,7 @@ OFSwitch13WifiController::ConfigChannel (const Address& address, const uint8_t& 
 {
 	Ptr<RemoteSwitch> swtch = GetRemoteSwitch (address);
 	Ptr<WifiAp> ap = GetWifiAp (address);
-	ap->SetChannelInfo (channel, frequency, channelWidth);
+	ap->SetChannelInfo (channelNumber, frequency, channelWidth);
 	struct ofl_exp_wifi_msg_channel msg;
 	msg.header.header.header.type = OFPT_EXPERIMENTER;
 	msg.header.header.experimenter_id = WIFI_VENDOR_ID;

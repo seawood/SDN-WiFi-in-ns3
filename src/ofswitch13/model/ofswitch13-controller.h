@@ -163,6 +163,13 @@ public:
    * Destructor implementation
    */
   virtual void DoDispose ();
+  
+  /**
+  * Get the remote switch for this address.
+  * \param address The socket address.
+  * \return The remote switch.
+  */
+  Ptr<RemoteSwitch> GetRemoteSwitch (Address address);
 
   Ptr<WifiAp> GetWifiAp (const Address& address) const;
   
@@ -357,13 +364,6 @@ private:
    * \param from The packet sender address.
    */
   void ReceiveFromSwitch (Ptr<Packet> packet, Address from);
-
-  /**
-   * Get the remote switch for this address.
-   * \param address The socket address.
-   * \return The remote switch.
-   */
-  Ptr<RemoteSwitch> GetRemoteSwitch (Address address);
 
   /**
    * \name Socket callbacks
