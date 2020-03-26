@@ -93,7 +93,7 @@ void
 OFSwitch13WifiController::ConfiChannelStrategy (void)
 {
 	//TODO: channel allocation algorithm
-	Ptr<WifiApsMap_t> apsMap = GetWifiApsMap();
+	Ptr<WifiApsMap_t> apsMap = OfSwitch13Controller::GetWifiApsMap();
 	for (auto it : *apsMap)
 	{
 		ConfigChannel (it.first, 13, 2470, 20);
