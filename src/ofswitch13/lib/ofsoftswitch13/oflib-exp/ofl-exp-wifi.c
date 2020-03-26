@@ -23,7 +23,7 @@ ofl_exp_wifi_msg_pack(struct ofl_msg_experimenter *msg,
 		struct ofl_exp_wifi_msg_header *exp = (struct ofl_exp_wifi_msg_header*)msg;
 		switch (exp->type){
 			case (WIFI_EXT_CHANNEL_CONFIG_REQUEST): {
-				struct ofl_exp_wifi_msg_channel_req* c = (struct ofl_exp_wifi_msg_channel_req*)exp;
+				//struct ofl_exp_wifi_msg_channel_req* c = (struct ofl_exp_wifi_msg_channel_req*)exp;
 				struct wifi_extension_header* wifi;
 				*buf_len = sizeof(struct wifi_extension_header);
 				*buf = (uint8_t*)calloc(1, *buf_len);
@@ -56,7 +56,7 @@ ofl_exp_wifi_msg_pack(struct ofl_msg_experimenter *msg,
 		OFL_LOG_WARN(LOG_MODULE, "Trying to pack non-wifi Experimenter message.");
         return -1;
 	}
-		
+	return 0;
 }
 
 ofl_err
@@ -156,7 +156,7 @@ ofl_exp_wifi_msg_to_string(struct ofl_msg_experimenter *msg)
 				fprintf (stream, "%s channel configure, ", 
 						 exp->type == WIFI_EXT_CHANNEL_CONFIG_REPLY ? "reply" : "set");
 				fprintf (stream, "channel number = %u,", c->channel->m_channelNumber);
-				frpintf (stream, "frequency = %u, ", c->channel->m_frequency);
+				fprintf (stream, "frequency = %u, ", c->channel->m_frequency);
 				fprintf (stream, "chanel width = %u.", c->channel->m_channelWidth);
 				break;
 			}
@@ -164,6 +164,7 @@ ofl_exp_wifi_msg_to_string(struct ofl_msg_experimenter *msg)
 				OFL_LOG_WARN(LOG_MODULE, "Trying to print unknown wifi Experimenter message.");
                 fprintf(stream, "ofexp{type=\"%u\"}", exp->type);
 			}
+		}
 	}else {
 		OFL_LOG_WARN(LOG_MODULE, "Trying to print non-wifi Experimenter message.");
         fprintf(stream, "exp{exp_id=\"%u\"}", msg->experimenter_id);
