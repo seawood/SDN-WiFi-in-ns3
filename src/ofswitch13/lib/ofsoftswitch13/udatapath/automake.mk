@@ -85,6 +85,8 @@ udatapath_libudatapath_a_SOURCES = \
 	udatapath/dp_control.h \
 	udatapath/dp_exp.c \
 	udatapath/dp_exp.h \
+	udatapath/dp_exp_wifi.c \
+	udatapath/dp_exp_wifi.h \
 	udatapath/flow_table.c \
 	udatapath/flow_table.h \
 	udatapath/flow_entry.c \
@@ -131,6 +133,8 @@ udatapath_libns3ofswitch13_a_SOURCES = \
 	udatapath/dp_control.h \
 	udatapath/dp_exp.c \
 	udatapath/dp_exp.h \
+	udatapath/dp_exp_wifi.c \
+	udatapath/dp_exp_wifi.h \
 	udatapath/dp_ports.c \
 	udatapath/dp_ports.h \
 	udatapath/flow_table.c \
@@ -181,7 +185,8 @@ udatapath_libns3ofswitch13_a_LIBADD = \
 udatapath_libns3ofswitch13_a_LIBADD += \
 	oflib-exp/ofl-exp.o \
 	oflib-exp/ofl-exp-nicira.o \
-	oflib-exp/ofl-exp-openflow.o
+	oflib-exp/ofl-exp-openflow.o \
+	oflib-exp/ofl-exp-wifi.o
 
 udatapath_libns3ofswitch13_a_LIBADD += \
 	lib/backtrace.o \
