@@ -21,13 +21,13 @@ static struct vlog_rate_limit rl = VLOG_RATE_LIMIT_INIT(60, 60);
 ofl_err
 dp_handle_wifi_config_request(struct datapath *dp, struct ofl_exp_wifi_msg_channel_req *msg,
 							  const struct sender *sender) {
-	VLOG_DBG_rl(LOG_MODULE, &rl, "handle WIFI_EXT_CHANNEL_CONFIG_REQUEST msg");
+	VLOG_DBG_RL(LOG_MODULE, &rl, "handle WIFI_EXT_CHANNEL_CONFIG_REQUEST msg");
 	return 0;
 }
 
 ofl_err
 dp_handle_wifi_channel_set(struct datapath *dp, struct ofl_exp_wifi_msg_channel *msg,
 						   const struct sender *sender) {
-	VLOG_DBG_rl(LOG_MODULE, &rl, "handle WIFI_EXT_CHANNEL_SET msg");
+	VLOG_DBG_RL(LOG_MODULE, &rl, "handle WIFI_EXT_CHANNEL_SET msg");
 	return 0;
 }

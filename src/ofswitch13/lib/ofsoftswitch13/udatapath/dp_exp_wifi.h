@@ -5,6 +5,9 @@
 #ifndef DP_EXP_WIFI_H
 #define DP_EXP_WIFI_H 1
 
+#include "datapath.h"
+#include "oflib-exp/ofl-exp-wifi.h"
+#include "ofl.h"
 
 
 ofl_err dp_handle_wifi_config_request(struct datapath *dp, struct ofl_exp_wifi_msg_channel_req *msg,
