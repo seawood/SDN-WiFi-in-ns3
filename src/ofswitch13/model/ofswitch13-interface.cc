@@ -21,6 +21,9 @@
 #include "ofswitch13-interface.h"
 #include "ofswitch13-device.h"
 #include "ofswitch13-controller.h"
+#include "openflow/wifi-ext.h"
+#include "oflib-exp/ofl-exp-wifi.h"
+
 
 NS_LOG_COMPONENT_DEFINE ("OFSwitch13Interface");
 
