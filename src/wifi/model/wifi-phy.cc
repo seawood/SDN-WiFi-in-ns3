@@ -1932,7 +1932,7 @@ WifiPhy::GetPlcpPreambleDuration (WifiTxVector txVector)
     }
 }
 
-ChannelToFrequencyWidthMap
+WifiPhy::ChannelToFrequencyWidthMap
 WifiPhy::GetChannelToFrequencyWidthMap (void)
 {
 	return m_channelToFrequencyWidth;
