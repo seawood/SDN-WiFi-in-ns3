@@ -20,6 +20,7 @@
 
 #include <ns3/object-vector.h>
 #include <ns3/wifi-net-device.h>
+#include <ns-3/ptr.h>
 #include "ofswitch13-device.h"
 #include "ofswitch13-port.h"
 
@@ -215,7 +216,7 @@ GetWifiNetDevice (const uint64_t& dpId)
 		tmp = dev->GetSwitchPort(i)->GetPortDevice();
 		if (tmp->GetTypeId() == WifiNetDevice::GetTypeId())
 		{
-			result = tmp;
+			result = DynamicCast (tmp);
 			break;
 		}
 	}
