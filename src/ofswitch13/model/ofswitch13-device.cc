@@ -208,8 +208,8 @@ Ptr<WifiNetDevice>
 GetWifiNetDevice (const uint64_t& dpId)
 {
 	Ptr<OFSwitch13Device> dev = OFSwitch13Device::GetDevice(dpId);
-	Ptr<NetDevice> tmp = Create<NetDevice>();
-	Ptr<WifiNetDevice> result = Create<WifiNetDevice>();
+	Ptr<NetDevice> tmp;
+	Ptr<WifiNetDevice> result;
 	for (uint32_t i = 0; i < dev->GetNSwitchPorts(); ++i)
 	{
 		tmp = dev->GetSwitchPort(i)->GetPortDevice();
