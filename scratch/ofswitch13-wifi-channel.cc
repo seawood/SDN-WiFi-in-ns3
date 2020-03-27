@@ -38,8 +38,8 @@ int
 main (int argc, char *argv[])
 {
   uint16_t simTime = 10;
-  bool verbose = false;
-  bool trace = false;
+  bool verbose = true;
+  bool trace = true;
 
   // Configure command line parameters
   CommandLine cmd;
@@ -51,18 +51,19 @@ main (int argc, char *argv[])
   if (verbose)
     {
       OFSwitch13Helper::EnableDatapathLogs ();
-      LogComponentEnable ("OFSwitch13Interface", LOG_LEVEL_ALL);
+      //LogComponentEnable ("OFSwitch13Interface", LOG_LEVEL_ALL);
       LogComponentEnable ("OFSwitch13Device", LOG_LEVEL_ALL);
-      LogComponentEnable ("OFSwitch13Port", LOG_LEVEL_ALL);
-      LogComponentEnable ("OFSwitch13Queue", LOG_LEVEL_ALL);
-      LogComponentEnable ("OFSwitch13SocketHandler", LOG_LEVEL_ALL);
-      LogComponentEnable ("OFSwitch13Controller", LOG_LEVEL_ALL);
-      LogComponentEnable ("OFSwitch13LearningController", LOG_LEVEL_ALL);
-      LogComponentEnable ("OFSwitch13Helper", LOG_LEVEL_ALL);
-      LogComponentEnable ("OFSwitch13InternalHelper", LOG_LEVEL_ALL);
+      //LogComponentEnable ("OFSwitch13Port", LOG_LEVEL_ALL);
+      //LogComponentEnable ("OFSwitch13Queue", LOG_LEVEL_ALL);
+      //LogComponentEnable ("OFSwitch13SocketHandler", LOG_LEVEL_ALL);
+      //LogComponentEnable ("OFSwitch13Controller", LOG_LEVEL_ALL);
+      //LogComponentEnable ("OFSwitch13LearningController", LOG_LEVEL_ALL);
+      //LogComponentEnable ("OFSwitch13Helper", LOG_LEVEL_ALL);
+     // LogComponentEnable ("OFSwitch13InternalHelper", LOG_LEVEL_ALL);
       LogComponentEnable ("WifiNetDevice", LOG_LEVEL_ALL);
-      LogComponentEnable ("CsmaNetDevice", LOG_LEVEL_ALL);
-      LogComponentEnable ("Simulator", LOG_LEVEL_ALL);
+      //LogComponentEnable ("CsmaNetDevice", LOG_LEVEL_ALL);
+      //LogComponentEnable ("Simulator", LOG_LEVEL_ALL);
+	  LogComponentEnable ("OFSwitch13WifiController", LOG_LEVEL_ALL);
     }
 	
 
@@ -100,6 +101,10 @@ main (int argc, char *argv[])
   
   WifiHelper wifi;
   wifi.SetRemoteStationManager ("ns3::ArfWifiManager");
+  wifi.SetStandard (WIFI_PHY_STANDARD_UNSPECIFIED);
+  Config::SetDefault ("ns3::WifiPhy::Frequency", UintegerValue (2417));
+  Config::SetDefault ("ns3::WifiPhy::ChannelWidth", UintegerValue (20));
+  Config::SetDefault ("ns3::WifiPhy::ChannelNumber", UintegerValue (2));
   
   YansWifiPhyHelper wifiPhy = YansWifiPhyHelper::Default();
   YansWifiChannelHelper wifiChannel = YansWifiChannelHelper::Default();

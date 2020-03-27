@@ -67,6 +67,7 @@ OFSwitch13WifiController::HandleExperimenterMsg (
 	struct ofl_exp_wifi_msg_header *msg, Ptr<const RemoteSwitch> swtch,
 	uint32_t xid)
 {
+	NS_LOG_FUNCTION (this);
 	if (msg->header.experimenter_id != WIFI_VENDOR_ID)
 	{
 		NS_LOG_ERROR ("unable to handle non-wifi experimenter msg");
@@ -98,6 +99,7 @@ void
 OFSwitch13WifiController::ConfigChannelStrategy (void)
 {
 	//TODO: channel allocation algorithm
+	NS_LOG_FUNCTION (this << "switch all to channel 13");
 	for (auto const &it : m_wifiApsAddress)
 	{
 		ConfigChannel (it, 13, 2470, 20);
@@ -108,6 +110,7 @@ void
 OFSwitch13WifiController::ConfigChannel (const Address& address, const uint8_t& channelNumber,
 					const uint16_t frequency, const uint16_t& channelWidth)
 {
+	NS_LOG_FUNCTION (this);
 	Ptr<RemoteSwitch> swtch = GetRemoteSwitch (address);
 	Ptr<WifiAp> ap = m_wifiApsMap[address];
 	ap->SetChannelInfo (channelNumber, frequency, channelWidth);
