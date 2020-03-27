@@ -203,6 +203,7 @@ void
 OFSwitch13Device::SetIsWifi (uint32_t isWifi)
 {
 	m_isWifi = isWifi;
+	m_datapath->wifi_capability = isWifi;
 }
 
 Ptr<WifiNetDevice>
@@ -214,7 +215,7 @@ OFSwitch13Device::GetWifiNetDevice (const uint64_t& dpId)
 	for (uint32_t i = 0; i < dev->GetNSwitchPorts(); ++i)
 	{
 		tmp = dev->GetSwitchPort(i)->GetPortDevice();
-		if (tmp->GetTypeId() == WifiNetDevice::GetTypeId())
+		if (tmp->GetName() == "WifiNetDevice")
 		{
 			result = DynamicCast<WifiNetDevice, NetDevice>(tmp);
 			break;
