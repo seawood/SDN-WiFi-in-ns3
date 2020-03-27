@@ -101,7 +101,7 @@ main (int argc, char *argv[])
   
   WifiHelper wifi;
   wifi.SetRemoteStationManager ("ns3::ArfWifiManager");
-  wifi.SetStandard (WIFI_PHY_STANDARD_UNSPECIFIED);
+  //wifi.SetStandard (WIFI_PHY_STANDARD_UNSPECIFIED);
   Config::SetDefault ("ns3::WifiPhy::Frequency", UintegerValue (2417));
   Config::SetDefault ("ns3::WifiPhy::ChannelWidth", UintegerValue (20));
   Config::SetDefault ("ns3::WifiPhy::ChannelNumber", UintegerValue (2));
