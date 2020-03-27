@@ -206,7 +206,7 @@ OFSwitch13Device::SetIsWifi (uint32_t isWifi)
 }
 
 Ptr<WifiNetDevice>
-GetWifiNetDevice (const uint64_t& dpId)
+OFSwitch13Device::GetWifiNetDevice (const uint64_t& dpId)
 {
 	Ptr<OFSwitch13Device> dev = OFSwitch13Device::GetDevice(dpId);
 	Ptr<NetDevice> tmp;

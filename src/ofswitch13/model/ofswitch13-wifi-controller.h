@@ -40,7 +40,7 @@ public:
 		struct ofl_exp_wifi_msg_header *msg, Ptr<const RemoteSwitch> swtch,
 		uint32_t xid);
 	
-	void ConfiChannelStrategy (void);
+	void ConfigChannelStrategy (void);
 	
 private:
 	void ConfigChannel (const Address& address, const uint8_t& channelNumber,

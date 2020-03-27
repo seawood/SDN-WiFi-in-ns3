@@ -174,8 +174,8 @@ main (int argc, char *argv[])
 	  wifiPhy.EnablePcap ("sta", staDevs);
     }
 	
-	Simulator::Schedule (Seconds (3), &OFSwitch13WifiController::ConfiChannelStrategy,
-						*wifiControl);
+	Simulator::Schedule (Seconds (3), &OFSwitch13WifiController::ConfigChannelStrategy,
+						wifiControl);
 
   // Run the simulation
   Simulator::Stop (Seconds (simTime));

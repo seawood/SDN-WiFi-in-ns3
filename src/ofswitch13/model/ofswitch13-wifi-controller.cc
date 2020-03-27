@@ -95,7 +95,7 @@ OFSwitch13WifiController::HandleExperimenterMsg (
 }
 
 void 
-OFSwitch13WifiController::ConfiChannelStrategy (void)
+OFSwitch13WifiController::ConfigChannelStrategy (void)
 {
 	//TODO: channel allocation algorithm
 	for (auto const &it : m_wifiApsAddress)
