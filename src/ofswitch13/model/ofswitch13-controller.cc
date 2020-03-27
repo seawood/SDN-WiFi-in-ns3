@@ -73,13 +73,6 @@ OFSwitch13Controller::DoDispose ()
   Application::DoDispose ();
 }
 
-Ptr<WifiAp>
-OFSwitch13Controller::GetWifiAp (const Address& address) const
-{
-	NS_LOG_FUNCTION (this);
-	return m_wifiApsMap[address];
-}
-
 Ptr<WifiNetworkStatus>
 OFSwitch13Controller::GetWifiNetworkStatus (void) const
 {

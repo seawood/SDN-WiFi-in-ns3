@@ -36,7 +36,7 @@ OFSwitch13WifiController::OFSwitch13WifiController()
 	NS_LOG_FUNCTION (this);
 	for (auto it = m_wifiApsMap.begin(); it != m_wifiApsMap.end(); ++it)
 	{
-		m_wifiApsAddress.push_back (it->first));
+		m_wifiApsAddress.push_back (it->first);
 	}
 }
 
@@ -77,7 +77,7 @@ OFSwitch13WifiController::HandleExperimenterMsg (
 		case (WIFI_EXT_CHANNEL_CONFIG_REPLY):
 		{
 			struct ofl_exp_wifi_msg_channel* exp = (struct ofl_exp_wifi_msg_channel*)msg;
-			Ptr<WifiAp> ap = GetWifiAp (swtch->GetAddress());
+			Ptr<WifiAp> ap = m_wifiApsMap[swtch->GetAddress()];
 			ap->SetChannelInfo (exp->channel->m_channelNumber, exp->channel->m_frequency,
 								exp->channel->m_channelWidth);
 			GetWifiNetworkStatus()->UpdateFrequencyUsed (swtch->GetAddress(), 
@@ -98,10 +98,9 @@ void
 OFSwitch13WifiController::ConfiChannelStrategy (void)
 {
 	//TODO: channel allocation algorithm
-	Ptr<WifiApsMap_t> apsMap = OFSwitch13Controller::GetWifiApsMap();
-	for (auto it = apsMap->begin(); it != apsMap->end(); ++it)
+	for (auto const &it : m_wifiApsAddress)
 	{
-		ConfigChannel (it->first, 13, 2470, 20);
+		ConfigChannel (it, 13, 2470, 20);
 	}
 }
 
@@ -110,7 +109,7 @@ OFSwitch13WifiController::ConfigChannel (const Address& address, const uint8_t& 
 					const uint16_t frequency, const uint16_t& channelWidth)
 {
 	Ptr<RemoteSwitch> swtch = GetRemoteSwitch (address);
-	Ptr<WifiAp> ap = GetWifiAp (address);
+	Ptr<WifiAp> ap = m_wifiApsMap[address];
 	ap->SetChannelInfo (channelNumber, frequency, channelWidth);
 	struct ofl_exp_wifi_msg_channel msg;
 	msg.header.header.header.type = OFPT_EXPERIMENTER;

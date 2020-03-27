@@ -173,8 +173,6 @@ public:
   */
   Ptr<RemoteSwitch> GetRemoteSwitch (Address address);
 
-  Ptr<WifiAp> GetWifiAp (const Address& address) const;
-  
   Ptr<WifiNetworkStatus> GetWifiNetworkStatus (void) const;
  
   /**
