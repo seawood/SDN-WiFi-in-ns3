@@ -23,6 +23,7 @@
 
 #include "ns3/net-device.h"
 #include "ns3/traced-callback.h"
+#include <string>
 
 namespace ns3 {
 
@@ -60,6 +61,8 @@ public:
 
   WifiNetDevice ();
   virtual ~WifiNetDevice ();
+  
+  virtual std::string GetName (void);
 
   /**
    * \param mac the mac layer to use.

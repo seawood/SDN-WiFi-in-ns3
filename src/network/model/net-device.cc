@@ -20,6 +20,7 @@
 
 #include "ns3/log.h"
 #include "net-device.h"
+#include <string>
 
 namespace ns3 {
 
@@ -39,6 +40,12 @@ TypeId NetDevice::GetTypeId (void)
 NetDevice::~NetDevice ()
 {
   NS_LOG_FUNCTION (this);
+}
+
+std::string
+NetDevice::GetName (void)
+{
+	return "NetDevice";
 }
 
 } // namespace ns3

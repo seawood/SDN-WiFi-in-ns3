@@ -33,6 +33,7 @@
 #include "csma-net-device.h"
 #include "csma-channel.h"
 #include "ns3/net-device-queue-interface.h"
+#include <string>
 
 namespace ns3 {
 
@@ -210,6 +211,13 @@ CsmaNetDevice::~CsmaNetDevice()
 {
   NS_LOG_FUNCTION_NOARGS ();
   m_queue = 0;
+}
+
+
+std::string
+CsmaNetDevice::GetName (void)
+{
+	return "CsmaNetDevice";
 }
 
 void

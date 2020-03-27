@@ -33,6 +33,7 @@
 #include "ns3/data-rate.h"
 #include "ns3/ptr.h"
 #include "ns3/mac48-address.h"
+#include <string>
 
 namespace ns3 {
 
@@ -89,6 +90,8 @@ public:
    */
   virtual ~CsmaNetDevice ();
 
+  virtual std::string GetName (void);
+  
   /**
    * Set the interframe gap used to separate packets.  The interframe gap
    * defines the minimum space required between packets sent by this device.

@@ -211,7 +211,7 @@ OFSwitch13Helper::InstallSwitch (Ptr<Node> swNode, NetDeviceContainer &swPorts)
     {
       NS_LOG_INFO (" Adding switch port " << *it <<" netdevice type: " << (*it)->GetTypeId().GetGroupName());
       openFlowDev->AddSwitchPort (*it);
-	  if ((*it)->GetTypeId().GetGroupName() == "Wifi") //is WifiNetDevice
+	  if ((*it)->GetName() == "WifiNetDevice") //is WifiNetDevice
 	  {
 		  NS_LOG_INFO ("Adding wifiNetDevice");
 		  openFlowDev -> SetIsWifi (0x00000001);

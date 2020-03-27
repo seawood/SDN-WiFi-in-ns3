@@ -31,6 +31,7 @@
 #include "wifi-mac-queue.h"
 #include "ns3/ethernet-header.h"
 #include "ns3/ethernet-trailer.h"
+#include <string>
 
 namespace ns3 {
 
@@ -82,6 +83,12 @@ WifiNetDevice::WifiNetDevice ()
 WifiNetDevice::~WifiNetDevice ()
 {
   NS_LOG_FUNCTION_NOARGS ();
+}
+
+std::string
+WifiNetDevice::GetName (void)
+{
+	return "WifiNetDevice";
 }
 
 void

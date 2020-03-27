@@ -22,6 +22,7 @@
 #define NET_DEVICE_H
 
 #include <stdint.h>
+#include <string>
 #include "ns3/callback.h"
 #include "ns3/object.h"
 #include "ns3/ptr.h"
@@ -101,6 +102,8 @@ public:
    */
   static TypeId GetTypeId (void);
   virtual ~NetDevice();
+  
+  virtual std::string GetName (void);
 
   /**
    * \param index ifIndex of the device 
