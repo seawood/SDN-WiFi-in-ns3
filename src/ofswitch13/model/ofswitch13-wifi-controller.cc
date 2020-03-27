@@ -34,10 +34,6 @@ NS_OBJECT_ENSURE_REGISTERED (OFSwitch13WifiController);
 OFSwitch13WifiController::OFSwitch13WifiController()
 {
 	NS_LOG_FUNCTION (this);
-	for (auto it = m_wifiApsMap.begin(); it != m_wifiApsMap.end(); ++it)
-	{
-		m_wifiApsAddress.push_back (it->first);
-	}
 }
 
 OFSwitch13WifiController::~OFSwitch13WifiController()
@@ -81,7 +77,7 @@ OFSwitch13WifiController::HandleExperimenterMsg (
 			Ptr<WifiAp> ap = m_wifiApsMap[swtch->GetAddress()];
 			ap->SetChannelInfo (exp->channel->m_channelNumber, exp->channel->m_frequency,
 								exp->channel->m_channelWidth);
-			GetWifiNetworkStatus()->UpdateFrequencyUsed (swtch->GetAddress(), 
+			m_wifiNetworkStatus.UpdateFrequencyUsed (swtch->GetAddress(), 
 					exp->channel->m_frequency, exp->channel->m_channelWidth);
 			break;
 		}
@@ -95,14 +91,31 @@ OFSwitch13WifiController::HandleExperimenterMsg (
 	return 0;
 }
 
+ofl_err
+OFSwitch13WifiController::HandleFeaturesReplyWifi (Ptr<const RemoteSwitch> swtch)
+{
+	NS_LOG_FUNCTION (this);
+	// update m_wifiApsMap
+	Ptr<WifiAp> ap = Create<WifiAp> (swtch->m_address);
+	m_wifiApsMap.insert (std::make_pair (swtch->m_address, ap));
+	// send experimenter msg to query for initial channel configuration
+	struct ofl_exp_wifi_msg_header msg;
+	msg.header.header.type = OFPT_EXPERIMENTER;
+	msg.header.experimenter_id = WIFI_VENDOR_ID;
+	msg.type = WIFI_EXT_CHANNEL_CONFIG_REQUEST;
+	SendToSwitch (swtch, (struct ofl_msg_header*)&msg);
+	NS_LOG_DEBUG ("send WIFI_EXT_CHANNEL_CONFIG_REQUEST to wifi ap");
+}
+
 void 
 OFSwitch13WifiController::ConfigChannelStrategy (void)
 {
-	//TODO: channel allocation algorithm
+	//TODO (xyy): channel allocation algorithm
 	NS_LOG_FUNCTION (this << "switch all to channel 13");
-	for (auto const &it : m_wifiApsAddress)
+	NS_LOG_DEBUG ("m_wifiApsMap size: " << m_wifiApsMap.size());
+	for (auto it = m_wifiApsMap.begin(); it != m_wifiApsMap.end(); ++it)
 	{
-		ConfigChannel (it, 13, 2470, 20);
+		ConfigChannel (it->first, 13, 2470, 20);
 	}
 }
 
@@ -125,7 +138,8 @@ OFSwitch13WifiController::ConfigChannel (const Address& address, const uint8_t& 
 	msg.channel = &info;
 	
 	SendToSwitch (swtch, (struct ofl_msg_header*)&msg);
-	GetWifiNetworkStatus()->UpdateFrequencyUsed (address, frequency, channelWidth);
+	NS_LOG_DEBUG ("sent WIFI_EXT_CHANNEL_SET to wifi ap");
+	m_wifiNetworkStatus.UpdateFrequencyUsed (address, frequency, channelWidth);
 }
 
 } // namespace ns3

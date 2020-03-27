@@ -35,7 +35,6 @@ OFSwitch13Controller::OFSwitch13Controller ()
 {
   NS_LOG_FUNCTION (this);
   
-  m_wifiNetworkStatus = WifiNetworkStatus ();
   m_xid = rand () & 0xffffffff;
 }
 
@@ -71,13 +70,6 @@ OFSwitch13Controller::DoDispose ()
   m_schedCommands.clear ();
 
   Application::DoDispose ();
-}
-
-Ptr<WifiNetworkStatus>
-OFSwitch13Controller::GetWifiNetworkStatus (void) const
-{
-	NS_LOG_FUNCTION (this);
-	return Create<WifiNetworkStatus>(m_wifiNetworkStatus);
 }
 
 int
@@ -392,10 +384,7 @@ OFSwitch13Controller::HandleFeaturesReply (
   swtch->m_reserved = msg->reserved;
   if (swtch->m_reserved)
   {
-	  Ptr<WifiAp> ap = Create<WifiAp> (swtch->m_address);
-	  m_wifiApsMap.insert (std::make_pair (swtch->m_address, ap));
-	  
-	  //TODO(xyy): send experimenter msg to query for channel configuration
+	  HandleFeaturesReplyWifi (swtch);
   }
   ofl_msg_free ((struct ofl_msg_header*)msg, 0);
 
@@ -523,6 +512,13 @@ OFSwitch13Controller::HandleExperimenterMsg (
 	NS_LOG_FUNCTION (this << swtch << xid);
 
 	ofl_msg_free ((struct ofl_msg_header*)msg, 0);
+	return 0;
+}
+
+ofl_err
+OFSwitch13Controller::HandleFeaturesReplyWifi (Ptr<const RemoteSwitch> swtch)
+{
+	NS_LOG_FUNCTION (this << swtch);
 	return 0;
 }
 // --- END: Handlers functions -------

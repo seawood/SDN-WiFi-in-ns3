@@ -40,13 +40,19 @@ public:
 		struct ofl_exp_wifi_msg_header *msg, Ptr<const RemoteSwitch> swtch,
 		uint32_t xid);
 	
+	virtual ofl_err HandleFeaturesReplyWifi (Ptr<const RemoteSwitch> swtch);
+	
 	void ConfigChannelStrategy (void);
 	
 private:
 	void ConfigChannel (const Address& address, const uint8_t& channelNumber,
 						const uint16_t frequency, const uint16_t& channelWidth);
 	
-	std::vector<Address> m_wifiApsAddress;
+	/** Map to store Wifi AP info by Address */
+	typedef std::map <Address, Ptr<WifiAp>> WifiApsMap_t;
+	WifiApsMap_t    m_wifiApsMap;
+	
+	WifiNetworkStatus m_wifiNetworkStatus;
 };
 
 }  //namespace ns3
