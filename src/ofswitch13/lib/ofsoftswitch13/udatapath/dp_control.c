@@ -70,10 +70,6 @@ static ofl_err
 handle_control_features_request(struct datapath *dp,
           struct ofl_msg_header *msg, const struct sender *sender) {
 
-	if (VLOG_IS_DBG_ENABLED(LOG_MODULE)) {
-        VLOG_DBG_RL(LOG_MODULE, &rl, "handle features request, dp->wifi_capability= %ul", dp->wifi_capability);
-    }
-	
     struct ofl_msg_features_reply reply =
             {{.type = OFPT_FEATURES_REPLY},
              .datapath_id  = dp->id,
