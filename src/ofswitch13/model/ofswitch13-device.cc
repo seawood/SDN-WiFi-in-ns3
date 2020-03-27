@@ -202,6 +202,7 @@ OFSwitch13Device::GetIsWifi (void) const
 void
 OFSwitch13Device::SetIsWifi (uint32_t isWifi)
 {
+	NS_LOG_FUNCTION (this << isWifi);
 	m_isWifi = isWifi;
 	m_datapath->wifi_capability = isWifi;
 }
