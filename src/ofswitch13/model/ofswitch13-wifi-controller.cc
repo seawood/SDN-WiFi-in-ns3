@@ -96,15 +96,16 @@ OFSwitch13WifiController::HandleFeaturesReplyWifi (Ptr<const RemoteSwitch> swtch
 {
 	NS_LOG_FUNCTION (this);
 	// update m_wifiApsMap
-	Ptr<WifiAp> ap = Create<WifiAp> (swtch->m_address);
-	m_wifiApsMap.insert (std::make_pair (swtch->m_address, ap));
+	Ptr<WifiAp> ap = Create<WifiAp> (swtch->GetAddress());
+	m_wifiApsMap.insert (std::make_pair (swtch->GetAddress(), ap));
 	// send experimenter msg to query for initial channel configuration
 	struct ofl_exp_wifi_msg_header msg;
 	msg.header.header.type = OFPT_EXPERIMENTER;
 	msg.header.experimenter_id = WIFI_VENDOR_ID;
 	msg.type = WIFI_EXT_CHANNEL_CONFIG_REQUEST;
-	SendToSwitch (swtch, (struct ofl_msg_header*)&msg);
+	ofl_err err = SendToSwitch (swtch, (struct ofl_msg_header*)&msg);
 	NS_LOG_DEBUG ("send WIFI_EXT_CHANNEL_CONFIG_REQUEST to wifi ap");
+	return err;
 }
 
 void 
