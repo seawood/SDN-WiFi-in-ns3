@@ -382,6 +382,7 @@ OFSwitch13Controller::HandleFeaturesReply (
   swtch->m_auxiliaryId = msg->auxiliary_id;
   swtch->m_capabilities = msg->capabilities;
   swtch->m_reserved = msg->reserved;
+  NS_LOG_DEBUG ("reserved: " << msg->reserved);
   if (swtch->m_reserved)
   {
 	  HandleFeaturesReplyWifi (swtch);
