@@ -144,6 +144,7 @@ send_packet_to_controller (struct pipeline *pl, struct packet *pkt,
 int
 send_openflow_buffer_to_remote (struct ofpbuf *buffer, struct remote *remote)
 {
+	NS_LOG_FUNCTION(this << ":overide version");
   return OFSwitch13Device::SendOpenflowBufferToRemote (buffer, remote);
 }
 

@@ -442,6 +442,7 @@ static
 #endif
 int
 send_openflow_buffer_to_remote(struct ofpbuf *buffer, struct remote *remote) {
+	VLOG_DBG_RL(LOG_MODULE, &rl, "send_openflow_buffer_to_remote: origin version");
     struct rconn* rconn = remote->rconn;
     int retval;
     if (buffer->conn_id == PTIN_CONNECTION &&

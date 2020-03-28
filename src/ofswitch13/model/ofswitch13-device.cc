@@ -553,6 +553,7 @@ int
 OFSwitch13Device::SendOpenflowBufferToRemote (struct ofpbuf *buffer,
                                               struct remote *remote)
 {
+  NS_LOG_FUNCTION(this);
   Ptr<OFSwitch13Device> dev = OFSwitch13Device::GetDevice (remote->dp->id);
   Ptr<Packet> packet = ofs::PacketFromBuffer (buffer);
   Ptr<RemoteController> remoteCtrl = dev->GetRemoteController (remote);
