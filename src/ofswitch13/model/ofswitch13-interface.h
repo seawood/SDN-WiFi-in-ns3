@@ -40,7 +40,6 @@
 #include <ns3/socket.h>
 
 #include <boost/static_assert.hpp>
-#include "openflow/openflow.h"
 
 extern "C"
 {
@@ -73,6 +72,7 @@ extern "C"
 #include "oflib/oxm-match.h"
 	
 #include "openflow/wifi-ext.h"
+#include "openflow/openflow.h"
 #include "oflib-exp/ofl-exp-wifi.h"
 
 #include "lib/ofpbuf.h"

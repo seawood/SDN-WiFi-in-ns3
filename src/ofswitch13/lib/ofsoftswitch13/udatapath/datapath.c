@@ -96,13 +96,13 @@ static void remote_destroy(struct remote *);
 
 
 /* Callbacks for processing experimenter messages in OFLib. */
-static struct ofl_exp_msg dp_exp_msg =
+struct ofl_exp_msg dp_exp_msg =
         {.pack      = ofl_exp_msg_pack,
          .unpack    = ofl_exp_msg_unpack,
          .free      = ofl_exp_msg_free,
          .to_string = ofl_exp_msg_to_string};
 
-static struct ofl_exp dp_exp =
+struct ofl_exp dp_exp =
         {.act   = NULL,
          .inst  = NULL,
          .match = NULL,
