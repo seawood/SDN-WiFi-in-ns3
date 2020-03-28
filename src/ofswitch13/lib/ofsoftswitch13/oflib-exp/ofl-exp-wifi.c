@@ -79,6 +79,7 @@ ofl_exp_wifi_msg_unpack(struct ofp_header *oh, size_t *len,
 				dst->header.header.experimenter_id = ntohl(exp->vendor);
 				dst->header.type = ntohl(exp->subtype);
 				(*msg) = (struct ofl_msg_experimenter*)dst;
+				*len -= sizeof(struct wifi_extension_header);
 				return 0;
 			}
 			case (WIFI_EXT_CHANNEL_CONFIG_REPLY):
@@ -98,6 +99,7 @@ ofl_exp_wifi_msg_unpack(struct ofp_header *oh, size_t *len,
 				dst->channel->m_frequency = ntohs(src->m_frequency);
 				dst->channel->m_channelWidth = ntohs(src->m_channelWidth);
 				(*msg) = (struct ofl_msg_experimenter*)dst;
+				*len -= sizeof(struct wifi_channel_header);
 				return 0;	
 			}
 			default: {
