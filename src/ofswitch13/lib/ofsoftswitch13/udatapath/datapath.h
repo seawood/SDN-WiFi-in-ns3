@@ -49,6 +49,7 @@
 #include "oflib/ofl.h"
 #include "oflib/ofl-messages.h"
 #include "oflib/ofl-structs.h"
+#include "oflib-exp/ofl-exp.h"
 #include "oflib-exp/ofl-exp-nicira.h"
 #include "group_table.h"
 #include "timeval.h"
