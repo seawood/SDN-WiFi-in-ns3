@@ -22,7 +22,6 @@
 #include <ns3/uinteger.h>
 #include <ns3/tcp-socket-factory.h>
 #include "ofswitch13-controller.h"
-#include "oflib-exp/ofl-exp-wifi.h"
 
 namespace ns3 {
 

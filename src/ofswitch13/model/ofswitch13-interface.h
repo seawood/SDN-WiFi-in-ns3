@@ -71,6 +71,9 @@ extern "C"
 #include "oflib/ofl-print.h"
 #include "oflib/ofl-structs.h"
 #include "oflib/oxm-match.h"
+	
+#include "openflow/wifi-ext.h"
+#include "oflib-exp/ofl-exp-wifi.h"
 
 #include "lib/ofpbuf.h"
 #include "lib/timeval.h"

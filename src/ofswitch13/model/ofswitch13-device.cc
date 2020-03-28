@@ -23,7 +23,6 @@
 #include <ns3/ptr.h>
 #include "ofswitch13-device.h"
 #include "ofswitch13-port.h"
-#include "datapath.c"
 
 #undef NS_LOG_APPEND_CONTEXT
 #define NS_LOG_APPEND_CONTEXT                 \

@@ -21,8 +21,7 @@
 #include "ofswitch13-interface.h"
 #include "ofswitch13-device.h"
 #include "ofswitch13-controller.h"
-#include "openflow/wifi-ext.h"
-#include "oflib-exp/ofl-exp-wifi.h"
+
 
 NS_LOG_COMPONENT_DEFINE ("OFSwitch13Interface");
 
@@ -90,7 +89,7 @@ PacketFromMsg (struct ofl_msg_header *msg, uint32_t xid)
   struct ofpbuf *buffer;
 
   buffer = ofpbuf_new (0);
-  error = ofl_msg_pack (msg, xid, &buf, &buf_size, &dp_exp);
+  error = ofl_msg_pack (msg, xid, &buf, &buf_size, &dp_exp); //TODO:dp_exp
   if (!error)
     {
       ofpbuf_use (buffer, buf, buf_size);
