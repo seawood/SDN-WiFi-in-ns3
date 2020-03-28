@@ -70,7 +70,7 @@ ofl_exp_wifi_msg_unpack(struct ofp_header *oh, size_t *len,
 	}
 	
 	exp = (struct wifi_extension_header*)oh;
-	if (ntohl(exp->vendor == WIFI_VENDOR_ID)) {
+	if (ntohl(exp->vendor) == WIFI_VENDOR_ID) {
 		switch (exp->subtype) {
 			case (WIFI_EXT_CHANNEL_CONFIG_REQUEST): {
 				struct ofl_exp_wifi_msg_channel_req* dst;
