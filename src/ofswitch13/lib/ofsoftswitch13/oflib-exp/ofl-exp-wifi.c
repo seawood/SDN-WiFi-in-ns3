@@ -70,8 +70,9 @@ ofl_exp_wifi_msg_unpack(struct ofp_header *oh, size_t *len,
 	}
 	
 	exp = (struct wifi_extension_header*)oh;
+	OFL_LOG_WARN(LOG_MODULE, "exp->vendor: %ul", ntohl(exp->vendor));
 	if (ntohl(exp->vendor) == WIFI_VENDOR_ID) {
-		switch (exp->subtype) {
+		switch (ntohl(exp->subtype)) {
 			case (WIFI_EXT_CHANNEL_CONFIG_REQUEST): {
 				struct ofl_exp_wifi_msg_channel_req* dst;
 				dst = (struct ofl_exp_wifi_msg_channel_req*)malloc(sizeof(struct ofl_exp_wifi_msg_channel_req));
@@ -93,9 +94,9 @@ ofl_exp_wifi_msg_unpack(struct ofp_header *oh, size_t *len,
 				dst = (struct ofl_exp_wifi_msg_channel*)malloc(sizeof(struct ofl_exp_wifi_msg_channel));
 				dst->header.header.experimenter_id = ntohl(exp->vendor);
 				dst->header.type = ntohl(exp->subtype);
-				dst->channel->m_channelNumber = src->m_channelNumber;
-				dst->channel->m_frequency = src->m_frequency;
-				dst->channel->m_channelWidth = src->m_channelWidth;
+				dst->channel->m_channelNumber = ntohs(src->m_channelNumber);
+				dst->channel->m_frequency = ntohs(src->m_frequency);
+				dst->channel->m_channelWidth = ntohs(src->m_channelWidth);
 				(*msg) = (struct ofl_msg_experimenter*)dst;
 				return 0;	
 			}
