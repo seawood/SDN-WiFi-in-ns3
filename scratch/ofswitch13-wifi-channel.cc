@@ -51,7 +51,7 @@ main (int argc, char *argv[])
   if (verbose)
     {
       OFSwitch13Helper::EnableDatapathLogs ();
-      //LogComponentEnable ("OFSwitch13Interface", LOG_LEVEL_ALL);
+      LogComponentEnable ("OFSwitch13Interface", LOG_LEVEL_ALL);
       LogComponentEnable ("OFSwitch13Device", LOG_LEVEL_ALL);
       //LogComponentEnable ("OFSwitch13Port", LOG_LEVEL_ALL);
       //LogComponentEnable ("OFSwitch13Queue", LOG_LEVEL_ALL);

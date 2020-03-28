@@ -758,7 +758,6 @@ OFSwitch13Device::DatapathNew ()
   list_init (&dp->remotes);
   
   dp->wifi_capability = m_isWifi;
-  NS_LOG_DEBUG ("m_isWifi: " << m_isWifi);
 
   // unused
   dp->generation_id = -1;
