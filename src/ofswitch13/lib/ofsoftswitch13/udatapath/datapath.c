@@ -95,20 +95,6 @@ static void remote_destroy(struct remote *);
 #define PTIN_CONNECTION 1
 
 
-/* Callbacks for processing experimenter messages in OFLib. */
-struct ofl_exp_msg dp_exp_msg =
-        {.pack      = ofl_exp_msg_pack,
-         .unpack    = ofl_exp_msg_unpack,
-         .free      = ofl_exp_msg_free,
-         .to_string = ofl_exp_msg_to_string};
-
-struct ofl_exp dp_exp =
-        {.act   = NULL,
-         .inst  = NULL,
-         .match = NULL,
-         .stats = NULL,
-         .msg   = &dp_exp_msg};
-
 /* Generates and returns a random datapath id. */
 static uint64_t
 gen_datapath_id(void) {
