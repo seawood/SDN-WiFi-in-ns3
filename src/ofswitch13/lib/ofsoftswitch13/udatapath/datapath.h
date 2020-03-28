@@ -230,8 +230,8 @@ dp_send_message(struct datapath *dp, struct ofl_msg_header *msg,
                      const struct sender *sender);
 
 /* Callbacks for processing experimenter messages in OFLib. */
-struct ofl_exp_msg dp_exp_msg;
-struct ofl_exp dp_exp;
+extern struct ofl_exp_msg dp_exp_msg;
+extern struct ofl_exp dp_exp;
 
 #if defined (__GNUC__) && defined (NS3_OFSWITCH13)
 

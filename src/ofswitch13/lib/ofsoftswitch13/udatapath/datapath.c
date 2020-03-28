@@ -94,13 +94,13 @@ static void remote_destroy(struct remote *);
 #define MAIN_CONNECTION 0
 #define PTIN_CONNECTION 1
 
-dp_exp_msg =
+struct ofl_exp_msg dp_exp_msg =
 	{.pack      = ofl_exp_msg_pack,
      .unpack    = ofl_exp_msg_unpack,
 	 .free      = ofl_exp_msg_free,
 	 .to_string = ofl_exp_msg_to_string};
 
-dp_exp =
+struct ofl_exp dp_exp =
 		{.act   = NULL,
          .inst  = NULL,
 		 .match = NULL,
@@ -113,7 +113,6 @@ gen_datapath_id(void) {
     eth_addr_random(ea);
     return eth_addr_to_uint64(ea);
 }
-
 
 struct datapath *
 dp_new(void) {
