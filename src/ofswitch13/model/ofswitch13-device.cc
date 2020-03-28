@@ -23,6 +23,7 @@
 #include <ns3/ptr.h>
 #include "ofswitch13-device.h"
 #include "ofswitch13-port.h"
+#include "datapath.c"
 
 #undef NS_LOG_APPEND_CONTEXT
 #define NS_LOG_APPEND_CONTEXT                 \
@@ -784,7 +785,7 @@ OFSwitch13Device::DatapathNew ()
   list_init (&dp->port_list);
   dp->ports_num = 0;
   dp->max_queues = NETDEV_MAX_QUEUES;
-  dp->exp = 0;
+  dp->exp = &dp_exp;
 
   dp->config.flags = OFPC_FRAG_NORMAL; // IP fragments with no special handling
   dp->config.miss_send_len = OFP_DEFAULT_MISS_SEND_LEN; // 128 bytes

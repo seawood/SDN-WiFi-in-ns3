@@ -67,6 +67,7 @@
 #include "vconn.h"
 
 #if defined (__GNUC__) && defined (NS3_OFSWITCH13)
+    #pragma message "define weak function: send_openflow_buffer_to_remote"
     // Define send_openflow_buffer_to_remote functions as weak, 
     // so ns3 can override it and send the buffer over simulated channel. 
     #pragma weak send_openflow_buffer_to_remote
