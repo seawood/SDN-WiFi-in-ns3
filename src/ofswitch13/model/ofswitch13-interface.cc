@@ -185,6 +185,7 @@ dp_handle_wifi_config_request(struct datapath *dp, struct ofl_exp_wifi_msg_chann
 		struct ofl_exp_wifi_msg_channel reply;
 		reply.header.header.header.type = OFPT_EXPERIMENTER;
 		reply.header.header.experimenter_id = WIFI_VENDOR_ID;
+		reply.header.type = WIFI_EXT_CHANNEL_CONFIG_REPLY;
 		reply.channel = (struct ofl_channel_info*)malloc(sizeof(struct ofl_channel_info));
 		Ptr<WifiPhy> phy = wifiDev->GetPhy();
 		reply.channel->m_channelNumber = phy->GetChannelNumber();
