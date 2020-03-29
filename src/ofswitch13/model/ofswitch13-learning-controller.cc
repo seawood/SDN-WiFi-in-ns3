@@ -184,7 +184,7 @@ OFSwitch13LearningController::HandlePacketIn (
     }
 
   // All handlers must free the message when everything is ok
-  ofl_msg_free ((struct ofl_msg_header*)msg, 0);
+  ofl_msg_free ((struct ofl_msg_header*)msg, &dp_exp);
   return 0;
 }
 
@@ -214,7 +214,7 @@ OFSwitch13LearningController::HandleFlowRemoved (
     }
 
   // All handlers must free the message when everything is ok
-  ofl_msg_free_flow_removed (msg, true, 0);
+  ofl_msg_free_flow_removed (msg, true, &dp_exp);
   return 0;
 }
 

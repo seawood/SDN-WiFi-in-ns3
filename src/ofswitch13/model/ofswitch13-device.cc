@@ -1152,7 +1152,7 @@ OFSwitch13Device::ReplyWithErrorMessage (ofl_err error, struct ofpbuf *buffer,
   err.data_length = buffer->size;
   err.data = (uint8_t*)buffer->data;
 
-  char *msgStr = ofl_msg_to_string ((struct ofl_msg_header*)&err, 0);
+  char *msgStr = ofl_msg_to_string ((struct ofl_msg_header*)&err, m_datapath->exp);
   NS_LOG_ERROR ("Error processing OpenFlow message. Reply with " << msgStr);
   free (msgStr);
 
