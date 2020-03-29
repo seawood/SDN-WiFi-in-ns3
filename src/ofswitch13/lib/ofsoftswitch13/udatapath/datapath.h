@@ -79,8 +79,6 @@ struct datapath {
     char  *serial_num;
 
     uint64_t  id;               /* Unique identifier for this datapath. */
-	
-	uint32_t wifi_capability;    /* flag of wifi support*/
 
     struct list remotes;        /* Remote connections. */
 
@@ -127,6 +125,7 @@ struct datapath {
 #ifdef NS3_OFSWITCH13
     // Effective number of pipeline tables.
     size_t pipeline_num_tables;
+	uint32_t wifi_capability;    /* flag of wifi support*/
 
     // Callbacks to notify the simulator when cloning or destroying a packet.
     void (*pkt_clone_cb) (struct packet *pkt, struct packet *clone);
