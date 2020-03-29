@@ -70,7 +70,7 @@ ofl_exp_wifi_msg_unpack(struct ofp_header *oh, size_t *len,
 	}
 	
 	exp = (struct wifi_extension_header*)oh;
-	OFL_LOG_WARN(LOG_MODULE, "exp->vendor: %ul", ntohl(exp->vendor));
+	OFL_LOG_DBG(LOG_MODULE, "exp->vendor:: %x", ntohl(exp->vendor));
 	if (ntohl(exp->vendor) == WIFI_VENDOR_ID) {
 		switch (ntohl(exp->subtype)) {
 			case (WIFI_EXT_CHANNEL_CONFIG_REQUEST): {
@@ -80,6 +80,7 @@ ofl_exp_wifi_msg_unpack(struct ofp_header *oh, size_t *len,
 				dst->header.type = ntohl(exp->subtype);
 				(*msg) = (struct ofl_msg_experimenter*)dst;
 				*len -= sizeof(struct wifi_extension_header);
+				OFL_LOG_DBG(LOG_MODULE, "unpack WIFI_EXT_CHANNEL_CONFIG");
 				return 0;
 			}
 			case (WIFI_EXT_CHANNEL_CONFIG_REPLY):
