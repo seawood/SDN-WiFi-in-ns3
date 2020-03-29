@@ -606,7 +606,7 @@ OFSwitch13Controller::ReceiveFromSwitch (Ptr<Packet> packet, Address from)
 
   // Get the openflow buffer, unpack the message and send to message handler
   struct ofpbuf *buffer = ofs::BufferFromPacket (packet, packet->GetSize ());
-  error = ofl_msg_unpack ((uint8_t*)buffer->data, buffer->size, &msg, &xid, 0);
+  error = ofl_msg_unpack ((uint8_t*)buffer->data, buffer->size, &msg, &xid, &dp_exp);
 
   if (!error)
     {

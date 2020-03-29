@@ -213,7 +213,7 @@ OFSwitch13Device::GetWifiNetDevice (const uint64_t& dpId)
 	Ptr<OFSwitch13Device> dev = OFSwitch13Device::GetDevice(dpId);
 	Ptr<NetDevice> tmp;
 	Ptr<WifiNetDevice> result;
-	for (uint32_t i = 0; i < dev->GetNSwitchPorts(); ++i)
+	for (uint32_t i = 1; i <= dev->GetNSwitchPorts(); ++i)
 	{
 		tmp = dev->GetSwitchPort(i)->GetPortDevice();
 		if (tmp->GetName() == "WifiNetDevice")
