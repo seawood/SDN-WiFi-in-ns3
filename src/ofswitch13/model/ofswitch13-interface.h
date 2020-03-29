@@ -64,6 +64,7 @@ extern "C"
 #include "udatapath/packet.h"
 #include "udatapath/packet_handle_std.h"
 #include "udatapath/pipeline.h"
+#include "udatapath/dp_exp_wifi.h"
 
 #include "oflib/ofl-actions.h"
 #include "oflib/ofl-messages.h"

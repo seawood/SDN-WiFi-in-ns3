@@ -14,6 +14,7 @@
 #if defined (__GNUC__) && defined (NS3_OFSWITCH13)
 	// Define these functions as weak, 
 	// so ns3 can override it and send the buffer over switch port.
+	#pragma message "weak function: wifi"
 	#pragma weak dp_handle_wifi_config_request
 	#pragma weak dp_handle_wifi_channel_set
 #endif
