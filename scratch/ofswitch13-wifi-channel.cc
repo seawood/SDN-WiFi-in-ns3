@@ -64,6 +64,7 @@ main (int argc, char *argv[])
       //LogComponentEnable ("CsmaNetDevice", LOG_LEVEL_ALL);
       //LogComponentEnable ("Simulator", LOG_LEVEL_ALL);
 	  LogComponentEnable ("OFSwitch13WifiController", LOG_LEVEL_ALL);
+	  LogComponentEnable ("WifiElements", LOG_LEVEL_ALL);
     }
 	
 
