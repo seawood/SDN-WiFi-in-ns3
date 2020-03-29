@@ -68,6 +68,7 @@ WifiNetworkStatus::InitializeFrequencyUnused ()
 			m_frequencyUnused.insert (it.second);
 		}
 	}
+	NS_LOG_INFO("m_frequencyUnused.size():" << m_frequencyUnused.size());
 }
 void
 WifiNetworkStatus::UpdateFrequencyUsed (Address address, 
@@ -77,13 +78,15 @@ WifiNetworkStatus::UpdateFrequencyUsed (Address address,
 	FrequencyWidthPair pair(frequency, width);
 	if (m_frequencyUsed.find (pair) != m_frequencyUsed.end())
 	{
+		NS_LOG_INFO("find in m_frequencyUsed");
 		m_frequencyUsed[pair].insert(address);
 	}
 	else
 	{
 		std::set<Address> addr;
 		addr.insert(address);
-		m_frequencyUsed[pair] = addr;
+		m_frequencyUsed.insert(std::make_pair(pair,addr));
+		//m_frequencyUsed[pair] = addr;
 		m_frequencyUnused.erase (pair);
 	}
 	

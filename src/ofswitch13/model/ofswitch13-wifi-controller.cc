@@ -31,6 +31,7 @@ NS_OBJECT_ENSURE_REGISTERED (OFSwitch13WifiController);
 OFSwitch13WifiController::OFSwitch13WifiController()
 {
 	NS_LOG_FUNCTION (this);
+	m_wifiNetworkStatus = Create<WifiNetworkStatus>();
 }
 
 OFSwitch13WifiController::~OFSwitch13WifiController()
@@ -74,8 +75,9 @@ OFSwitch13WifiController::HandleExperimenterMsg (
 			Ptr<WifiAp> ap = m_wifiApsMap[swtch->GetAddress()];
 			ap->SetChannelInfo (exp->channel->m_channelNumber, exp->channel->m_frequency,
 								exp->channel->m_channelWidth);
-			m_wifiNetworkStatus.UpdateFrequencyUsed (swtch->GetAddress(), 
+			m_wifiNetworkStatus->UpdateFrequencyUsed (swtch->GetAddress(), 
 					exp->channel->m_frequency, exp->channel->m_channelWidth);
+			ofl_msg_free((struct ofl_msg_header*)msg, &dp_exp);
 			break;
 		}
 		default:
@@ -137,7 +139,7 @@ OFSwitch13WifiController::ConfigChannel (const Address& address, const uint8_t& 
 	
 	SendToSwitch (swtch, (struct ofl_msg_header*)&msg);
 	NS_LOG_DEBUG ("sent WIFI_EXT_CHANNEL_SET to wifi ap");
-	m_wifiNetworkStatus.UpdateFrequencyUsed (address, frequency, channelWidth);
+	m_wifiNetworkStatus->UpdateFrequencyUsed (address, frequency, channelWidth);
 }
 
 } // namespace ns3

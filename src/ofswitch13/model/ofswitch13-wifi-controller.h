@@ -51,7 +51,7 @@ private:
 	typedef std::map <Address, Ptr<WifiAp>> WifiApsMap_t;
 	WifiApsMap_t    m_wifiApsMap;
 	
-	WifiNetworkStatus m_wifiNetworkStatus;
+	Ptr<WifiNetworkStatus> m_wifiNetworkStatus;
 };
 
 }  //namespace ns3

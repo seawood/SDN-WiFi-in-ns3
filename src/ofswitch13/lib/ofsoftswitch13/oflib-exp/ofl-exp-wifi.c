@@ -91,13 +91,20 @@ ofl_exp_wifi_msg_unpack(struct ofp_header *oh, size_t *len,
 					OFL_LOG_WARN(LOG_MODULE, "Received  message WIFI_EXT_CHANNEL_CONFIG_REPLY/WIFI_EXT_CHANNEL_SET has invalid length (%zu).", *len);
                     return ofl_error(OFPET_BAD_REQUEST, OFPBRC_BAD_LEN);
 				}
+				OFL_LOG_WARN(LOG_MODULE, "unpack WIFI_EXT_CHANNEL or CONFIG");
 				src = (struct wifi_channel_header*)exp;
 				dst = (struct ofl_exp_wifi_msg_channel*)malloc(sizeof(struct ofl_exp_wifi_msg_channel));
 				dst->header.header.experimenter_id = ntohl(exp->vendor);
 				dst->header.type = ntohl(exp->subtype);
+				OFL_LOG_WARN(LOG_MODULE, "m");
+				dst->channel = (struct ofl_channel_info*)malloc(sizeof(struct ofl_channel_info));
+				OFL_LOG_WARN(LOG_MODULE, "a");
 				dst->channel->m_channelNumber = ntohs(src->m_channelNumber);
+				OFL_LOG_WARN(LOG_MODULE, "b");
 				dst->channel->m_frequency = ntohs(src->m_frequency);
+				OFL_LOG_WARN(LOG_MODULE, "c");
 				dst->channel->m_channelWidth = ntohs(src->m_channelWidth);
+				OFL_LOG_WARN(LOG_MODULE, "dst unpack");
 				(*msg) = (struct ofl_msg_experimenter*)dst;
 				*len -= sizeof(struct wifi_channel_header);
 				return 0;	
