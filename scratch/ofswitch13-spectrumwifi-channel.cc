@@ -77,8 +77,8 @@ int
 main (int argc, char *argv[])
 {
   uint16_t simTime = 10;
-  bool verbose = true;
-  bool trace = true;
+  bool verbose = false;
+  bool trace = false;
   std::string errorModelType = "ns3::NistErrorRateModel";
   double distance = 50;
 
@@ -88,6 +88,7 @@ main (int argc, char *argv[])
   cmd.AddValue ("verbose", "Enable verbose output", verbose);
   cmd.AddValue ("trace", "Enable datapath stats and pcap traces", trace);
   cmd.AddValue ("errorModelType", "select ns3::NistErrorRateModel or ns3::YansErrorRateModel", errorModelType);
+  cmd.AddValue ("distance", "distance between nodes", distance);
   cmd.Parse (argc, argv);
 
   if (verbose)
@@ -154,9 +155,8 @@ main (int argc, char *argv[])
 	  = CreateObject<MultiModelSpectrumChannel> ();
   Ptr<FriisPropagationLossModel> lossModel
 	  = CreateObject<FriisPropagationLossModel> ();
-  lossModel->SetFrequency (5.180e9);
+  //lossModel->SetFrequency (5.180e9);
   spectrumChannel->AddPropagationLossModel (lossModel);
-
   Ptr<ConstantSpeedPropagationDelayModel> delayModel
 	  = CreateObject<ConstantSpeedPropagationDelayModel> ();
   spectrumChannel->SetPropagationDelayModel (delayModel);
@@ -165,14 +165,14 @@ main (int argc, char *argv[])
   SpectrumWifiPhyHelper spectrumPhy = SpectrumWifiPhyHelper::Default ();
   spectrumPhy.SetChannel (spectrumChannel);
   spectrumPhy.SetErrorRateModel (errorModelType);
-  spectrumPhy.Set ("Frequency", UintegerValue (5180));
+  //spectrumPhy.Set ("Frequency", UintegerValue (5180));
   spectrumPhy.Set ("TxPowerStart", DoubleValue (1)); // dBm  (1.26 mW)
-  spectrumPhy.Set ("TxPowerEnd", DoubleValue (1));
+  spectrumPhy.Set ("TxPowerEnd", DoubleValue (4));
   spectrumPhy.Set ("ShortGuardEnabled", BooleanValue (false));
-  spectrumPhy.Set ("ChannelWidth", UintegerValue (20));
+  //spectrumPhy.Set ("ChannelWidth", UintegerValue (20));
 
   WifiHelper wifi;
-  wifi.SetStandard (WIFI_PHY_STANDARD_80211n_5GHZ);
+  //wifi.SetStandard (WIFI_PHY_STANDARD_80211n_5GHZ);
   StringValue DataRate = StringValue ("HtMcs0");
   wifi.SetRemoteStationManager ("ns3::ConstantRateWifiManager","DataMode", DataRate,
 								"ControlMode", DataRate);
