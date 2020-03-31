@@ -77,8 +77,8 @@ int
 main (int argc, char *argv[])
 {
   uint16_t simTime = 10;
-  bool verbose = false;
-  bool trace = false;
+  bool verbose = true;
+  bool trace = true;
   std::string errorModelType = "ns3::NistErrorRateModel";
   double distance = 50;
 
@@ -167,15 +167,15 @@ main (int argc, char *argv[])
   spectrumPhy.SetErrorRateModel (errorModelType);
   //spectrumPhy.Set ("Frequency", UintegerValue (5180));
   spectrumPhy.Set ("TxPowerStart", DoubleValue (1)); // dBm  (1.26 mW)
-  spectrumPhy.Set ("TxPowerEnd", DoubleValue (4));
+  spectrumPhy.Set ("TxPowerEnd", DoubleValue (1));
   spectrumPhy.Set ("ShortGuardEnabled", BooleanValue (false));
   //spectrumPhy.Set ("ChannelWidth", UintegerValue (20));
 
   WifiHelper wifi;
   //wifi.SetStandard (WIFI_PHY_STANDARD_80211n_5GHZ);
-  StringValue DataRate = StringValue ("HtMcs0");
-  wifi.SetRemoteStationManager ("ns3::ConstantRateWifiManager","DataMode", DataRate,
-								"ControlMode", DataRate);
+  //StringValue DataRate = StringValue ("HtMcs0");
+  //wifi.SetRemoteStationManager ("ns3::ConstantRateWifiManager","DataMode", DataRate,
+								//"ControlMode", DataRate);
   //mac configuration
   WifiMacHelper wifiMac;
   Ssid ssid1 = Ssid ("wifi1");
@@ -261,8 +261,8 @@ main (int argc, char *argv[])
       spectrumPhy.EnablePcap ("sta", staDevs);
     }
 	
-	//Simulator::Schedule (Seconds (6), &OFSwitch13WifiController::ConfigChannelStrategy,
-				//		wifiControl);
+  Simulator::Schedule (Seconds (6), &OFSwitch13WifiController::ConfigChannelStrategy,
+				wifiControl);
 
 
   // Run the simulation
