@@ -63,7 +63,8 @@ void MonitorSpectrumRx(bool signalType,
 {
 	if (record.find(senderNodeId) != record.end())
 	{
-		record[senderNodeId] += ((rxPower - record[senderNodeId].second)/record[senderNodeId].first)
+		record[senderNodeId].first++;
+		record[senderNodeId].second += ((rxPower - record[senderNodeId].second)/record[senderNodeId].first);
 	}
 	else
 	{
@@ -79,7 +80,7 @@ main (int argc, char *argv[])
   bool verbose = true;
   bool trace = true;
   std::string errorModelType = "ns3::NistErrorRateModel";
-  uint16_t index = 256;
+  double distance = 50;
 
   // Configure command line parameters
   CommandLine cmd;
@@ -87,17 +88,8 @@ main (int argc, char *argv[])
   cmd.AddValue ("verbose", "Enable verbose output", verbose);
   cmd.AddValue ("trace", "Enable datapath stats and pcap traces", trace);
   cmd.AddValue ("errorModelType", "select ns3::NistErrorRateModel or ns3::YansErrorRateModel", errorModelType);
-  cmd.AddValue ("index", "restrict index to single value between 0 and 31", index);
   cmd.Parse (argc, argv);
 
-  uint16_t startIndex = 0;
-  uint16_t stopIndex = 31;
-  if (index < 32)
-  {
-      startIndex = index;
-      stopIndex = index;
-  }
-  
   if (verbose)
     {
       OFSwitch13Helper::EnableDatapathLogs ();
@@ -113,8 +105,10 @@ main (int argc, char *argv[])
       LogComponentEnable ("WifiNetDevice", LOG_LEVEL_ALL);
       //LogComponentEnable ("CsmaNetDevice", LOG_LEVEL_ALL);
       //LogComponentEnable ("Simulator", LOG_LEVEL_ALL);
-	  LogComponentEnable ("OFSwitch13WifiController", LOG_LEVEL_ALL);
-	  LogComponentEnable ("WifiElements", LOG_LEVEL_ALL);
+      LogComponentEnable ("OFSwitch13WifiController", LOG_LEVEL_ALL);
+      LogComponentEnable ("WifiElements", LOG_LEVEL_ALL);
+      LogComponentEnable ("WifiPhy", LOG_LEVEL_ALL);
+      LogComponentEnable ("SpectrumWifiPhy", LOG_LEVEL_ALL);
     }
 	
 
@@ -169,6 +163,7 @@ main (int argc, char *argv[])
   
   // spectrum phy configuration
   SpectrumWifiPhyHelper spectrumPhy = SpectrumWifiPhyHelper::Default ();
+  spectrumPhy.SetChannel (spectrumChannel);
   spectrumPhy.SetErrorRateModel (errorModelType);
   spectrumPhy.Set ("Frequency", UintegerValue (5180));
   spectrumPhy.Set ("TxPowerStart", DoubleValue (1)); // dBm  (1.26 mW)
@@ -177,6 +172,7 @@ main (int argc, char *argv[])
   spectrumPhy.Set ("ChannelWidth", UintegerValue (20));
 
   WifiHelper wifi;
+  wifi.SetStandard (WIFI_PHY_STANDARD_80211n_5GHZ);
   StringValue DataRate = StringValue ("HtMcs0");
   wifi.SetRemoteStationManager ("ns3::ConstantRateWifiManager","DataMode", DataRate,
 								"ControlMode", DataRate);
@@ -204,6 +200,11 @@ main (int argc, char *argv[])
   
   //mobility configuration
   MobilityHelper mobility;
+  Ptr<ListPositionAllocator> positionAlloc = CreateObject<ListPositionAllocator> ();
+  positionAlloc->Add (Vector (0.0, 0.0, 0.0));
+  positionAlloc->Add (Vector (distance, 0.0, 0.0));
+  positionAlloc->Add (Vector (0.0, distance, 0.0));
+  positionAlloc->Add (Vector (distance, distance, 0.0));
   mobility.Install (aps);
   mobility.Install (stas);
 
@@ -240,12 +241,12 @@ main (int argc, char *argv[])
   ApplicationContainer pingApps = pingHelper.Install (stas.Get (0));
   pingApps.Start (Seconds (1));
 
-  Config::ConnectWithoutContext ("/NodeList/"+to_string(aps.Get(0).GetId())+
-								 "/DeviceList/"+to_sring(apWifiDevs.Get(0).GetIfIndex())+
+  Config::ConnectWithoutContext ("/NodeList/"+std::to_string(aps.Get(0)->GetId())+
+								 "/DeviceList/"+std::to_string(apWifiDevs.Get(0)->GetIfIndex())+
 								 "/Phy/MonitorSnifferRx",
 								 MakeCallback (&MonitorSniffRx));
-  Config::ConnectWithoutContext ("/NodeList/"+to_string(aps.Get(0).GetId())+
-								 "/DeviceList/"+to_sring(apWifiDevs.Get(0).GetIfIndex())+
+  Config::ConnectWithoutContext ("/NodeList/"+std::to_string(aps.Get(0)->GetId())+
+								 "/DeviceList/"+std::to_string(apWifiDevs.Get(0)->GetIfIndex())+
 								 "/$ns3::WifiNetDevice/Phy/$ns3::SpectrumWifiPhy/SignalArrival", 
 								 MakeCallback (&MonitorSpectrumRx));
   
@@ -256,8 +257,8 @@ main (int argc, char *argv[])
       of13Helper->EnableDatapathStats ("switch-stats");
       csmaHelper.EnablePcap ("switch", switchPorts, true);
       csmaHelper.EnablePcap ("apCsma", apDevices);
-	  wifiPhy.EnablePcap ("apWifi", apWifiDevs);
-	  wifiPhy.EnablePcap ("sta", staDevs);
+      spectrumPhy.EnablePcap ("apWifi", apWifiDevs);
+      spectrumPhy.EnablePcap ("sta", staDevs);
     }
 	
 	//Simulator::Schedule (Seconds (6), &OFSwitch13WifiController::ConfigChannelStrategy,
@@ -278,7 +279,7 @@ main (int argc, char *argv[])
             std::setw (12) << g_noiseDbmAvg <<
             std::setw (12) << (g_signalDbmAvg - g_noiseDbmAvg) <<
             std::endl;
-  std::cout <<"*******"<<endl;
+  std::cout <<"*******"<< std::endl;
   std::cout << std::setw (12) << "nodeId" <<
             std::setw (12) << "samples" <<
             std::setw (12) << "rxPower" <<
@@ -287,7 +288,7 @@ main (int argc, char *argv[])
   {
 	  std::cout << std::setw (12) << item.first <<
 				std::setw (12) << item.second.first <<
-				std::setw (12) <<item.second.first <<
+				std::setw (12) <<item.second.second <<
 				std::endl;
   }
   
