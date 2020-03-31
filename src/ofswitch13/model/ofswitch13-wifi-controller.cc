@@ -115,7 +115,7 @@ OFSwitch13WifiController::ConfigChannelStrategy (void)
 	NS_LOG_DEBUG ("m_wifiApsMap size: " << m_wifiApsMap.size());
 	for (auto it = m_wifiApsMap.begin(); it != m_wifiApsMap.end(); ++it)
 	{
-		ConfigChannel (it->first, 13, 2470, 20);
+		ConfigChannel (it->first, 13, 2472, 20);
 	}
 }
 

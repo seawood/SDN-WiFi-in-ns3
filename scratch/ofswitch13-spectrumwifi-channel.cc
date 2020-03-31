@@ -179,20 +179,24 @@ main (int argc, char *argv[])
   //mac configuration
   WifiMacHelper wifiMac;
   Ssid ssid1 = Ssid ("wifi1");
+  
+  //ap0 and sta0 use 2412MHz(channel 1), ap1 and sta1 use 2417MHz(channel 2)
   wifiMac.SetType ("ns3::StaWifiMac",
                    "ActiveProbing", BooleanValue (true),
                    "Ssid", SsidValue (ssid1));
+  spectrumPhy.Set ("Frequency", UintegerValue (2412));
   staDevs.Add (wifi.Install (spectrumPhy, wifiMac, stas.Get(0)));
-  
-  Ssid ssid2 = Ssid ("wifi2");
-  wifiMac.SetType ("ns3::StaWifiMac",
-                   "ActiveProbing", BooleanValue (true),
-                   "Ssid", SsidValue (ssid2));
-  staDevs.Add (wifi.Install (spectrumPhy, wifiMac, stas.Get(1)));
   
   wifiMac.SetType ("ns3::ApWifiMac",
                    "Ssid", SsidValue (ssid1));
   apWifiDevs.Add (wifi.Install (spectrumPhy, wifiMac, aps.Get(0)));
+  
+  Ssid ssid2 = Ssid ("wifi2");
+  spectrumPhy.Set ("Frequency", UintegerValue (2417));
+  wifiMac.SetType ("ns3::StaWifiMac",
+                   "ActiveProbing", BooleanValue (true),
+                   "Ssid", SsidValue (ssid2));
+  staDevs.Add (wifi.Install (spectrumPhy, wifiMac, stas.Get(1)));
   
   wifiMac.SetType ("ns3::ApWifiMac",
                    "Ssid", SsidValue (ssid2));
@@ -261,6 +265,7 @@ main (int argc, char *argv[])
       spectrumPhy.EnablePcap ("sta", staDevs);
     }
 	
+  //switch ap1 and ap2 to 2472MHz(channel 13)
   Simulator::Schedule (Seconds (6), &OFSwitch13WifiController::ConfigChannelStrategy,
 				wifiControl);
 
