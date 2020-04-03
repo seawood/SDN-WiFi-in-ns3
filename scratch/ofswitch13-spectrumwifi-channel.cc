@@ -70,6 +70,7 @@ void MonitorSpectrumRx(bool signalType,
 	{
 		record[senderNodeId] = std::make_pair(1, rxPower);
 	}
+	std::cout << "nodeId:" << senderNodeId << "; rxPower:" << rxPower << "; rxPowerAvg:" << record[senderNodeId].second <<std::endl;
 	
 }
 
@@ -166,8 +167,8 @@ main (int argc, char *argv[])
   spectrumPhy.SetChannel (spectrumChannel);
   spectrumPhy.SetErrorRateModel (errorModelType);
   //spectrumPhy.Set ("Frequency", UintegerValue (5180));
-  spectrumPhy.Set ("TxPowerStart", DoubleValue (1)); // dBm  (1.26 mW)
-  spectrumPhy.Set ("TxPowerEnd", DoubleValue (1));
+  spectrumPhy.Set ("TxPowerStart", DoubleValue (10)); // dBm  (1.26 mW)
+  spectrumPhy.Set ("TxPowerEnd", DoubleValue (10));
   spectrumPhy.Set ("ShortGuardEnabled", BooleanValue (false));
   //spectrumPhy.Set ("ChannelWidth", UintegerValue (20));
 
@@ -266,8 +267,8 @@ main (int argc, char *argv[])
     }
 	
   //switch ap1 and ap2 to 2472MHz(channel 13)
-  Simulator::Schedule (Seconds (6), &OFSwitch13WifiController::ConfigChannelStrategy,
-				wifiControl);
+  //Simulator::Schedule (Seconds (6), &OFSwitch13WifiController::ConfigChannelStrategy,
+//				wifiControl);
 
 
   // Run the simulation
@@ -275,7 +276,7 @@ main (int argc, char *argv[])
   Simulator::Run ();
   
   //print simulation result
-  std::cout << std::setprecision (2) << std::fixed;
+  std::cout << std::setprecision (4) << std::fixed;
   std::cout << std::setw (12) << "signal" <<
             std::setw (12) << "noise" <<
             std::setw (12) << "SNR" <<

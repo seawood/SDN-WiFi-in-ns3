@@ -166,7 +166,7 @@ ofl_exp_wifi_msg_to_string(struct ofl_msg_experimenter *msg)
 				fprintf (stream, "channel number = %u,", c->channel->m_channelNumber);
 				fprintf (stream, "frequency = %u, ", c->channel->m_frequency);
 				fprintf (stream, "chanel width = %u, ", c->channel->m_channelWidth);
-				fprintf (stream, "mac48address = %s.", c->m_mac48address);
+				fprintf (stream, "mac48address = %s.", c->mac48address);
 				break;
 			}
 			default: {

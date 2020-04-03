@@ -191,7 +191,7 @@ dp_handle_wifi_config_request(struct datapath *dp, struct ofl_exp_wifi_msg_chann
 		reply.channel->m_channelNumber = phy->GetChannelNumber();
 		reply.channel->m_frequency = phy->GetFrequency();
 		reply.channel->m_channelWidth = phy->GetChannelWidth();
-		Mac48Address::ConvertFrom(wifiDev->GetAddress()).CopyTo(reply.mac48Address);
+		Mac48Address::ConvertFrom(wifiDev->GetAddress()).CopyTo(reply.mac48address);
 		
 		error = dp_send_message(dp, (struct ofl_msg_header*)&reply, sender);
 	}
