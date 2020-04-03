@@ -28,9 +28,11 @@ struct wifi_channel_header {
 	uint16_t m_frequency;
 	uint16_t m_channelWidth;
 	uint8_t m_channelNumber;
-	uint8_t pad[3];    /* Align to 64-bits */
+	uint8_t pad1[3];    /* Align to 64-bits */
+	uint8_t m_mac48address[6];
+	uint8_t pad2[2];
 };
-OFP_ASSERT(sizeof(struct wifi_channel_header) == 24);
+OFP_ASSERT(sizeof(struct wifi_channel_header) == 32);
 
 #endif  /*OPENFLOW_WIFI_EXT_H*/
 

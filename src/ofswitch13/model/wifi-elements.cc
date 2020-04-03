@@ -28,10 +28,10 @@ NS_LOG_COMPONENT_DEFINE ("WifiElements");
 
 // definition of class wifiAp
 
-WifiAp::WifiAp (const Address& address)
+WifiAp::WifiAp (const Address& address):
+	m_address(address)
 {
 	NS_LOG_FUNCTION (this);
-	m_address = address;
 }
 
 void
@@ -47,7 +47,19 @@ WifiAp::SetChannelInfo (const uint8_t& channel, const uint16_t& frequency,
 	
 }
 
+void
+WifiAp::SetMac48Address (const uint8_t buffer[6])
+{
+	NS_LOG_FUNCTION (this);
+	m_mac48address.CopyFrom (buffer);
+}
 
+Mac48Address
+WifiAp::GetMac48Address (void)
+{
+	NS_LOG_FUNCTION (this);
+	return m_mac48address;
+}
 
 // definition of class wifiNetWorkStatus
 
@@ -55,6 +67,13 @@ WifiNetworkStatus::WifiNetworkStatus()
 {
 	NS_LOG_FUNCTION (this);
 	InitializeFrequencyUnused();
+}
+
+void
+WifiNetworkStatus::AddApMac48address (const Mac48Address& mac48address)
+{
+	NS_LOG_FUNCTION (this);
+	m_apsMac48address.insert (mac48address);
 }
 
 void

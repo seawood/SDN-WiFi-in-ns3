@@ -44,6 +44,7 @@ ofl_exp_wifi_msg_pack(struct ofl_msg_experimenter *msg,
 				wifi->m_channelNumber = htonl(c->channel->m_channelNumber);
 				wifi->m_frequency = htons(c->channel->m_frequency);
 				wifi->m_channelWidth = htons(c->channel->m_channelWidth);
+				memcpy (wifi->m_mac48address, c->mac48address, 6); //hton?
 				break;
 			}
 			default: {
@@ -97,15 +98,11 @@ ofl_exp_wifi_msg_unpack(struct ofp_header *oh, size_t *len,
 				dst = (struct ofl_exp_wifi_msg_channel*)malloc(sizeof(struct ofl_exp_wifi_msg_channel));
 				dst->header.header.experimenter_id = ntohl(exp->vendor);
 				dst->header.type = ntohl(exp->subtype);
-				OFL_LOG_WARN(LOG_MODULE, "m");
 				dst->channel = (struct ofl_channel_info*)malloc(sizeof(struct ofl_channel_info));
-				OFL_LOG_WARN(LOG_MODULE, "a");
 				dst->channel->m_channelNumber = ntohs(src->m_channelNumber);
-				OFL_LOG_WARN(LOG_MODULE, "b");
 				dst->channel->m_frequency = ntohs(src->m_frequency);
-				OFL_LOG_WARN(LOG_MODULE, "c");
 				dst->channel->m_channelWidth = ntohs(src->m_channelWidth);
-				OFL_LOG_WARN(LOG_MODULE, "dst unpack");
+				memcpy (dst->mac48address, src->m_mac48address, 6);
 				(*msg) = (struct ofl_msg_experimenter*)dst;
 				*len -= sizeof(struct wifi_channel_header);
 				return 0;	
@@ -168,7 +165,8 @@ ofl_exp_wifi_msg_to_string(struct ofl_msg_experimenter *msg)
 						 exp->type == WIFI_EXT_CHANNEL_CONFIG_REPLY ? "reply" : "set");
 				fprintf (stream, "channel number = %u,", c->channel->m_channelNumber);
 				fprintf (stream, "frequency = %u, ", c->channel->m_frequency);
-				fprintf (stream, "chanel width = %u.", c->channel->m_channelWidth);
+				fprintf (stream, "chanel width = %u, ", c->channel->m_channelWidth);
+				fprintf (stream, "mac48address = %s.", c->m_mac48address);
 				break;
 			}
 			default: {

@@ -29,6 +29,7 @@ struct ofl_exp_wifi_msg_channel_req {
 struct ofl_exp_wifi_msg_channel {  
 	struct ofl_exp_wifi_msg_header header;
 	struct ofl_channel_info *channel;
+	uint8_t mac48address[6];
 };
 
 int

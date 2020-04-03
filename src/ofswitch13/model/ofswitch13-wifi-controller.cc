@@ -73,6 +73,8 @@ OFSwitch13WifiController::HandleExperimenterMsg (
 		{
 			struct ofl_exp_wifi_msg_channel* exp = (struct ofl_exp_wifi_msg_channel*)msg;
 			Ptr<WifiAp> ap = m_wifiApsMap[swtch->GetAddress()];
+			ap->SetMac48Address (exp->mac48address);
+			m_wifiNetworkStatus->AddApMac48address (ap->GetMac48Address());
 			ap->SetChannelInfo (exp->channel->m_channelNumber, exp->channel->m_frequency,
 								exp->channel->m_channelWidth);
 			m_wifiNetworkStatus->UpdateFrequencyUsed (swtch->GetAddress(), 

@@ -32,10 +32,12 @@ public:
 	void SetChannelInfo (const uint8_t& channel, const uint16_t& frequency,
 						 const uint16_t& channelWidth,
 						 const WifiPhyStandard& standard = WIFI_PHY_STANDARD_UNSPECIFIED);
-	
+	void SetMac48Address (const uint8_t buffer[6]);
+	Mac48Address GetMac48Address (void);
 	
 private:
-	Address m_address;
+	Address m_address;  //Ipv4Address
+	Mac48Address m_mac48address;
 	
 	// channel information
 	uint8_t m_channelNumber;
@@ -56,15 +58,16 @@ class WifiNetworkStatus : public SimpleRefCount<WifiNetworkStatus>
 public:
 	WifiNetworkStatus ();
 	void UpdateFrequencyUsed (Address address, uint16_t frequency, uint16_t width);
-	
+	void AddApMac48address (const Mac48Address& mac48address);
 	  
 private:
 	void InitializeFrequencyUnused ();
 	
 	typedef std::pair<uint16_t, uint16_t> FrequencyWidthPair;
-	
 	std::map<FrequencyWidthPair, std::set<Address>> m_frequencyUsed;
 	std::set<FrequencyWidthPair> m_frequencyUnused;
+	
+	std::set<Mac48Address> m_apsMac48address;
 	  
 	  
 }; // class WifiNetworkStatus
