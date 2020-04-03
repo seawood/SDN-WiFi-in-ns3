@@ -20,6 +20,7 @@ enum wifi_extension_subtype {
 	WIFI_EXT_CHANNEL_QUALITY_TRIGGERED
 };
 
+//WIFI_EXT_CHANNEL_CONFIG_REQUEST
 struct wifi_extension_header {
     struct ofp_header header;
     uint32_t vendor;            /* OPENFLOW_VENDOR_ID. */
@@ -27,6 +28,8 @@ struct wifi_extension_header {
 };
 OFP_ASSERT(sizeof(struct wifi_extension_header) == 16);
 
+//WIFI_EXT_CHANNEL_CONFIG_REPLY,
+//WIFI_EXT_CHANNEL_SET
 struct wifi_channel_header {
 	struct wifi_extension_header header;
 	uint16_t m_frequency;
@@ -58,13 +61,13 @@ OFP_ASSERT(sizeof(struct channel_quality_report) == 32);
 //WIFI_EXT_CHANNEL_QUALITY_REPLY,
 //WIFI_EXT_CHANNEL_QUALITY_TRIGGER_SET,
 //WIFI_EXT_CHANNEL_QUALITY_TRIGGERED
-struct wifi_channel_quality_reply {
+struct wifi_channel_quality {
 	struct wifi_extension_header header;
 	uint32_t num;
 	uint8_t pad[4];
 	struct channel_quality_report reports[0]; //list of channel quality report
 };
-OFP_ASSERT(sizeof(struct wifi_channel_quality_reply) == 24);
+OFP_ASSERT(sizeof(struct wifi_channel_quality) == 24);
 
 
 #endif  /*OPENFLOW_WIFI_EXT_H*/

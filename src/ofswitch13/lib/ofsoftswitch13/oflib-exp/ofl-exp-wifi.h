@@ -20,7 +20,7 @@ struct ofl_channel_info {
 	uint16_t m_channelWidth;
 };
 
-//WIFI_EXT_CHANNEL_CONFIG_REQUEST,
+//WIFI_EXT_CHANNEL_CONFIG_REQUEST
 struct ofl_exp_wifi_msg_channel_req {
 	struct ofl_exp_wifi_msg_header header;
 };
@@ -32,6 +32,30 @@ struct ofl_exp_wifi_msg_channel {
 	uint8_t mac48address[6];
 };
 
+/**------------------------------------------------***/
+
+//WIFI_EXT_CHANNEL_QUALITY_REQUEST
+struct ofl_exp_wifi_msg_chaqua_req {
+	struct ofl_exp_wifi_msg_header header;
+	uint8_t mac48address[6];
+};
+
+struct chaqua_report {
+	uint8_t mac48address[6];
+	uint64_t packets;     //number of received packets
+	double rxPower_avg;   //average ?double
+	double rxPower_std;   //standard deviation
+};
+//WIFI_EXT_CHANNEL_QUALITY_REPLY,
+//WIFI_EXT_CHANNEL_QUALITY_TRIGGER_SET,
+//WIFI_EXT_CHANNEL_QUALITY_TRIGGERED
+struct ofl_exp_wifi_msg_chaqua {
+	struct ofl_exp_wifi_msg_header header;
+	uint32_t num;
+	struct chaqua_report** reports;
+};
+
+/**------------------------------------------------***/
 int
 ofl_exp_wifi_msg_pack(struct ofl_msg_experimenter *msg, uint8_t **buf, size_t *buf_len);
 
