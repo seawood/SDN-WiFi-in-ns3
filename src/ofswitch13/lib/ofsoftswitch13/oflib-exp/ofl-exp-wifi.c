@@ -61,8 +61,8 @@ ofl_exp_wifi_msg_pack(struct ofl_msg_experimenter *msg,
 			case (WIFI_EXT_CHANNEL_QUALITY_REPLY):
 			case (WIFI_EXT_CHANNEL_QUALITY_TRIGGER_SET):
 			case (WIFI_EXT_CHANNEL_QUALITY_TRIGGERED): {
-				struct wifi_channel_quality* src = (struct wifi_channel_quality*)exp;
-				struct ofl_exp_wifi_msg_chaqua* dst;
+				struct ofl_exp_wifi_msg_chaqua* src = (struct ofl_exp_wifi_msg_chaqua*)exp;
+				struct wifi_channel_quality* dst;
 				*buf_len = sizeof(struct wifi_channel_quality) + src->num * sizeof(struct channel_quality_report);
 				*buf = (uint8_t*)malloc (*buf_len);
 				dst = (struct wifi_channel_quality*)(*buf);
