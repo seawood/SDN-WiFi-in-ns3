@@ -573,11 +573,11 @@ OFSwitch13Device::ReportChannelQualityTriggered (const Mac48Address& mac48addres
 	reply.header.header.experimenter_id = WIFI_VENDOR_ID;
 	reply.header.type = WIFI_EXT_CHANNEL_QUALITY_TRIGGERED;
 	reply.num = 1;
-	uint8_t *buf = malloc(sizeof(struct chaqua_report));
-	reply.reports = (struct chaqua_report**)&buf;
+	reply.reports = (struct chaqua_report**)malloc(sizeof(struct chaqua_report*));
+	reply.reports[0] = (struct chaqua_report*)malloc(sizeof(struct chaqua_report));
 	mac48address.CopyTo(reply.reports[0]->mac48address);
 	reply.reports[0]->packets = packets;
-	reply.reports[0]->rxPower_avd = rxPower_avd;
+	reply.reports[0]->rxPower_avg = rxPower_avg;
 	reply.reports[0]->rxPower_std = rxPower_std;
 	
 	struct sender senderCtrl;

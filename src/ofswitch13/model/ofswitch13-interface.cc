@@ -247,12 +247,12 @@ dp_handle_wifi_chanqua_request(struct datapath *dp,
 		SpectrumWifiPhy::ChannelQualityMap* record = phy->GetChannelQualityRecord();
 		if (requestAddr.IsBroadcast()) // request all channel quality info
 		{
-			reply->num = record->size();
-			uint8_t *buf = malloc(reply->num * sizeof(struct chaqua_report));
-			reply.reports = (struct chaqua_report**)&buf;
+			reply.num = record->size();
+			reply.reports = (struct chaqua_report**)malloc(reply.num * sizeof(struct chaqua_report*));
 			int i = 0;
 			for (auto itr = record->begin(); itr != record->end(); ++itr)
 			{
+				reply.reports[i] = (struct chaqua_report*)malloc(sizeof(struct chaqua_report));
 				itr->first.CopyTo(reply.reports[i]->mac48address);
 				reply.reports[i]->packets = itr->second.packets;
 				reply.reports[i]->rxPower_avg = itr->second.rxPower_avg;
@@ -263,12 +263,12 @@ dp_handle_wifi_chanqua_request(struct datapath *dp,
 		else  // request channel quality info of a specific STA
 		{
 			reply->num = 1;
-			uint8_t *buf = malloc(sizeof(struct chaqua_report));
-			reply.reports = (struct chaqua_report**)&buf;
+			reply.reports = (struct chaqua_report**)malloc(sizeof(struct chaqua_report*));
 			for (auto itr = record->begin(); itr != record.end(); ++itr)
 			{
 				if (requestAddr == itr->first)
 				{
+					reply.reports[0] = (struct chaqua_report*) malloc(sizeof(struct chaqua_report));
 					requestAddr.CopyTo(reply.reports[0]->mac48address);
 					reply.reports[0]->packets = itr->second.packets;
 					reply.reports[0]->rxPower_avd = itr->second.rxPower_avd;

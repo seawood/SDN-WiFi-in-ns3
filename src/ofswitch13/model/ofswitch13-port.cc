@@ -214,7 +214,7 @@ OFSwitch13Port::NotifyConstructionCompleted ()
 			MakeCallback (&OFSwitch13Port::Receive, this));
 		Ptr<SpectrumWifiPhy> phy = wifiDev->GetPhy();
 		phy->SetChannelQualityTriggeredCallback(
-			MakeCallback(&OFSwitch13Device::ReportChannelQualityTriggered));
+			MakeCallback(&OFSwitch13Device::ReportChannelQualityTriggered), m_openflowDev);
 	}
 }
 

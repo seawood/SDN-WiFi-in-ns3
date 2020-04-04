@@ -196,7 +196,7 @@ SpectrumWifiPhy::GetChannelQualityRecord (void)
 }
 
 void
-SetChannelQualityTriggeredCallback (ChannelQualityTriggeredCallback cb)
+SpectrumWifiPhy::SetChannelQualityTriggeredCallback (ChannelQualityTriggeredCallback cb)
 {
 	NS_LOG_FUNCTION (this);
 	m_reportChannelQualityTriggered = cb;

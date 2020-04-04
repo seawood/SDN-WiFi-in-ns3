@@ -22,6 +22,7 @@
 #define WIFI_ELEMENTS_H
 
 #include <ns3/wifi-module.h>
+#include "ofswitch13-interface.h"
 
 namespace ns3{
 
@@ -62,7 +63,7 @@ public:
 	void AddApMac48address (const Mac48Address& mac48address);
 	void UpdateChannelQuality(const Address& apAddr, struct chaqua_report* report);
 	void UpdateApsInterference (const Address& dstAp, const Address& srcAp, struct chaqua_report* report);
-	void GetOneSTA (Address* ap, mac48Address* sta); //temporary
+	void GetOneSTA (Address* ap, Mac48Address* sta); //temporary
 	void PrintChannelQuality (void); //temporary, when receive reply or trigger
 private:
 	void InitializeFrequencyUnused ();
