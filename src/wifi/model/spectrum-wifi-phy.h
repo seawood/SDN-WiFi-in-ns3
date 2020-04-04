@@ -30,6 +30,8 @@
 #include "ns3/spectrum-channel.h"
 #include "ns3/spectrum-model.h"
 #include "wifi-phy.h"
+#include "ns3/mac48-address.h"
+#include "ns3/ofswitch13-device.h"
 
 namespace ns3 {
 

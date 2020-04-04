@@ -188,7 +188,7 @@ SpectrumWifiPhy::ConfigureStandard (WifiPhyStandard standard)
 }
 
 //bad design
-ChannelQualityMap*
+SpectrumWifiPhy::ChannelQualityMap*
 SpectrumWifiPhy::GetChannelQualityRecord (void)
 {
 	NS_LOG_FUNCTION (this);
@@ -226,22 +226,23 @@ void
 SpectrumWifiPhy::ChannelQualityRecordAdd (const Mac48Address& mac48address, 
 		const double& rxPower)
 {
-	NS_LOG_FUNCTION (this << mac48Address <<":" << rxPower);
+	NS_LOG_FUNCTION (this << mac48address <<":" << rxPower);
 	auto it = m_channelQuality.find(mac48address);
 	if (it != m_channelQuality.end())
 	{
-		it->packets++;
-		it->rxPower_avg += ((rxPower - it->rxPower_avg)/(double)it->packets);
+		auto item = it->second;
+		item.packets++;
+		item.rxPower_avg += ((rxPower - item.rxPower_avg)/(double)item.packets);
 		// TODO: standard deviation
 		NS_LOG_INFO ("update m_channelQuality:" << mac48address << ",avg=" <<
-					 it->rxPower_avg << ",std=" << it->rxPower_std);
-		if (it->trigger_set && ((it->packets >= it->packets_trigger) ||
-				(it->rxPower_avg >= it->rxPower_avg_trigger) ||
-				it->rxPower_std >= it->rxPower_std_trigger))
+					 item.rxPower_avg << ",std=" << item.rxPower_std);
+		if (item.trigger_set && ((item.packets >= item.packets_trigger) ||
+				(item.rxPower_avg >= item.rxPower_avg_trigger) ||
+				item.rxPower_std >= item.rxPower_std_trigger))
 		{
-			OFSwitch13Device::ReportChannelQualityTriggered (mac48address, it->packets,
-															it->rxPower_avg, it->rxPower_std);
-			it->trigger_set = false;
+			OFSwitch13Device::ReportChannelQualityTriggered (mac48address, item.packets,
+									item.rxPower_avg, item.rxPower_std);
+			item.trigger_set = false;
 		}
 	}
 	else
@@ -251,7 +252,7 @@ SpectrumWifiPhy::ChannelQualityRecordAdd (const Mac48Address& mac48address,
 		report.rxPower_avg = rxPower;
 		report.rxPower_std = 0;
 		report.trigger_set = false;
-		m_channelQuality[mac48Address] = report;
+		m_channelQuality[mac48address] = report;
 		NS_LOG_INFO ("initial item for m_channelQuality:" << mac48address);
 	}
 }

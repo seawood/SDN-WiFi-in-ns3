@@ -214,7 +214,7 @@ ofl_exp_wifi_msg_free(struct ofl_msg_experimenter *msg)
 			case (WIFI_EXT_CHANNEL_QUALITY_TRIGGER_SET):
 			case (WIFI_EXT_CHANNEL_QUALITY_TRIGGERED):
 			{
-				struct ofl_exp_wifi_msg_channel *c = (struct ofl_exp_wifi_msg_channel *)exp;
+				struct ofl_exp_wifi_msg_chaqua *c = (struct ofl_exp_wifi_msg_chaqua *)exp;
 				for (uint32_t i = 0; i < c->num; ++i)
 				{
 					free (c->reports[i]);
@@ -279,9 +279,9 @@ ofl_exp_wifi_msg_to_string(struct ofl_msg_experimenter *msg)
 				for (uint32_t i = 0; i < c->num; ++i)
 				{
 					fprintf (stream, "mac48address: %s", c->reports[i]->mac48address);
-					fprintf (stream, "packets: %u", c->reports[i]->packets);
-					fprintf (stream, "rxPower_avg: %u", c->reports[i]->rxPower_avg);
-					fprintf (stream, "rxPower_std: %u", c->reports[i]->rxPower_std);
+					fprintf (stream, "packets: %lu", c->reports[i]->packets);
+					fprintf (stream, "rxPower_avg: %f", c->reports[i]->rxPower_avg);
+					fprintf (stream, "rxPower_std: %f", c->reports[i]->rxPower_std);
 				}
 				break;
 			}

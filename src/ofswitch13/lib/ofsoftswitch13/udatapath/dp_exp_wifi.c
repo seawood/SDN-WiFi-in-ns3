@@ -18,7 +18,7 @@
 	#pragma weak dp_handle_wifi_config_request
 	#pragma weak dp_handle_wifi_channel_set
 	#pragma weak dp_handle_wifi_chanqua_request
-	#paragma weak dp_handle_wifi_chanqua_trigger_set
+	#pragma weak dp_handle_wifi_chanqua_trigger_set
 #endif
 
 static struct vlog_rate_limit rl = VLOG_RATE_LIMIT_INIT(60, 60);
@@ -50,5 +50,5 @@ dp_handle_wifi_chanqua_trigger_set (struct datapath *dp UNUSED,
 									struct ofl_exp_wifi_msg_chaqua *msg UNUSED,
 									const struct sender *sender UNUSED) {
 	VLOG_DBG_RL(LOG_MODULE, &rl, "handle WIFI_EXT_CHANNEL_QUALITY_TRIGGER_SET msg");
-	return 0
+	return 0;
 }
