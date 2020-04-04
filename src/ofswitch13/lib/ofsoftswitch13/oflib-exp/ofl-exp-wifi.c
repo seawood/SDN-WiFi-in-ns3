@@ -51,7 +51,7 @@ ofl_exp_wifi_msg_pack(struct ofl_msg_experimenter *msg,
 				struct ofl_exp_wifi_msg_chaqua_req* src = (struct ofl_exp_wifi_msg_chaqua_req*)exp;
 				struct wifi_channel_quality_request* dst;
 				*buf_len = sizeof(struct wifi_channel_quality_request);
-				*buf = (uint8_t*)malloc(buf_len);
+				*buf = (uint8_t*)malloc(*buf_len);
 				dst = (struct wifi_channel_quality_request*)(*buf);
 				dst->header.vendor = htonl(exp->header.experimenter_id);
 				dst->header.subtype = htonl(exp->type);
