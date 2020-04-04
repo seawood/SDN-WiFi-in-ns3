@@ -196,6 +196,13 @@ SpectrumWifiPhy::GetChannelQualityRecord (void)
 }
 
 void
+SetChannelQualityTriggeredCallback (ChannelQualityTriggeredCallback cb)
+{
+	NS_LOG_FUNCTION (this);
+	m_reportChannelQualityTriggered = cb;
+}
+
+void
 SpectrumWifiPhy::AddOperationalChannel (uint8_t channelNumber)
 {
   m_operationalChannelList.push_back (channelNumber);
@@ -240,7 +247,7 @@ SpectrumWifiPhy::ChannelQualityRecordAdd (const Mac48Address& mac48address,
 				(item.rxPower_avg >= item.rxPower_avg_trigger) ||
 				item.rxPower_std >= item.rxPower_std_trigger))
 		{
-			OFSwitch13Device::ReportChannelQualityTriggered (mac48address, item.packets,
+			m_reportChannelQualityTriggered (mac48address, item.packets,
 									item.rxPower_avg, item.rxPower_std);
 			item.trigger_set = false;
 		}

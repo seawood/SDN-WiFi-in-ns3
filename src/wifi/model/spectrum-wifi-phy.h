@@ -31,7 +31,6 @@
 #include "ns3/spectrum-model.h"
 #include "wifi-phy.h"
 #include "ns3/mac48-address.h"
-#include "ns3/ofswitch13-device.h"
 
 namespace ns3 {
 
@@ -198,7 +197,11 @@ public:
   };
   typedef std::map<Mac48Address, struct Report> ChannelQualityMap;
   ChannelQualityMap *GetChannelQualityRecord (void);
+  
+  typedef void (* ChannelQualityTriggeredCallback) (Mac48Address mac48address, uint32_t packets,
+		  double rxPower_avg, double rxPower_std);
 
+  void SetChannelQualityTriggeredCallback (ChannelQualityTriggeredCallback cb);
 protected:
   // Inherited
   void DoDispose (void);
@@ -235,6 +238,7 @@ private:
   TracedCallback<bool, uint32_t, double, Time> m_signalCb; //!< Signal callback
   
   ChannelQualityMap m_channelQuality;
+  ChannelQualityTriggeredCallback m_reportChannelQualityTriggered;
 };
 
 } //namespace ns3
