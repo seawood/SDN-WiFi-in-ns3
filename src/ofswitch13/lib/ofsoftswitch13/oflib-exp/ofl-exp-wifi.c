@@ -47,6 +47,37 @@ ofl_exp_wifi_msg_pack(struct ofl_msg_experimenter *msg,
 				memcpy (wifi->m_mac48address, c->mac48address, 6); //hton?
 				break;
 			}
+			case (WIFI_EXT_CHANNEL_QUALITY_REQUEST): {
+				struct ofl_exp_wifi_msg_chaqua_req* src = (struct ofl_exp_wifi_msg_chaqua_req*)exp;
+				struct wifi_channel_quality_request* dst;
+				*buf_len = sizeof(struct wifi_channel_quality_request);
+				*buf = (uint8_t*)malloc(buf_len);
+				dst = (struct wifi_channel_quality_request*)(*buf);
+				dst->header.vendor = htonl(exp->header.experimenter_id);
+				dst->header.subtype = htonl(exp->type);
+				memcpy (dst->mac48address, src->mac48address, 6);
+				break;
+			}
+			case (WIFI_EXT_CHANNEL_QUALITY_REPLY):
+			case (WIFI_EXT_CHANNEL_QUALITY_TRIGGER_SET):
+			case (WIFI_EXT_CHANNEL_QUALITY_TRIGGERED): {
+				struct wifi_channel_quality* src = (struct wifi_channel_quality*)exp;
+				struct ofl_exp_wifi_msg_chaqua* dst;
+				*buf_len = sizeof(struct wifi_channel_quality) + src->num * sizeof(struct channel_quality_report);
+				*buf = (uint8_t*)malloc (*buf_len);
+				dst = (struct wifi_channel_quality*)(*buf);
+				dst->header.vendor = htonl(exp->header.experimenter_id);
+				dst->header.subtype = htonl(exp->type);
+				dst->num = htonl(src->num);
+				for (size_t i = 0; i <src->num; ++i)
+				{
+					memcpy (dst->reports[i].mac48address, src->reports[i]->mac48address, 6);
+					dst->reports[i].packets = htonl(src->reports[i]->packets);
+					dst->reports[i].rxPower_avg = htonl(src->reports[i]->rxPower_avg);
+					dst->reports[i].rxPower_std = htonl(src->reports[i]->rxPower_std);
+				}
+				break;
+			}
 			default: {
 				OFL_LOG_WARN(LOG_MODULE, "Trying to pack unknown Openflow Experimenter message.");
                 return -1;
@@ -107,6 +138,51 @@ ofl_exp_wifi_msg_unpack(struct ofp_header *oh, size_t *len,
 				*len -= sizeof(struct wifi_channel_header);
 				return 0;	
 			}
+			case (WIFI_EXT_CHANNEL_QUALITY_REQUEST): {
+				struct wifi_channel_quality_request* src;
+				struct ofl_exp_wifi_msg_chaqua_req* dst;
+				if (*len < sizeof(struct wifi_channel_quality_request))
+				{
+					OFL_LOG_WARN(LOG_MODULE, "Received  message WIFI_EXT_CHANNEL_QUALITY_REQUEST has invalid length (%zu).", *len);
+                    return ofl_error(OFPET_BAD_REQUEST, OFPBRC_BAD_LEN);
+				}
+				OFL_LOG_WARN(LOG_MODULE, "unpack WIFI_EXT_CHANNEL_QUALITY_REQUEST");
+				src = (struct wifi_channel_quality_request*)exp;
+				dst = (struct ofl_exp_wifi_msg_chaqua_req*)malloc(sizeof(struct ofl_exp_wifi_msg_chaqua_req));
+				dst->header.header.experimenter_id = ntohl(exp->vendor);
+				dst->header.type = ntohl(exp->subtype);
+				memcpy (dst->mac48address, src->mac48address, 6);
+				(*msg) = (struct ofl_msg_experimenter*)dst;
+				*len -= sizeof(struct wifi_channel_quality_request);
+				return 0;
+			}
+			case (WIFI_EXT_CHANNEL_QUALITY_REPLY):
+			case (WIFI_EXT_CHANNEL_QUALITY_TRIGGER_SET):
+			case (WIFI_EXT_CHANNEL_QUALITY_TRIGGERED): {
+				struct wifi_channel_quality* src;
+				struct ofl_exp_wifi_msg_chaqua* dst;
+				if (*len < sizeof(struct wifi_channel_quality))
+				{
+					OFL_LOG_WARN(LOG_MODULE, "Received  message WIFI_EXT_CHANNEL_QUALITY_ has invalid length (%zu).", *len);
+                    return ofl_error(OFPET_BAD_REQUEST, OFPBRC_BAD_LEN);
+				}
+				OFL_LOG_WARN(LOG_MODULE, "unpack WIFI_EXT_CHANNEL_QUALITY_");
+				src = (struct wifi_channel_quality*)exp;
+				dst = (struct ofl_exp_wifi_msg_chaqua*)malloc(sizeof(struct ofl_exp_wifi_msg_chaqua));
+				dst->num = ntohl (src->num);
+				dst->reports = (struct chaqua_report**)malloc(dst->num * sizeof(struct chaqua_report*));
+				for (size_t i = 0; i < dst->num; ++i)
+				{
+					dst->reports[i] = (struct chaqua_report*)malloc(sizeof(struct chaqua_report));
+					memcpy (dst->reports[i]->mac48address, src->reports[i].mac48address,  6);
+					dst->reports[i]->packets = ntohl(src->reports[i].packets);
+					dst->reports[i]->rxPower_avg = ntohl(src->reports[i].rxPower_avg);
+					dst->reports[i]->rxPower_std = ntohl(src->reports[i].rxPower_std);
+				}
+				(*msg) = (struct ofl_msg_experimenter*)dst;
+				*len -= sizeof(struct wifi_channel_quality) + dst->num * sizeof(struct channel_quality_report);
+				return 0;
+			}
 			default: {
 				OFL_LOG_WARN(LOG_MODULE, "Trying to unpack unknown wifi Experimenter message.");
                 return ofl_error(OFPET_BAD_REQUEST, OFPBRC_BAD_EXPERIMENTER);
@@ -130,6 +206,19 @@ ofl_exp_wifi_msg_free(struct ofl_msg_experimenter *msg)
 			case (WIFI_EXT_CHANNEL_SET): {
 				struct ofl_exp_wifi_msg_channel *c = (struct ofl_exp_wifi_msg_channel *)exp;
 				free (c->channel);
+				break;
+			}
+			case (WIFI_EXT_CHANNEL_QUALITY_REQUEST):
+				break;
+			case (WIFI_EXT_CHANNEL_QUALITY_REPLY):
+			case (WIFI_EXT_CHANNEL_QUALITY_TRIGGER_SET):
+			case (WIFI_EXT_CHANNEL_QUALITY_TRIGGERED):
+			{
+				struct ofl_exp_wifi_msg_channel *c = (struct ofl_exp_wifi_msg_channel *)exp;
+				for (uint32_t i = 0; i < c->num; ++i)
+				{
+					free (c->reports[i]);
+				}
 				break;
 			}
 			default: {
@@ -167,6 +256,33 @@ ofl_exp_wifi_msg_to_string(struct ofl_msg_experimenter *msg)
 				fprintf (stream, "frequency = %u, ", c->channel->m_frequency);
 				fprintf (stream, "chanel width = %u, ", c->channel->m_channelWidth);
 				fprintf (stream, "mac48address = %s.", c->mac48address);
+				break;
+			}
+			case (WIFI_EXT_CHANNEL_QUALITY_REQUEST):
+			{
+				struct ofl_exp_wifi_msg_chaqua_req *c = (struct ofl_exp_wifi_msg_chaqua_req*)exp;
+				fprintf (stream, "request for channel quality of: %s", c->mac48address);
+				break;
+			}
+			case (WIFI_EXT_CHANNEL_QUALITY_REPLY):
+			case (WIFI_EXT_CHANNEL_QUALITY_TRIGGER_SET):
+			case (WIFI_EXT_CHANNEL_QUALITY_TRIGGERED):
+			{
+				struct ofl_exp_wifi_msg_chaqua* c = (struct ofl_exp_wifi_msg_chaqua*)exp;
+				if (exp->type == WIFI_EXT_CHANNEL_QUALITY_REPLY)
+					fprintf (stream, "Type: WIFI_EXT_CHANNEL_QUALITY_REPLY");
+				else if (exp->type == WIFI_EXT_CHANNEL_QUALITY_TRIGGER_SET)
+					fprintf (stream, "Type: WIFI_EXT_CHANNEL_QUALITY_TRIGGER_SET");
+				else
+					fprintf (stream, "Type: WIFI_EXT_CHANNEL_QUALITY_TRIGGERED");
+				fprintf (stream, "num: %u", c->num);
+				for (uint32_t i = 0; i < c->num; ++i)
+				{
+					fprintf (stream, "mac48address: %s", c->reports[i]->mac48address);
+					fprintf (stream, "packets: %u", c->reports[i]->packets);
+					fprintf (stream, "rxPower_avg: %u", c->reports[i]->rxPower_avg);
+					fprintf (stream, "rxPower_std: %u", c->reports[i]->rxPower_std);
+				}
 				break;
 			}
 			default: {

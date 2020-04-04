@@ -278,6 +278,10 @@ public:
    */
   static int
   SendOpenflowBufferToRemote (struct ofpbuf *buffer, struct remote *remote);
+  
+  static void
+  ReportChannelQualityTriggered (const Mac48Address& mac48address, const uint64_t& packets,
+								 const double& rxPower_avg, const double& rxPower_std);
 
   /**
    * Overriding ofsoftswitch13 dp_actions_output_port weak function from

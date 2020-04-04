@@ -184,6 +184,18 @@ public:
   virtual void SetChannelWidth (uint16_t channelwidth);
 
   virtual void ConfigureStandard (WifiPhyStandard standard);
+   
+  struct Report {
+	  bool trigger_set;
+	  uint64_t packets;     //number of received packets
+	  uint64_t packets_trigger;
+	  double rxPower_avg;   //average
+	  double rxPower_avg_trigger;
+	  double rxPower_std;   //standard deviation
+	  double rxPower_std_trigger;
+  };
+  typedef std::map<Mac48Address, struct Report> ChannelQualityMap;
+  ChannelQualityMap *GetChannelQualityRecord (void);
 
 protected:
   // Inherited
@@ -192,6 +204,8 @@ protected:
 
 
 private:
+	
+  void ChannelQualityRecordAdd (const Mac48Address& mac48address, const double& rxPower);
   /**
    * \param centerFrequency center frequency (MHz)
    * \param channelWidth channel width (MHz) of the channel for the current transmission
@@ -217,7 +231,8 @@ private:
   mutable Ptr<const SpectrumModel> m_rxSpectrumModel; //!< receive spectrum model
   bool m_disableWifiReception;          //!< forces this Phy to fail to sync on any signal
   TracedCallback<bool, uint32_t, double, Time> m_signalCb; //!< Signal callback
-
+  
+  ChannelQualityMap m_channelQuality;
 };
 
 } //namespace ns3

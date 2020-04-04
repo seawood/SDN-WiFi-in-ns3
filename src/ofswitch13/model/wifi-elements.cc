@@ -60,6 +60,12 @@ WifiAp::GetMac48Address (void)
 	NS_LOG_FUNCTION (this);
 	return m_mac48address;
 }
+Address
+WifiAp::GetAddress (void)
+{
+	NS_LOG_FUNCTION (this);
+	return m_address;
+}
 
 // definition of class wifiNetWorkStatus
 
@@ -74,6 +80,66 @@ WifiNetworkStatus::AddApMac48address (const Mac48Address& mac48address)
 {
 	NS_LOG_FUNCTION (this);
 	m_apsMac48address.insert (mac48address);
+}
+
+void
+WifiNetworkStatus::UpdateChannelQuality(const Address& apAddr, 
+										struct chaqua_report* report)
+{
+	NS_LOG_FUNCTION (this);
+	Mac48Address addr48;
+	addr48.CopyFrom (report->mac48address);
+	auto item = m_STAsChannelQuality.find(addr48);
+	if (item == m_STAsChannelQuality.end()) //new STA
+	{
+		std::map<Address, struct ChannelReport> newMap;
+		m_STAsChannelQuality[addr48] = newMap;
+	}
+	auto itemMap = m_STAsChannelQuality[addr48];
+	if (itemMap.find (apAddr) != itemMap.end())
+	{
+		itemMap[apAddr].packets = report->packets;
+		itemMap[apAddr].rxPower_avg = report->rxPower_avg;
+		itemMap[apAddr].rxPower_std = report->rxPower_std;
+	}
+	else
+	{
+		struct ChannelReport newChannelReport;
+		newChannelReport.packets = report->packets;
+		newChannelReport.rxPower_avg = report->rxPower_avg;
+		newChannelReport.rxPower_std = report->rxPower_std;
+		itemMap.insert(std::make_pair(apAddr, newChannelReport));
+	}
+	
+}
+
+void 
+WifiNetworkStatus::UpdateApsInterference (const Address& dstAp, 
+							const Address& srcAp, 
+							struct chaqua_report* report)
+{
+	NS_LOG_FUNCTION (this);
+	auto item = m_APsInterference.find(srcAp);
+	if (item == m_APsInterference.end())
+	{
+		std::map<Address, struct ChannelReport> newMap;
+		m_APsInterference[srcAp] = newMap;
+	}
+	auto itemMap = m_APsInterference[srcAp];
+	if (itemMap.find(dstAp) != itemMap.end())
+	{
+		itemMap[dstAp].packets = report->packets;
+		itemMap[dstAp].rxPower_avg = report->rxPower_avg;
+		itemMap[dstAp].rxPower_std = report->rxPower_std;
+	}
+	else
+	{
+		struct ChannelReport newChannelReport;
+		newChannelReport.packets = report->packets;
+		newChannelReport.rxPower_avg = report->rxPower_avg;
+		newChannelReport.rxPower_std = report->rxPower_std;
+		itemMap[dstAp] = newChannelReport;
+	}
 }
 
 void
@@ -111,6 +177,51 @@ WifiNetworkStatus::UpdateFrequencyUsed (Address address,
 	
 }
 
+void 
+WifiNetworkStatus::GetOneSTA (Address* ap, mac48Address* sta)
+{
+	NS_LOG_FUNCTION(this);
+	if (m_STAsChannelQuality.empty())
+	{
+		NS_LOG_ERROR("no sta");
+		return;
+	}
+	auto item = m_STAsChannelQuality->begin();
+	*sta = item->first;
+	*ap = item->second->begin()->first;
+}
+
+void 
+WifiNetworkStatus::PrintChannelQuality (void)
+{
+	NS_LOG_FUNCTION(this);
+	NS_LOG_INFO ("m_STAsChannelQuality final report:");
+	for (auto itr = m_STAsChannelQuality.begin(); itr != m_STAsChannelQuality.end(); ++itr)
+	{
+		NS_LOG_INFO ("STA : " << itr->first << "****");
+		for (auto item = itr->second.begin(); item != itr->second.end(); ++item)
+		{
+			NS_LOG_INFO("in AP:" << item->first << "channel info: " <<
+						item->second.packets << ";" << 
+						item->second.rxPower_avg << ";" <<
+						item->second.rxPower_std);
+						
+		}
+	}
+	NS_LOG_INFO ("m_APsInterference final report:");
+	for (auto itr = m_APsInterference.begin(); itr != m_APsInterference.end(); ++itr)
+	{
+		NS_LOG_INFO ("AP : " << itr->first << "****");
+		for (auto item = itr->second.begin(); item != itr->second.end(); ++item)
+		{
+			NS_LOG_INFO("in AP:" << item->first << "channel info: " <<
+						item->second.packets << ";" << 
+						item->second.rxPower_avg << ";" <<
+						item->second.rxPower_std);
+			
+		}
+	}
+}
 
 
 } //namespace ns3

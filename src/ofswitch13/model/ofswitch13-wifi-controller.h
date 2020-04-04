@@ -42,14 +42,26 @@ public:
 	virtual ofl_err HandleFeaturesReplyWifi (Ptr<const RemoteSwitch> swtch);
 	
 	void ConfigChannelStrategy (void);
-	
+	struct OneReport {
+		Mac48Address address;
+		uint64_t packets;     //number of received packets
+		double rxPower_avg;   //average ?double
+		double rxPower_std;   //standard deviation
+	};
+	void ChannelQualityReportStrategy (void);
+	void ChannelQualityTriggerStrategy (void); //TODO
 private:
 	void ConfigChannel (const Address& address, const uint8_t& channelNumber,
 						const uint16_t frequency, const uint16_t& channelWidth);
 	
+	void RequestChannelQuality (const Address& address, const Mac48Address& mac48address);
+	void SetChannelQualityTrigger (const Address& address, const std::vector<struct OneReport>& triggers);
+	
 	/** Map to store Wifi AP info by Address */
 	typedef std::map <Address, Ptr<WifiAp>> WifiApsMap_t;
 	WifiApsMap_t    m_wifiApsMap;
+	typedef std::map <Mac48Address, Ptr<WifiAp>> WifiApsMac48Map_t;
+	WifiApsMac48Map_t m_wifiApsMac48Map;
 	
 	Ptr<WifiNetworkStatus> m_wifiNetworkStatus;
 };

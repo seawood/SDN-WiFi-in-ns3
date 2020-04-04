@@ -13,5 +13,13 @@ ofl_err dp_handle_wifi_config_request(struct datapath *dp, struct ofl_exp_wifi_m
 									  const struct sender *sender);					  
 
 ofl_err dp_handle_wifi_channel_set(struct datapath *dp, struct ofl_exp_wifi_msg_channel *msg,
-									const struct sender *sender);					  
+									const struct sender *sender);	
+
+ofl_err dp_handle_wifi_chanqua_request(struct datapath *dp,
+							   struct ofl_exp_wifi_msg_chaqua_req *msg,
+							   const struct sender *sender);
+
+ofl_err dp_handle_wifi_chanqua_trigger_set (struct datapath *dp,
+									struct ofl_exp_wifi_msg_chaqua *msg,
+									const struct sender *sender);
 #endif // DP_EXP_WIFI_H

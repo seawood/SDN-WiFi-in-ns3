@@ -77,11 +77,37 @@ OFSwitch13WifiController::HandleExperimenterMsg (
 			Mac48Address addr = ap->GetMac48Address();
 			NS_LOG_INFO ("SetMac48Address=" << addr);
 			m_wifiNetworkStatus->AddApMac48address (ap->GetMac48Address());
+			m_wifiApsMac48Map[ap->GetMac48Address()] = ap;
 			ap->SetChannelInfo (exp->channel->m_channelNumber, exp->channel->m_frequency,
 								exp->channel->m_channelWidth);
 			m_wifiNetworkStatus->UpdateFrequencyUsed (swtch->GetAddress(), 
 					exp->channel->m_frequency, exp->channel->m_channelWidth);
 			ofl_msg_free((struct ofl_msg_header*)msg, &dp_exp);
+			break;
+		}
+		case (WIFI_EXT_CHANNEL_QUALITY_TRIGGERED): // TODO: trigger handle
+		case (WIFI_EXT_CHANNEL_QUALITY_REPLY):
+		{
+			struct ofl_exp_wifi_msg_chaqua* exp = (struct ofl_exp_wifi_msg_chaqua*)msg;
+			Ptr<WifiAp> ap = m_wifiApsMap[swtch->GetAddress()];
+			Address apAddr = swtch->GetAddress();
+			for (uint64_t i = 0; i < exp->num; ++i)
+			{
+				Mac48Address addr;
+				addr.CopyFrom (exp->reports[i]->mac48address);
+				auto item = m_wifiApsMac48Map.find(addr);
+				if (item != m_wifiApsMac48Map.end()) //AP
+				{
+					m_wifiNetworkStatus->UpdateApsInterference (apAddr, 
+							m_wifiApsMac48Map[addr]->GetAddress(), exp->reports[i]);
+				}
+				else
+				{
+					m_wifiNetworkStatus->UpdateChannelQuality(apAddr, exp->reports[i]);
+				}
+			}
+			ofl_msg_free((struct ofl_msg_header*)msg, &dp_exp);
+			m_wifiNetworkStatus->PrintChannelQuality();
 			break;
 		}
 		default:
@@ -123,6 +149,36 @@ OFSwitch13WifiController::ConfigChannelStrategy (void)
 	}
 }
 
+// request all
+void
+OFSwitch13WifiController::ChannelQualityReportStrategy (void)
+{
+	NS_LOG_FUNCTION (this);
+	Mac48Address all("ff:ff:ff:ff:ff:ff");
+	for (auto itr = m_wifiApsMap.begin(); itr != m_wifiApsMap.end(); ++itr)
+	{
+		RequestChannelQuality (itr->first, all);
+	}
+}
+
+
+void
+OFSwitch13WifiController::ChannelQualityTriggerStrategy (void)
+{
+	NS_LOG_FUNCTION (this);
+	Address ap;
+	Mac48Address sta;
+	m_wifiNetworkStatus->GetOneSTA(&ap, &sta);
+	std::vector<struct OneReport> triggers;
+	struct OneReport trigger;
+	trigger.address = sta;
+	trigger.packets = 10;
+	trigger.rxPower_avg = 10;
+	trigger.rxPower_std = 10;
+	triggers.push_back(trigger);
+	SetChannelQualityTrigger(ap, triggers);
+}
+
 void
 OFSwitch13WifiController::ConfigChannel (const Address& address, const uint8_t& channelNumber,
 					const uint16_t frequency, const uint16_t& channelWidth)
@@ -144,6 +200,49 @@ OFSwitch13WifiController::ConfigChannel (const Address& address, const uint8_t& 
 	SendToSwitch (swtch, (struct ofl_msg_header*)&msg);
 	NS_LOG_DEBUG ("sent WIFI_EXT_CHANNEL_SET to wifi ap");
 	m_wifiNetworkStatus->UpdateFrequencyUsed (address, frequency, channelWidth);
+}
+
+void
+OFSwitch13WifiController::RequestChannelQuality (const Address& address, 
+		const Mac48Address& mac48address)
+{
+	NS_LOG_FUNCTION (this);
+	Ptr<RemoteSwitch> swtch = GetRemoteSwitch (address);
+	struct ofl_exp_wifi_msg_chaqua_req msg;
+	msg.header.header.header.type = OFPT_EXPERIMENTER;
+	msg.header.header.experimenter_id = WIFI_VENDOR_ID;
+	msg.header.type = WIFI_EXT_CHANNEL_QUALITY_REQUEST;
+	mac48address.CopyTo (msg.mac48address);
+	
+	SendToSwitch (swtch, (struct ofl_msg_header*)&msg);
+	NS_LOG_DEBUG ("sent WIFI_EXT_CHANNEL_QUALITY_REQUEST to wifi ap");
+}
+
+void
+OFSwitch13WifiController::SetChannelQualityTrigger (const Address& address, 
+		const std::vector<struct OneReport>& triggers)
+{
+	NS_LOG_FUNCTION (this);
+	Ptr<RemoteSwitch> swtch = GetRemoteSwitch (address);
+	struct ofl_exp_wifi_msg_chaqua msg;
+	msg.header.header.header.type = OFPT_EXPERIMENTER;
+	msg.header.header.experimenter_id = WIFI_VENDOR_ID;
+	msg.header.type = WIFI_EXT_CHANNEL_QUALITY_TRIGGER_SET;
+	msg.num = triggers.size();
+	
+	uint8_t* buf = malloc(msg.num * sizeof(struct chaqua_report));
+	for (uint32_t i = 0; i < msg.num; ++i)
+	{
+		msg.reports[i] = (struct chaqua_report*)buf;
+		triggers[i].CopyTo(msg.reports[i].mac48address);
+		msg.reports[i].packets = triggers[i].packets;
+		msg.reports[i].rxPower_avg = triggers[i].rxPower_avg;
+		msg.reports[i].rxPower_std = triggers[i].rxPower_std;
+		buf += sizeof(struct chaqua_report);
+	}
+	
+	SendToSwitch (swtch, (struct ofl_msg_header*)&msg);
+	NS_LOG_DEBUG ("sent WIFI_EXT_CHANNEL_QUALITY_TRIGGER_SET to wifi ap");
 }
 
 } // namespace ns3

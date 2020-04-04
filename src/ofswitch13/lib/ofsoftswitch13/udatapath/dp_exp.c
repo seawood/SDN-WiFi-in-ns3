@@ -105,6 +105,12 @@ dp_exp_message(struct datapath *dp,
 				case (WIFI_EXT_CHANNEL_SET): {
 					return dp_handle_wifi_channel_set(dp, (struct ofl_exp_wifi_msg_channel*)msg, sender);
 				}
+				case (WIFI_EXT_CHANNEL_QUALITY_REQUEST): {
+					return dp_handle_wifi_chanqua_request (dp, (struct ofl_exp_wifi_msg_chaqua_req*)msg, sender);
+				}
+				case (WIFI_EXT_CHANNEL_QUALITY_TRIGGER_SET): {
+					return dp_handle_wifi_chanqua_trigger_set (dp, (struct ofl_exp_wifi_msg_chaqua*)msg, sender);
+				}
 				default: {
 					VLOG_WARN_RL(LOG_MODULE, &rl, "Trying to handle unknown wifi experimenter type (%u).", exp->type);
                     return ofl_error(OFPET_BAD_REQUEST, OFPBRC_BAD_EXPERIMENTER);

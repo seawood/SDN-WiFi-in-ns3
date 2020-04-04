@@ -187,6 +187,14 @@ SpectrumWifiPhy::ConfigureStandard (WifiPhyStandard standard)
     }
 }
 
+//bad design
+ChannelQualityMap*
+SpectrumWifiPhy::GetChannelQualityRecord (void)
+{
+	NS_LOG_FUNCTION (this);
+	return &m_channelQuality;
+}
+
 void
 SpectrumWifiPhy::AddOperationalChannel (uint8_t channelNumber)
 {
@@ -215,6 +223,40 @@ SpectrumWifiPhy::ClearOperationalChannelList ()
 }
 
 void
+SpectrumWifiPhy::ChannelQualityRecordAdd (const Mac48Address& mac48address, 
+		const double& rxPower)
+{
+	NS_LOG_FUNCTION (this << mac48Address <<":" << rxPower);
+	auto it = m_channelQuality.find(mac48address);
+	if (it != m_channelQuality.end())
+	{
+		it->packets++;
+		it->rxPower_avg += ((rxPower - it->rxPower_avg)/(double)it->packets);
+		// TODO: standard deviation
+		NS_LOG_INFO ("update m_channelQuality:" << mac48address << ",avg=" <<
+					 it->rxPower_avg << ",std=" << it->rxPower_std);
+		if (it->trigger_set && ((it->packets >= it->packets_trigger) ||
+				(it->rxPower_avg >= it->rxPower_avg_trigger) ||
+				it->rxPower_std >= it->rxPower_std_trigger))
+		{
+			OFSwitch13Device::ReportChannelQualityTriggered (mac48address, it->packets,
+															it->rxPower_avg, it->rxPower_std);
+			it->trigger_set = false;
+		}
+	}
+	else
+	{
+		struct Report report;
+		report.packets = 1;
+		report.rxPower_avg = rxPower;
+		report.rxPower_std = 0;
+		report.trigger_set = false;
+		m_channelQuality[mac48Address] = report;
+		NS_LOG_INFO ("initial item for m_channelQuality:" << mac48address);
+	}
+}
+
+void
 SpectrumWifiPhy::StartRx (Ptr<SpectrumSignalParameters> rxParams)
 {
   NS_LOG_FUNCTION (this << rxParams);
@@ -222,9 +264,12 @@ SpectrumWifiPhy::StartRx (Ptr<SpectrumSignalParameters> rxParams)
   Ptr<SpectrumValue> receivedSignalPsd = rxParams->psd;
   NS_LOG_DEBUG ("Received signal with PSD " << *receivedSignalPsd << " and duration " << rxDuration.As (Time::NS));
   uint32_t senderNodeId = 0;
+  Mac48Address mac48address;
   if (rxParams->txPhy)
     {
-      senderNodeId = rxParams->txPhy->GetDevice ()->GetNode ()->GetId ();
+	  Ptr<NetDevice> device = rxParams->txPhy->GetDevice ();
+      senderNodeId = device-> GetNode() ->GetId ();
+	  mac48address = Mac48Address::ConvertFrom(device->GetAddress());
     }
   NS_LOG_DEBUG ("Received signal from " << senderNodeId << " with unfiltered power " << WToDbm (Integral (*receivedSignalPsd)) << " dBm");
   // Integrate over our receive bandwidth (i.e., all that the receive
@@ -240,6 +285,7 @@ SpectrumWifiPhy::StartRx (Ptr<SpectrumSignalParameters> rxParams)
 
   Ptr<WifiSpectrumSignalParameters> wifiRxParams = DynamicCast<WifiSpectrumSignalParameters> (rxParams);
 
+  ChannelQualityRecordAdd (mac48address, WToDbm (rxPowerW));
   // Log the signal arrival to the trace source
   m_signalCb (wifiRxParams ? true : false, senderNodeId, WToDbm (rxPowerW), rxDuration);
   if (wifiRxParams == 0)

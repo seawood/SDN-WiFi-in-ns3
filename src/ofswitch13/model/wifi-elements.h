@@ -34,6 +34,7 @@ public:
 						 const WifiPhyStandard& standard = WIFI_PHY_STANDARD_UNSPECIFIED);
 	void SetMac48Address (const uint8_t buffer[6]);
 	Mac48Address GetMac48Address (void);
+	Address GetAddress (void);
 	
 private:
 	Address m_address;  //Ipv4Address
@@ -59,7 +60,10 @@ public:
 	WifiNetworkStatus ();
 	void UpdateFrequencyUsed (Address address, uint16_t frequency, uint16_t width);
 	void AddApMac48address (const Mac48Address& mac48address);
-	  
+	void UpdateChannelQuality(const Address& apAddr, struct chaqua_report* report);
+	void UpdateApsInterference (const Address& dstAp, const Address& srcAp, struct chaqua_report* report);
+	void GetOneSTA (Address* ap, mac48Address* sta); //temporary
+	void PrintChannelQuality (void); //temporary, when receive reply or trigger
 private:
 	void InitializeFrequencyUnused ();
 	
@@ -68,7 +72,14 @@ private:
 	std::set<FrequencyWidthPair> m_frequencyUnused;
 	
 	std::set<Mac48Address> m_apsMac48address;
-	  
+	
+	struct ChannelReport {
+		uint64_t packets;     //number of received packets
+		double rxPower_avg;   //average ?double
+		double rxPower_std;   //standard deviation
+	};
+	std::map<Mac48Address, std::map<Address, struct ChannelReport>> m_STAsChannelQuality;
+	std::map<Address, std::map<Address, struct ChannelReport>> m_APsInterference;
 	  
 }; // class WifiNetworkStatus
 

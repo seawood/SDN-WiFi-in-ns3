@@ -562,6 +562,32 @@ OFSwitch13Device::SendOpenflowBufferToRemote (struct ofpbuf *buffer,
 }
 
 void
+OFSwitch13Device::ReportChannelQualityTriggered (const Mac48Address& mac48address, 
+												const uint64_t& packets,
+												const double& rxPower_avg, 
+												const double& rxPower_std)
+{
+	NS_LOG_INFO ("send WIFI_EXT_CHANNEL_QUALITY_TRIGGERED to controller");
+	struct ofl_exp_wifi_msg_chaqua reply;
+	reply.header.header.header.type = OFPT_EXPERIMENTER;
+	reply.header.header.experimenter_id = WIFI_VENDOR_ID;
+	reply.header.type = WIFI_EXT_CHANNEL_QUALITY_TRIGGERED;
+	reply.num = 1;
+	uint8_t *buf = malloc(sizeof(struct chaqua_report));
+	reply.reports = (struct chaqua_report**)&buf;
+	mac48address.CopyTo(reply.reports[0]->mac48address);
+	reply.reports[0]->packets = packets;
+	reply.reports[0]->rxPower_avd = rxPower_avd;
+	reply.reports[0]->rxPower_std = rxPower_std;
+	
+	struct sender senderCtrl;
+	senderCtrl.remote = remoteCtrl->m_remote;
+	senderCtrl.conn_id = 0;
+	senderCtrl.xid = 0;
+	dp_send_message(m_datapath (struct ofl_msg_header*)&reply, &senderCtrl);
+}
+
+void
 OFSwitch13Device::DpActionsOutputPort (struct packet *pkt, uint32_t outPort,
                                        uint32_t outQueue, uint16_t maxLength,
                                        uint64_t cookie)

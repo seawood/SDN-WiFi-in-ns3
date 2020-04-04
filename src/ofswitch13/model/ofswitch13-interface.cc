@@ -226,3 +226,103 @@ dp_handle_wifi_channel_set(struct datapath *dp, struct ofl_exp_wifi_msg_channel 
 	return error;
 	
 }
+
+ofl_err
+dp_handle_wifi_chanqua_request(struct datapath *dp,
+							   struct ofl_exp_wifi_msg_chaqua_req *msg,
+							   const struct sender *sender)
+{
+	NS_LOG_DEBUG ("dp_handle_wifi_chanqua_request: overide version");
+	Ptr<WifiNetDevice> wifiDev = OFSwitch13Device::GetWifiNetDevice(dp->id);
+	ofl_err error = 1;
+	if (wifiDev)
+	{
+		struct ofl_exp_wifi_msg_chaqua reply;
+		reply.header.header.header.type = OFPT_EXPERIMENTER;
+		reply.header.header.experimenter_id = WIFI_VENDOR_ID;
+		reply.header.type = WIFI_EXT_CHANNEL_QUALITY_REPLY;
+		Mac48Address requestAddr;
+		requestAddr.CopyFrom (msg->mac48address);
+		Ptr<SpectrumWifiPhy> phy = wifiDev->GetPhy();
+		SpectrumWifiPhy::ChannelQualityMap* record = phy->GetChannelQualityRecord();
+		if (requestAddr.IsBroadcast()) // request all channel quality info
+		{
+			reply->num = record->size();
+			uint8_t *buf = malloc(reply->num * sizeof(struct chaqua_report));
+			reply.reports = (struct chaqua_report**)&buf;
+			int i = 0;
+			for (auto itr = record->begin(); itr != record->end(); ++itr)
+			{
+				itr->first.CopyTo(reply.reports[i]->mac48address);
+				reply.reports[i]->packets = itr->second.packets;
+				reply.reports[i]->rxPower_avg = itr->second.rxPower_avg;
+				reply.reports[i]->rxPower_std = itr->second.rxPower_std;
+				++i;
+			}
+		}
+		else  // request channel quality info of a specific STA
+		{
+			reply->num = 1;
+			uint8_t *buf = malloc(sizeof(struct chaqua_report));
+			reply.reports = (struct chaqua_report**)&buf;
+			for (auto itr = record->begin(); itr != record.end(); ++itr)
+			{
+				if (requestAddr == itr->first)
+				{
+					requestAddr.CopyTo(reply.reports[0]->mac48address);
+					reply.reports[0]->packets = itr->second.packets;
+					reply.reports[0]->rxPower_avd = itr->second.rxPower_avd;
+					reply.reports[0]->rxPower_std = itr->second.rxPower_std;
+					break;
+				}
+			}
+		}
+		error = dp_send_message(dp, (struct ofl_msg_header*)&reply, sender);
+	}
+	else
+	{
+		NS_LOG_ERROR("no wifiNetDevice");
+		error = 1;
+	}
+	return error;
+}
+
+ofl_err
+dp_handle_wifi_chanqua_trigger_set (struct datapath *dp,
+									struct ofl_exp_wifi_msg_chaqua *msg,
+									const struct sender *sender)
+{
+	NS_LOG_DEBUG ("dp_handle_wifi_chanqua_trigger_set: overide version");
+	Ptr<WifiNetDevice> wifiDev = OFSwitch13Device::GetWifiNetDevice(dp->id);
+	ofl_err error = 1;
+	if (wifiDev)
+	{
+		Ptr<SpectrumWifiPhy> phy = wifiDev->GetPhy();
+		SpectrumWifiPhy::ChannelQualityMap* record = phy->GetChannelQualityRecord();
+		for (uint32_t i = 0; i < msg->num; ++i)
+		{
+			Mac48Address setAddr;
+			setAddr.CopyFrom (msg->reports[i]->mac48address);
+			auto item = record->find (setAddr);
+			if (item != record->end())
+			{
+				item->trigger_set = true;
+				item->packets_trigger = msg->reports[i]->packets;
+				item->rxPower_avg_trigger = msg->reports[i]->rxPower_avg;
+				item->rxPower_std_trigger = msg->reports[i]->rxPower_std;
+			}
+			else
+			{
+				error = 1;
+				NS_LOG_ERROR("set trigger for non existing device");
+				break;
+			}
+		}
+	}
+	else
+	{
+		NS_LOG_ERROR("no wifiNetDevice");
+		error = 1;
+	}
+	return error;
+}
