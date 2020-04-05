@@ -173,7 +173,7 @@ ofl_exp_wifi_msg_unpack(struct ofp_header *oh, size_t *len,
 				OFL_LOG_DBG(LOG_MODULE, "dst->header.header.experimenter_id : %x", dst->header.header.experimenter_id );
 				dst->header.type = ntohl(exp->subtype);
 				dst->num = ntohl (src->num);
-				OFL_LOG_DBG(LOG_MODULE, "dst->num: %lu", dst->num);
+				OFL_LOG_DBG(LOG_MODULE, "dst->num: %u", dst->num);
 				dst->reports = (struct chaqua_report**)malloc(dst->num * sizeof(struct chaqua_report*));
 				for (size_t i = 0; i < dst->num; ++i)
 				{

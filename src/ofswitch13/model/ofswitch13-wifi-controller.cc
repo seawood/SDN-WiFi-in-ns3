@@ -37,6 +37,7 @@ OFSwitch13WifiController::OFSwitch13WifiController()
 OFSwitch13WifiController::~OFSwitch13WifiController()
 {
 	NS_LOG_FUNCTION (this);
+	m_wifiNetworkStatus->PrintChannelQuality();
 }
 
 TypeId
@@ -107,7 +108,6 @@ OFSwitch13WifiController::HandleExperimenterMsg (
 				}
 			}
 			ofl_msg_free((struct ofl_msg_header*)msg, &dp_exp);
-			m_wifiNetworkStatus->PrintChannelQuality();
 			break;
 		}
 		default:

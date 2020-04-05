@@ -86,21 +86,23 @@ void
 WifiNetworkStatus::UpdateChannelQuality(const Address& apAddr, 
 										struct chaqua_report* report)
 {
-	NS_LOG_FUNCTION (this);
 	Mac48Address addr48;
 	addr48.CopyFrom (report->mac48address);
+	NS_LOG_FUNCTION (this << addr48<< ";" <<report->packets << ";"
+			<< report->rxPower_avg << ";" << report->rxPower_std);
 	auto item = m_STAsChannelQuality.find(addr48);
 	if (item == m_STAsChannelQuality.end()) //new STA
 	{
 		std::map<Address, struct ChannelReport> newMap;
 		m_STAsChannelQuality[addr48] = newMap;
+		NS_LOG_DEBUG ("insert new STA into CQM: " << addr48);
 	}
-	auto itemMap = m_STAsChannelQuality[addr48];
-	if (itemMap.find (apAddr) != itemMap.end())
+	if (m_STAsChannelQuality[addr48].find (apAddr) != m_STAsChannelQuality[addr48].end())
 	{
-		itemMap[apAddr].packets = report->packets;
-		itemMap[apAddr].rxPower_avg = report->rxPower_avg;
-		itemMap[apAddr].rxPower_std = report->rxPower_std;
+		m_STAsChannelQuality[addr48][apAddr].packets = report->packets;
+		m_STAsChannelQuality[addr48][apAddr].rxPower_avg = report->rxPower_avg;
+		m_STAsChannelQuality[addr48][apAddr].rxPower_std = report->rxPower_std;
+		NS_LOG_DEBUG("update CQM:");
 	}
 	else
 	{
@@ -108,7 +110,8 @@ WifiNetworkStatus::UpdateChannelQuality(const Address& apAddr,
 		newChannelReport.packets = report->packets;
 		newChannelReport.rxPower_avg = report->rxPower_avg;
 		newChannelReport.rxPower_std = report->rxPower_std;
-		itemMap.insert(std::make_pair(apAddr, newChannelReport));
+		m_STAsChannelQuality[addr48].insert(std::make_pair(apAddr, newChannelReport));
+		NS_LOG_DEBUG ("update CQM with new AP:" << m_STAsChannelQuality[addr48][apAddr].packets);
 	}
 	
 }
@@ -125,12 +128,11 @@ WifiNetworkStatus::UpdateApsInterference (const Address& dstAp,
 		std::map<Address, struct ChannelReport> newMap;
 		m_APsInterference[srcAp] = newMap;
 	}
-	auto itemMap = m_APsInterference[srcAp];
-	if (itemMap.find(dstAp) != itemMap.end())
+	if (m_APsInterference[srcAp].find(dstAp) != m_APsInterference[srcAp].end())
 	{
-		itemMap[dstAp].packets = report->packets;
-		itemMap[dstAp].rxPower_avg = report->rxPower_avg;
-		itemMap[dstAp].rxPower_std = report->rxPower_std;
+		m_APsInterference[srcAp][dstAp].packets = report->packets;
+		m_APsInterference[srcAp][dstAp].rxPower_avg = report->rxPower_avg;
+		m_APsInterference[srcAp][dstAp].rxPower_std = report->rxPower_std;
 	}
 	else
 	{
@@ -138,7 +140,7 @@ WifiNetworkStatus::UpdateApsInterference (const Address& dstAp,
 		newChannelReport.packets = report->packets;
 		newChannelReport.rxPower_avg = report->rxPower_avg;
 		newChannelReport.rxPower_std = report->rxPower_std;
-		itemMap[dstAp] = newChannelReport;
+		m_APsInterference[srcAp][dstAp] = newChannelReport;
 	}
 }
 
@@ -198,7 +200,7 @@ WifiNetworkStatus::PrintChannelQuality (void)
 	NS_LOG_INFO ("m_STAsChannelQuality final report:");
 	for (auto itr = m_STAsChannelQuality.begin(); itr != m_STAsChannelQuality.end(); ++itr)
 	{
-		NS_LOG_INFO ("STA : " << itr->first << "****");
+		NS_LOG_INFO ("STA : " << itr->first << "****" << itr->second.size());
 		for (auto item = itr->second.begin(); item != itr->second.end(); ++item)
 		{
 			NS_LOG_INFO("in AP:" << item->first << "channel info: " <<
@@ -211,7 +213,7 @@ WifiNetworkStatus::PrintChannelQuality (void)
 	NS_LOG_INFO ("m_APsInterference final report:");
 	for (auto itr = m_APsInterference.begin(); itr != m_APsInterference.end(); ++itr)
 	{
-		NS_LOG_INFO ("AP : " << itr->first << "****");
+		NS_LOG_INFO ("AP : " << itr->first << "****" << itr->second.size());
 		for (auto item = itr->second.begin(); item != itr->second.end(); ++item)
 		{
 			NS_LOG_INFO("in AP:" << item->first << "channel info: " <<
