@@ -580,11 +580,7 @@ OFSwitch13Device::ReportChannelQualityTriggered (const Mac48Address& mac48addres
 	reply.reports[0]->rxPower_avg = rxPower_avg;
 	reply.reports[0]->rxPower_std = rxPower_std;
 	
-	struct sender senderCtrl;
-	senderCtrl.remote = remoteCtrl->m_remote;
-	senderCtrl.conn_id = 0;
-	senderCtrl.xid = 0;
-	dp_send_message(m_datapath (struct ofl_msg_header*)&reply, &senderCtrl);
+	dp_send_message(m_datapath, (struct ofl_msg_header*)&reply, 0);
 }
 
 void

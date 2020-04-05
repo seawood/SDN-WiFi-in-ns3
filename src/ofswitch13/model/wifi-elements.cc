@@ -178,7 +178,7 @@ WifiNetworkStatus::UpdateFrequencyUsed (Address address,
 }
 
 void 
-WifiNetworkStatus::GetOneSTA (Address* ap, mac48Address* sta)
+WifiNetworkStatus::GetOneSTA (Address* ap, Mac48Address* sta)
 {
 	NS_LOG_FUNCTION(this);
 	if (m_STAsChannelQuality.empty())
@@ -186,9 +186,9 @@ WifiNetworkStatus::GetOneSTA (Address* ap, mac48Address* sta)
 		NS_LOG_ERROR("no sta");
 		return;
 	}
-	auto item = m_STAsChannelQuality->begin();
+	auto item = m_STAsChannelQuality.begin();
 	*sta = item->first;
-	*ap = item->second->begin()->first;
+	*ap = item->second.begin()->first;
 }
 
 void 

@@ -243,7 +243,7 @@ dp_handle_wifi_chanqua_request(struct datapath *dp,
 		reply.header.type = WIFI_EXT_CHANNEL_QUALITY_REPLY;
 		Mac48Address requestAddr;
 		requestAddr.CopyFrom (msg->mac48address);
-		Ptr<SpectrumWifiPhy> phy = wifiDev->GetPhy();
+		Ptr<SpectrumWifiPhy> phy = DynamicCast<SpectrumWifiPhy, WifiPhy>(wifiDev->GetPhy());
 		SpectrumWifiPhy::ChannelQualityMap* record = phy->GetChannelQualityRecord();
 		if (requestAddr.IsBroadcast()) // request all channel quality info
 		{
@@ -262,16 +262,16 @@ dp_handle_wifi_chanqua_request(struct datapath *dp,
 		}
 		else  // request channel quality info of a specific STA
 		{
-			reply->num = 1;
+			reply.num = 1;
 			reply.reports = (struct chaqua_report**)malloc(sizeof(struct chaqua_report*));
-			for (auto itr = record->begin(); itr != record.end(); ++itr)
+			for (auto itr = record->begin(); itr != record->end(); ++itr)
 			{
 				if (requestAddr == itr->first)
 				{
 					reply.reports[0] = (struct chaqua_report*) malloc(sizeof(struct chaqua_report));
 					requestAddr.CopyTo(reply.reports[0]->mac48address);
 					reply.reports[0]->packets = itr->second.packets;
-					reply.reports[0]->rxPower_avd = itr->second.rxPower_avd;
+					reply.reports[0]->rxPower_avg = itr->second.rxPower_avg;
 					reply.reports[0]->rxPower_std = itr->second.rxPower_std;
 					break;
 				}
@@ -306,10 +306,11 @@ dp_handle_wifi_chanqua_trigger_set (struct datapath *dp,
 			auto item = record->find (setAddr);
 			if (item != record->end())
 			{
-				item->trigger_set = true;
-				item->packets_trigger = msg->reports[i]->packets;
-				item->rxPower_avg_trigger = msg->reports[i]->rxPower_avg;
-				item->rxPower_std_trigger = msg->reports[i]->rxPower_std;
+				auto itemMap = item->second;
+				itemMap.trigger_set = true;
+				itemMap.packets_trigger = msg->reports[i]->packets;
+				itemMap.rxPower_avg_trigger = msg->reports[i]->rxPower_avg;
+				itemMap.rxPower_std_trigger = msg->reports[i]->rxPower_std;
 			}
 			else
 			{

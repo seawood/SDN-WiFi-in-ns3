@@ -233,10 +233,10 @@ OFSwitch13WifiController::SetChannelQualityTrigger (const Address& address,
 	for (uint32_t i = 0; i < msg.num; ++i)
 	{
 		msg.reports[i] = (struct chaqua_report*)malloc(sizeof(struct chaqua_report));
-		triggers[i].address.CopyTo(msg.reports[i].mac48address);
-		msg.reports[i].packets = triggers[i].packets;
-		msg.reports[i].rxPower_avg = triggers[i].rxPower_avg;
-		msg.reports[i].rxPower_std = triggers[i].rxPower_std;
+		triggers[i].address.CopyTo(msg.reports[i]->mac48address);
+		msg.reports[i]->packets = triggers[i].packets;
+		msg.reports[i]->rxPower_avg = triggers[i].rxPower_avg;
+		msg.reports[i]->rxPower_std = triggers[i].rxPower_std;
 	}
 	
 	SendToSwitch (swtch, (struct ofl_msg_header*)&msg);
