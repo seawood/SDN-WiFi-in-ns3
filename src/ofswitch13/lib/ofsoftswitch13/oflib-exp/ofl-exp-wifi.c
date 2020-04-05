@@ -169,6 +169,8 @@ ofl_exp_wifi_msg_unpack(struct ofp_header *oh, size_t *len,
 				OFL_LOG_WARN(LOG_MODULE, "unpack WIFI_EXT_CHANNEL_QUALITY_");
 				src = (struct wifi_channel_quality*)exp;
 				dst = (struct ofl_exp_wifi_msg_chaqua*)malloc(sizeof(struct ofl_exp_wifi_msg_chaqua));
+				dst->header.header.experimenter_id = ntohl(exp->vendor);
+				dst->header.type = ntohl(exp->subtype);
 				dst->num = ntohl (src->num);
 				dst->reports = (struct chaqua_report**)malloc(dst->num * sizeof(struct chaqua_report*));
 				for (size_t i = 0; i < dst->num; ++i)
