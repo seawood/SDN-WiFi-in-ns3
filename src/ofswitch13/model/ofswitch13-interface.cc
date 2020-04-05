@@ -297,7 +297,7 @@ dp_handle_wifi_chanqua_trigger_set (struct datapath *dp,
 	ofl_err error = 1;
 	if (wifiDev)
 	{
-		Ptr<SpectrumWifiPhy> phy = wifiDev->GetPhy();
+		Ptr<SpectrumWifiPhy> phy = DynamicCast<SpectrumWifiPhy, WifiPhy>(wifiDev->GetPhy());
 		SpectrumWifiPhy::ChannelQualityMap* record = phy->GetChannelQualityRecord();
 		for (uint32_t i = 0; i < msg->num; ++i)
 		{
@@ -306,11 +306,10 @@ dp_handle_wifi_chanqua_trigger_set (struct datapath *dp,
 			auto item = record->find (setAddr);
 			if (item != record->end())
 			{
-				auto itemMap = item->second;
-				itemMap.trigger_set = true;
-				itemMap.packets_trigger = msg->reports[i]->packets;
-				itemMap.rxPower_avg_trigger = msg->reports[i]->rxPower_avg;
-				itemMap.rxPower_std_trigger = msg->reports[i]->rxPower_std;
+				item->second.trigger_set = true;
+				item->second.packets_trigger = msg->reports[i]->packets;
+				item->second.rxPower_avg_trigger = msg->reports[i]->rxPower_avg;
+				item->second.rxPower_std_trigger = msg->reports[i]->rxPower_std;
 			}
 			else
 			{

@@ -562,10 +562,8 @@ OFSwitch13Device::SendOpenflowBufferToRemote (struct ofpbuf *buffer,
 }
 
 void
-OFSwitch13Device::ReportChannelQualityTriggered (const Mac48Address& mac48address, 
-												const uint64_t& packets,
-												const double& rxPower_avg, 
-												const double& rxPower_std)
+OFSwitch13Device::ReportChannelQualityTriggered (Mac48Address mac48address, uint64_t packets,
+						double rxPower_avg, double rxPower_std)
 {
 	NS_LOG_INFO ("send WIFI_EXT_CHANNEL_QUALITY_TRIGGERED to controller");
 	struct ofl_exp_wifi_msg_chaqua reply;

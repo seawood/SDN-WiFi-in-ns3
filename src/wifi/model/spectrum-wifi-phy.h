@@ -198,8 +198,7 @@ public:
   typedef std::map<Mac48Address, struct Report> ChannelQualityMap;
   ChannelQualityMap *GetChannelQualityRecord (void);
   
-  typedef void (* ChannelQualityTriggeredCallback) (Mac48Address mac48address, uint32_t packets,
-		  double rxPower_avg, double rxPower_std);
+  typedef Callback<void, Mac48Address, uint64_t, double, double> ChannelQualityTriggeredCallback;
 
   void SetChannelQualityTriggeredCallback (ChannelQualityTriggeredCallback cb);
 protected:

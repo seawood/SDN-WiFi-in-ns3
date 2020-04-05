@@ -212,9 +212,9 @@ OFSwitch13Port::NotifyConstructionCompleted ()
 		NS_ASSERT (wifiDev);
 		wifiDev->SetOpenFlowReceiveCallback(
 			MakeCallback (&OFSwitch13Port::Receive, this));
-		Ptr<SpectrumWifiPhy> phy = wifiDev->GetPhy();
+		Ptr<SpectrumWifiPhy> phy = DynamicCast<SpectrumWifiPhy, WifiPhy>(wifiDev->GetPhy());
 		phy->SetChannelQualityTriggeredCallback(
-			MakeCallback(&OFSwitch13Device::ReportChannelQualityTriggered), m_openflowDev);
+			MakeCallback(&OFSwitch13Device::ReportChannelQualityTriggered, m_openflowDev));
 	}
 }
 
