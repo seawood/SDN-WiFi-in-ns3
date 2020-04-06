@@ -310,6 +310,7 @@ dp_handle_wifi_chanqua_trigger_set (struct datapath *dp,
 				item->second.packets_trigger = msg->reports[i]->packets;
 				item->second.rxPower_avg_trigger = msg->reports[i]->rxPower_avg;
 				item->second.rxPower_std_trigger = msg->reports[i]->rxPower_std;
+				error = 0;
 			}
 			else
 			{

@@ -247,8 +247,8 @@ main (int argc, char *argv[])
 	
 	Simulator::Schedule (Seconds (3), &OFSwitch13WifiController::ChannelQualityReportStrategy,
 						 wifiControl);
-	//Simulator::Schedule (Seconds (6), &OFSwitch13WifiController::ChannelQualityTriggerStrategy,
-	//wifiControl);
+	Simulator::Schedule (Seconds (6), &OFSwitch13WifiController::ChannelQualityTriggerStrategy,
+	wifiControl);
 
 	Simulator::Stop (Seconds (simTime));
 	

@@ -173,7 +173,7 @@ OFSwitch13WifiController::ChannelQualityTriggerStrategy (void)
 	struct OneReport trigger;
 	trigger.address = sta;
 	trigger.packets = 10;
-	trigger.rxPower_avg = 10;
+	trigger.rxPower_avg = 5;
 	trigger.rxPower_std = 10;
 	triggers.push_back(trigger);
 	SetChannelQualityTrigger(ap, triggers);
