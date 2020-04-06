@@ -237,19 +237,19 @@ SpectrumWifiPhy::ChannelQualityRecordAdd (const Mac48Address& mac48address,
 	auto it = m_channelQuality.find(mac48address);
 	if (it != m_channelQuality.end())
 	{
-		auto item = it->second;
-		item.packets++;
-		item.rxPower_avg += ((rxPower - item.rxPower_avg)/(double)item.packets);
+		auto item = &(it->second);
+		item->packets++;
+		item->rxPower_avg += ((rxPower - item->rxPower_avg)/(double)item->packets);
 		// TODO: standard deviation
 		NS_LOG_INFO ("update m_channelQuality:" << mac48address << ",avg=" <<
-					 item.rxPower_avg << ",std=" << item.rxPower_std);
-		if (item.trigger_set && ((item.packets >= item.packets_trigger) ||
-				(item.rxPower_avg >= item.rxPower_avg_trigger) ||
-				item.rxPower_std >= item.rxPower_std_trigger))
+					 item->rxPower_avg << ",std=" << item->rxPower_std);
+		if (item->trigger_set && ((item->packets >= item->packets_trigger) ||
+				(item->rxPower_avg >= item->rxPower_avg_trigger) ||
+				item->rxPower_std >= item->rxPower_std_trigger))
 		{
-			m_reportChannelQualityTriggered (mac48address, item.packets,
-									item.rxPower_avg, item.rxPower_std);
-			item.trigger_set = false;
+			m_reportChannelQualityTriggered (mac48address, item->packets,
+									item->rxPower_avg, item->rxPower_std);
+			item->trigger_set = false;
 		}
 	}
 	else
