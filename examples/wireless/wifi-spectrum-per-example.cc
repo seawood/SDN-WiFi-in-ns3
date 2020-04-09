@@ -150,6 +150,9 @@ int main (int argc, char *argv[])
     std::setw (12) << "Noise (dBm)" <<
     std::setw (9) << "SNR (dB)" <<
     std::endl;
+  LogComponentEnable ("UdpClient", LOG_LEVEL_ALL);
+  LogComponentEnable ("UdpServer", LOG_LEVEL_ALL);
+
   for (uint16_t i = startIndex; i <= stopIndex; i++)
     {
       uint32_t payloadSize;

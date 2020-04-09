@@ -38,6 +38,7 @@
 #include <ns3/wifi-module.h>
 #include <ns3/spectrum-module.h>
 #include "ns3/mobility-helper.h"
+#include "ns3/udp-client-server-helper.h"
 
 using namespace ns3;
 
@@ -82,22 +83,24 @@ main (int argc, char *argv[])
 	if (verbose)
     {
 		OFSwitch13Helper::EnableDatapathLogs ();
-		LogComponentEnable ("OFSwitch13Interface", LOG_LEVEL_ALL);
-		LogComponentEnable ("OFSwitch13Device", LOG_LEVEL_ALL);
+		//LogComponentEnable ("OFSwitch13Interface", LOG_LEVEL_ALL);
+		//LogComponentEnable ("OFSwitch13Device", LOG_LEVEL_ALL);
 		//LogComponentEnable ("OFSwitch13Port", LOG_LEVEL_ALL);
 		//LogComponentEnable ("OFSwitch13Queue", LOG_LEVEL_ALL);
 		//LogComponentEnable ("OFSwitch13SocketHandler", LOG_LEVEL_ALL);
-		LogComponentEnable ("OFSwitch13Controller", LOG_LEVEL_ALL);
+		//LogComponentEnable ("OFSwitch13Controller", LOG_LEVEL_ALL);
 		//LogComponentEnable ("OFSwitch13LearningController", LOG_LEVEL_ALL);
-		LogComponentEnable ("OFSwitch13Helper", LOG_LEVEL_ALL);
-		LogComponentEnable ("OFSwitch13InternalHelper", LOG_LEVEL_ALL);
+		//LogComponentEnable ("OFSwitch13Helper", LOG_LEVEL_ALL);
+		//LogComponentEnable ("OFSwitch13InternalHelper", LOG_LEVEL_ALL);
 		LogComponentEnable ("WifiNetDevice", LOG_LEVEL_ALL);
 		//LogComponentEnable ("CsmaNetDevice", LOG_LEVEL_ALL);
 		//LogComponentEnable ("Simulator", LOG_LEVEL_ALL);
-		LogComponentEnable ("OFSwitch13WifiController", LOG_LEVEL_ALL);
-		LogComponentEnable ("WifiElements", LOG_LEVEL_ALL);
+		//LogComponentEnable ("OFSwitch13WifiController", LOG_LEVEL_ALL);
+		//LogComponentEnable ("WifiElements", LOG_LEVEL_ALL);
 		LogComponentEnable ("WifiPhy", LOG_LEVEL_ALL);
 		LogComponentEnable ("SpectrumWifiPhy", LOG_LEVEL_ALL);
+		LogComponentEnable ("UdpServer", LOG_LEVEL_ALL);
+		LogComponentEnable ("UdpClient", LOG_LEVEL_ALL);
     }
 	
 
@@ -159,10 +162,11 @@ main (int argc, char *argv[])
 	spectrumPhy.Set ("ChannelWidth", UintegerValue (20));
 
 	WifiHelper wifi;
-	std::string DataRate = StringValue("HtMcs0");
-	double datarate = 6.5; //?
-	wifi.SetRemoteStationManager ("ns3::ConstantRateWifiManager","DataMode", DataRate,
-								  "ControlMode", DataRate);
+	//wifi.SetStandard (WIFI_PHY_STANDARD_80211ac);
+	//StringValue DataRate = StringValue("HtMcs0");
+	//double datarate = 6.5; //?
+	//wifi.SetRemoteStationManager ("ns3::ConstantRateWifiManager","DataMode", DataRate,
+	//							  "ControlMode", DataRate);
 	
 	//mac configuration
 	WifiMacHelper wifiMac;
@@ -237,16 +241,16 @@ main (int argc, char *argv[])
 	UdpServerHelper server (port);
 	ApplicationContainer serverApp = server.Install (stas.Get (1));
 	serverApp.Start (Seconds (0.0));
-	serverApp.Stop (Seconds (simulationTime + 1));
+	serverApp.Stop (Seconds (simTime + 1));
 	
-	UdpClientHelper client (staNodeInterface.GetAddress (0), port);
+	UdpClientHelper client (staIpIfaces.GetAddress (1), port);
 	client.SetAttribute ("MaxPackets", UintegerValue (4294967295u));
-	client.SetAttribute ("Interval", TimeValue (Time ("0.00001"))); //packets/s
+	client.SetAttribute ("Interval", TimeValue (Time ("0.001"))); //packets/s
 	uint32_t payloadSize = 972;  //1000 bytes IPv4
 	client.SetAttribute ("PacketSize", UintegerValue (payloadSize));
 	ApplicationContainer clientApp = client.Install (stas.Get (0));
 	clientApp.Start (Seconds (1.0));
-	clientApp.Stop (Seconds (simulationTime + 1));
+	clientApp.Stop (Seconds (simTime + 1));
 	
 	Config::ConnectWithoutContext ("/NodeList/"+std::to_string(aps.Get(0)->GetId())+
 								   "/DeviceList/"+std::to_string(apWifiDevs.Get(0)->GetIfIndex())+
@@ -279,12 +283,10 @@ main (int argc, char *argv[])
 	//print simulation result
 	std::cout << std::setprecision (4) << std::fixed;
 	
-	std::cout << std::setw(12) << "datarate" <<
-			  std::setw(12) << "throughput" <<
+	std::cout << std::setw(12) << "throughput" <<
 			  std::setw(12) << "receivedPackets" <<
 			  std::endl;
-	std::cout << std::setw(12) << datarate <<
-			  std::setw(12) << throughput <<
+	std::cout << std::setw(12) << throughput <<
 			  std::setw(12) << totalPacketThrough <<
 			  std::endl;
 	
