@@ -70,7 +70,7 @@ main (int argc, char *argv[])
 	bool trace = false;
 	std::string errorModelType = "ns3::NistErrorRateModel";
 	double distance = 5;        //meters
-	double rate = 0.5; //requests/s
+	double rate = 0.5;         //requests/s
 
 	// Configure command line parameters
 	CommandLine cmd;
@@ -79,11 +79,12 @@ main (int argc, char *argv[])
 	cmd.AddValue ("trace", "Enable datapath stats and pcap traces", trace);
 	cmd.AddValue ("errorModelType", "select ns3::NistErrorRateModel or ns3::YansErrorRateModel", errorModelType);
 	cmd.AddValue ("distance", "distance between nodes", distance);
+	cmd.AddValue ("rate", "channel quality OF request rate", rate);
 	cmd.Parse (argc, argv);
 
 	if (verbose)
     {
-		OFSwitch13Helper::EnableDatapathLogs ();
+		//OFSwitch13Helper::EnableDatapathLogs ();
 		//LogComponentEnable ("OFSwitch13Interface", LOG_LEVEL_ALL);
 		//LogComponentEnable ("OFSwitch13Device", LOG_LEVEL_ALL);
 		//LogComponentEnable ("OFSwitch13Port", LOG_LEVEL_ALL);
@@ -93,15 +94,16 @@ main (int argc, char *argv[])
 		//LogComponentEnable ("OFSwitch13LearningController", LOG_LEVEL_ALL);
 		//LogComponentEnable ("OFSwitch13Helper", LOG_LEVEL_ALL);
 		//LogComponentEnable ("OFSwitch13InternalHelper", LOG_LEVEL_ALL);
-		LogComponentEnable ("WifiNetDevice", LOG_LEVEL_ALL);
+		//LogComponentEnable ("WifiNetDevice", LOG_LEVEL_ALL);
 		//LogComponentEnable ("CsmaNetDevice", LOG_LEVEL_ALL);
 		//LogComponentEnable ("Simulator", LOG_LEVEL_ALL);
-		//LogComponentEnable ("OFSwitch13WifiController", LOG_LEVEL_ALL);
+		LogComponentEnable ("OFSwitch13WifiController", LOG_LEVEL_ALL);
 		//LogComponentEnable ("WifiElements", LOG_LEVEL_ALL);
-		LogComponentEnable ("WifiPhy", LOG_LEVEL_ALL);
-		LogComponentEnable ("SpectrumWifiPhy", LOG_LEVEL_ALL);
-		LogComponentEnable ("UdpServer", LOG_LEVEL_ALL);
-		LogComponentEnable ("UdpClient", LOG_LEVEL_ALL);
+		//LogComponentEnable ("WifiPhy", LOG_LEVEL_ALL);
+		//LogComponentEnable ("SpectrumWifiPhy", LOG_LEVEL_ALL);
+		//LogComponentEnable ("UdpServer", LOG_LEVEL_ALL);
+		//LogComponentEnable ("UdpClient", LOG_LEVEL_ALL);
+	        //LogComponentEnable ("PropagationLossModel", LOG_LEVEL_ALL);
     }
 	
 
@@ -145,8 +147,12 @@ main (int argc, char *argv[])
 	// spectrum channel configuration
 	Ptr<MultiModelSpectrumChannel> spectrumChannel
 		= CreateObject<MultiModelSpectrumChannel> ();
-	Ptr<FriisPropagationLossModel> lossModel
-		= CreateObject<FriisPropagationLossModel> ();
+	Ptr<RandomPropagationLossModel> lossModel
+		= CreateObject<RandomPropagationLossModel> ();
+	Ptr<UniformRandomVariable> x = CreateObject<UniformRandomVariable>();
+	x -> SetAttribute ("Min", DoubleValue(0.0));
+	x -> SetAttribute ("Max", DoubleValue(2.0));
+	lossModel -> SetAttribute ("Variable", PointerValue(x));
 	//lossModel->SetFrequency (5.180e9);
 	spectrumChannel->AddPropagationLossModel (lossModel);
 	Ptr<ConstantSpeedPropagationDelayModel> delayModel
@@ -246,7 +252,7 @@ main (int argc, char *argv[])
 	
 	UdpClientHelper client (staIpIfaces.GetAddress (1), port);
 	client.SetAttribute ("MaxPackets", UintegerValue (4294967295u));
-	client.SetAttribute ("Interval", TimeValue (Time ("0.001"))); //packets/s
+	client.SetAttribute ("Interval", TimeValue (Time ("0.0001"))); //packets/s
 	uint32_t payloadSize = 972;  //1000 bytes IPv4
 	client.SetAttribute ("PacketSize", UintegerValue (payloadSize));
 	ApplicationContainer clientApp = client.Install (stas.Get (0));
