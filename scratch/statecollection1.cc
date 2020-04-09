@@ -66,10 +66,11 @@ int
 main (int argc, char *argv[])
 {
 	double simTime = 10;        //Seconds
-	bool verbose = true;
-	bool trace = true;
+	bool verbose = false;
+	bool trace = false;
 	std::string errorModelType = "ns3::NistErrorRateModel";
 	double distance = 5;        //meters
+	double rate = 0.5; //requests/s
 
 	// Configure command line parameters
 	CommandLine cmd;
@@ -268,8 +269,13 @@ main (int argc, char *argv[])
 		spectrumPhy.EnablePcap ("sta", staDevs);
     }
 	
-	//Simulator::Schedule (Seconds (3), &OFSwitch13WifiController::ChannelQualityReportStrategy,
-						 //wifiControl);
+	double requestInterval = 1/rate;
+	for (double i = 1.0; i <= simTime; i+=requestInterval)
+	{
+		Simulator::Schedule (Seconds (i), &OFSwitch13WifiController::ChannelQualityReportStrategy,
+							 wifiControl);
+	}
+	
 
 	Simulator::Stop (Seconds (simTime + 1));
 	
@@ -283,11 +289,11 @@ main (int argc, char *argv[])
 	//print simulation result
 	std::cout << std::setprecision (4) << std::fixed;
 	
-	std::cout << std::setw(12) << "throughput" <<
-			  std::setw(12) << "receivedPackets" <<
+	std::cout << std::setw(20) << "throughput" <<
+			  std::setw(20) << "receivedPackets" <<
 			  std::endl;
-	std::cout << std::setw(12) << throughput <<
-			  std::setw(12) << totalPacketThrough <<
+	std::cout << std::setw(20) << throughput <<
+			  std::setw(20) << totalPacketThrough <<
 			  std::endl;
 	
 	std::cout << std::setw (12) << "nodeId" <<
