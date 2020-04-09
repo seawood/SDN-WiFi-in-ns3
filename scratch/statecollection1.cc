@@ -19,12 +19,12 @@
  *
  * AP0 and AP1 connected to a single OpenFlow switch. STA0 is served by AP0. STA1 is served by AP1.
  * The switch and two APs are managed by the default learning controller application.
- * STA0 and STA1 communicates with each other via the wired link.
+ * STA0 is udpclient, STA1 is udpserver.
  * 
- *      AP1---Switch---AP2
+ *      AP0---Switch---AP1
  *       |              |
  *       |              |
- *      STA1           STA2
+ *      STA0           STA1
  */
 #include <iomanip>
 #include <string>
@@ -64,11 +64,11 @@ void MonitorSpectrumRx(bool signalType,
 int
 main (int argc, char *argv[])
 {
-	uint16_t simTime = 10;
+	double simTime = 10;        //Seconds
 	bool verbose = true;
 	bool trace = true;
 	std::string errorModelType = "ns3::NistErrorRateModel";
-	double distance = 50;
+	double distance = 5;        //meters
 
 	// Configure command line parameters
 	CommandLine cmd;
@@ -153,22 +153,22 @@ main (int argc, char *argv[])
 	SpectrumWifiPhyHelper spectrumPhy = SpectrumWifiPhyHelper::Default ();
 	spectrumPhy.SetChannel (spectrumChannel);
 	spectrumPhy.SetErrorRateModel (errorModelType);
-	//spectrumPhy.Set ("Frequency", UintegerValue (5180));
-	spectrumPhy.Set ("TxPowerStart", DoubleValue (10)); // dBm  (1.26 mW)
-	spectrumPhy.Set ("TxPowerEnd", DoubleValue (10));
+	spectrumPhy.Set ("TxPowerStart", DoubleValue (100)); // dBm  (1.26 mW)
+	spectrumPhy.Set ("TxPowerEnd", DoubleValue (100));
 	spectrumPhy.Set ("ShortGuardEnabled", BooleanValue (false));
-	//spectrumPhy.Set ("ChannelWidth", UintegerValue (20));
+	spectrumPhy.Set ("ChannelWidth", UintegerValue (20));
 
 	WifiHelper wifi;
-	//wifi.SetStandard (WIFI_PHY_STANDARD_80211n_5GHZ);
-	//StringValue DataRate = StringValue ("HtMcs0");
-	//wifi.SetRemoteStationManager ("ns3::ConstantRateWifiManager","DataMode", DataRate,
-	//"ControlMode", DataRate);
+	std::string DataRate = StringValue("HtMcs0");
+	double datarate = 6.5; //?
+	wifi.SetRemoteStationManager ("ns3::ConstantRateWifiManager","DataMode", DataRate,
+								  "ControlMode", DataRate);
+	
 	//mac configuration
 	WifiMacHelper wifiMac;
 	Ssid ssid1 = Ssid ("wifi1");
 	
-	//ap0 and sta0 use 2412MHz(channel 1), ap1 and sta1 use 2417MHz(channel 2)
+	//ap0 and sta0 use 2412MHz, ap1 and sta1 use 5905MHz
 	wifiMac.SetType ("ns3::StaWifiMac",
 					 "ActiveProbing", BooleanValue (true),
 					 "Ssid", SsidValue (ssid1));
@@ -180,7 +180,7 @@ main (int argc, char *argv[])
 	apWifiDevs.Add (wifi.Install (spectrumPhy, wifiMac, aps.Get(0)));
 	
 	Ssid ssid2 = Ssid ("wifi2");
-	spectrumPhy.Set ("Frequency", UintegerValue (2472));
+	spectrumPhy.Set ("Frequency", UintegerValue (5905));
 	wifiMac.SetType ("ns3::StaWifiMac",
 					 "ActiveProbing", BooleanValue (true),
 					 "Ssid", SsidValue (ssid2));
@@ -192,12 +192,16 @@ main (int argc, char *argv[])
 	
 	//mobility configuration
 	MobilityHelper mobility;
+	
 	Ptr<ListPositionAllocator> positionAlloc = CreateObject<ListPositionAllocator> ();
 	positionAlloc->Add (Vector (0.0, distance, 0.0));
 	positionAlloc->Add (Vector (distance, distance, 0.0));
 	positionAlloc->Add (Vector (0.0, 0.0, 0.0));
 	positionAlloc->Add (Vector (distance, 0.0, 0.0));
 	mobility.SetPositionAllocator (positionAlloc);
+	
+	mobility.SetMobilityModel ("ns3::ConstantPositionMobilityModel");
+	
 	mobility.Install (aps);
 	mobility.Install (stas);
 
@@ -228,11 +232,21 @@ main (int argc, char *argv[])
 	Ipv4InterfaceContainer staIpIfaces;
 	staIpIfaces = ipv4helpr.Assign (staDevs);
 
-	// Configure ping application between STAs, STA0 ping STA1
-	V4PingHelper pingHelper = V4PingHelper (staIpIfaces.GetAddress (1));
-	pingHelper.SetAttribute ("Verbose", BooleanValue (true));
-	ApplicationContainer pingApps = pingHelper.Install (stas.Get (0));
-	pingApps.Start (Seconds (1));
+	// setting application
+	uint16_t port = 9;
+	UdpServerHelper server (port);
+	ApplicationContainer serverApp = server.Install (stas.Get (1));
+	serverApp.Start (Seconds (0.0));
+	serverApp.Stop (Seconds (simulationTime + 1));
+	
+	UdpClientHelper client (staNodeInterface.GetAddress (0), port);
+	client.SetAttribute ("MaxPackets", UintegerValue (4294967295u));
+	client.SetAttribute ("Interval", TimeValue (Time ("0.00001"))); //packets/s
+	uint32_t payloadSize = 972;  //1000 bytes IPv4
+	client.SetAttribute ("PacketSize", UintegerValue (payloadSize));
+	ApplicationContainer clientApp = client.Install (stas.Get (0));
+	clientApp.Start (Seconds (1.0));
+	clientApp.Stop (Seconds (simulationTime + 1));
 	
 	Config::ConnectWithoutContext ("/NodeList/"+std::to_string(aps.Get(0)->GetId())+
 								   "/DeviceList/"+std::to_string(apWifiDevs.Get(0)->GetIfIndex())+
@@ -250,16 +264,30 @@ main (int argc, char *argv[])
 		spectrumPhy.EnablePcap ("sta", staDevs);
     }
 	
-	Simulator::Schedule (Seconds (3), &OFSwitch13WifiController::ChannelQualityReportStrategy,
-						 wifiControl);
+	//Simulator::Schedule (Seconds (3), &OFSwitch13WifiController::ChannelQualityReportStrategy,
+						 //wifiControl);
 
-	Simulator::Stop (Seconds (simTime));
+	Simulator::Stop (Seconds (simTime + 1));
 	
 	// Run the simulation
 	Simulator::Run ();
 	
+	// calculate throughput
+	uint64_t totalPacketThrough = DynamicCast<UdpServer>(serverApp.Get(0))->GetReceived();
+	double throughput = totalPacketThrough * payloadSize * 8 / (simTime * 1000000.0);  //Mbit/s
+	
 	//print simulation result
 	std::cout << std::setprecision (4) << std::fixed;
+	
+	std::cout << std::setw(12) << "datarate" <<
+			  std::setw(12) << "throughput" <<
+			  std::setw(12) << "receivedPackets" <<
+			  std::endl;
+	std::cout << std::setw(12) << datarate <<
+			  std::setw(12) << throughput <<
+			  std::setw(12) << totalPacketThrough <<
+			  std::endl;
+	
 	std::cout << std::setw (12) << "nodeId" <<
 			  std::setw (12) << "samples" <<
 			  std::setw (12) << "rxPower" <<
