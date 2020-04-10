@@ -98,7 +98,7 @@ main (int argc, char *argv[])
 		//LogComponentEnable ("CsmaNetDevice", LOG_LEVEL_ALL);
 		//LogComponentEnable ("Simulator", LOG_LEVEL_ALL);
 		LogComponentEnable ("OFSwitch13WifiController", LOG_LEVEL_ALL);
-		//LogComponentEnable ("WifiElements", LOG_LEVEL_ALL);
+		LogComponentEnable ("WifiElements", LOG_LEVEL_ALL);
 		//LogComponentEnable ("WifiPhy", LOG_LEVEL_ALL);
 		//LogComponentEnable ("SpectrumWifiPhy", LOG_LEVEL_ALL);
 		//LogComponentEnable ("UdpServer", LOG_LEVEL_ALL);
@@ -252,7 +252,7 @@ main (int argc, char *argv[])
 	
 	UdpClientHelper client (staIpIfaces.GetAddress (1), port);
 	client.SetAttribute ("MaxPackets", UintegerValue (4294967295u));
-	client.SetAttribute ("Interval", TimeValue (Time ("0.0001"))); //packets/s
+	client.SetAttribute ("Interval", TimeValue (Time ("0.01"))); //packets/s
 	uint32_t payloadSize = 972;  //1000 bytes IPv4
 	client.SetAttribute ("PacketSize", UintegerValue (payloadSize));
 	ApplicationContainer clientApp = client.Install (stas.Get (0));
