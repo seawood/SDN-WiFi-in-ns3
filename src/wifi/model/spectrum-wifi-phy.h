@@ -190,10 +190,11 @@ public:
 	  bool trigger_set;
 	  uint64_t packets;     //number of received packets
 	  uint64_t packets_trigger;
-	  double rxPower_avg;   //average
+	  double rxPower_avg;   //average of last 10 packets
 	  double rxPower_avg_trigger;
 	  double rxPower_std;   //standard deviation
 	  double rxPower_std_trigger;
+	  std::queue<double> rxPower_records;
   };
   typedef std::map<Mac48Address, struct Report> ChannelQualityMap;
   ChannelQualityMap *GetChannelQualityRecord (void);

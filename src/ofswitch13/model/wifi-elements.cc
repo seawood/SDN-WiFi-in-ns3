@@ -203,20 +203,22 @@ WifiNetworkStatus::PrintChannelQuality (void)
 		NS_LOG_INFO ("STA : " << itr->first << "****" << itr->second.size());
 		for (auto item = itr->second.begin(); item != itr->second.end(); ++item)
 		{
-			NS_LOG_INFO("in AP:" << item->first << "channel info: " <<
+			Ipv4Address apIpv4 = Ipv4Address::ConvertFrom(item->first);
+			NS_LOG_INFO("in AP:" << apIpv4 << "channel info: " <<
 						item->second.packets << ";" << 
 						item->second.rxPower_avg << ";" <<
 						item->second.rxPower_std);
-						
 		}
 	}
 	NS_LOG_INFO ("m_APsInterference final report:");
 	for (auto itr = m_APsInterference.begin(); itr != m_APsInterference.end(); ++itr)
 	{
-		NS_LOG_INFO ("AP : " << itr->first << "****" << itr->second.size());
+		Ipv4Address ap1Ipv4 = Ipv4Address::ConvertFrom(itr->first);
+		NS_LOG_INFO ("AP : " << ap1Ipv4 << "****" << itr->second.size());
 		for (auto item = itr->second.begin(); item != itr->second.end(); ++item)
 		{
-			NS_LOG_INFO("in AP:" << item->first << "channel info: " <<
+			Ipv4Address ap2Ipv4 = Ipv4Address::ConvertFrom(item->first);
+			NS_LOG_INFO("in AP:" << ap2Ipv4 << "channel info: " <<
 						item->second.packets << ";" << 
 						item->second.rxPower_avg << ";" <<
 						item->second.rxPower_std);
