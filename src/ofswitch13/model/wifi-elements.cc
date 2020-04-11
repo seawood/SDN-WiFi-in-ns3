@@ -210,15 +210,15 @@ WifiNetworkStatus::PrintChannelQuality (void)
 						item->second.rxPower_std);
 		}
 	}
-	NS_LOG_INFO ("m_APsInterference final report:");
+	NS_LOG_WARN ("m_APsInterference final report:");
 	for (auto itr = m_APsInterference.begin(); itr != m_APsInterference.end(); ++itr)
 	{
 		Ipv4Address ap1Ipv4 = InetSocketAddress::ConvertFrom(itr->first).GetIpv4();
-		NS_LOG_INFO ("AP : " << ap1Ipv4 << "****" << itr->second.size());
+		NS_LOG_WARN ("AP : " << ap1Ipv4 << "****" << itr->second.size());
 		for (auto item = itr->second.begin(); item != itr->second.end(); ++item)
 		{
 			Ipv4Address ap2Ipv4 = InetSocketAddress::ConvertFrom(item->first).GetIpv4();
-			NS_LOG_INFO("in AP:" << ap2Ipv4 << "channel info: " <<
+			NS_LOG_WARN("in AP:" << ap2Ipv4 << "channel info: " <<
 						item->second.packets << ";" << 
 						item->second.rxPower_avg << ";" <<
 						item->second.rxPower_std);

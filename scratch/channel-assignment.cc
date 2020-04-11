@@ -66,11 +66,10 @@ int
 main (int argc, char *argv[])
 {
 	double simTime = 10;        //Seconds
-	bool verbose = false;
-	bool trace = false;
+	bool verbose = true;
+	bool trace = true;
 	std::string errorModelType = "ns3::NistErrorRateModel";
 	double distance = 5;        //meters
-	double rate = 0.5;         //requests/s
 
 	// Configure command line parameters
 	CommandLine cmd;
@@ -79,7 +78,6 @@ main (int argc, char *argv[])
 	cmd.AddValue ("trace", "Enable datapath stats and pcap traces", trace);
 	cmd.AddValue ("errorModelType", "select ns3::NistErrorRateModel or ns3::YansErrorRateModel", errorModelType);
 	cmd.AddValue ("distance", "distance between nodes", distance);
-	cmd.AddValue ("rate", "channel quality OF request rate", rate);
 	cmd.Parse (argc, argv);
 
 	if (verbose)
@@ -169,7 +167,7 @@ main (int argc, char *argv[])
 	spectrumPhy.Set ("ChannelWidth", UintegerValue (20));
 
 	WifiHelper wifi;
-	//wifi.SetStandard (WIFI_PHY_STANDARD_80211ac);
+	wifi.SetStandard (WIFI_PHY_STANDARD_80211ac);
 	//StringValue DataRate = StringValue("HtMcs0");
 	//double datarate = 6.5; //?
 	//wifi.SetRemoteStationManager ("ns3::ConstantRateWifiManager","DataMode", DataRate,
@@ -275,14 +273,11 @@ main (int argc, char *argv[])
 		spectrumPhy.EnablePcap ("sta", staDevs);
     }
 	
-	double requestInterval = 1/rate;
-	for (double i = 1.0; i <= simTime; i+=requestInterval)
-	{
-		Simulator::Schedule (Seconds (i), &OFSwitch13WifiController::ChannelQualityReportStrategy,
-							 wifiControl);
-	}
-	
-
+	Simulator::Schedule (Seconds (1), &OFSwitch13WifiController::ChannelQualityReportStrategy,
+						 wifiControl);
+	Simulator::Schedule (Seconds(3), &OFSwitch13WifiController::ConfigChannelStrategy, wifiControl);
+	Simulator::Schedule (Seconds (6), &OFSwitch13WifiController::ChannelQualityReportStrategy,
+						 wifiControl);
 	Simulator::Stop (Seconds (simTime + 1));
 	
 	// Run the simulation
