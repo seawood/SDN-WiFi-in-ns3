@@ -37,7 +37,7 @@ OFSwitch13WifiController::OFSwitch13WifiController()
 OFSwitch13WifiController::~OFSwitch13WifiController()
 {
 	NS_LOG_FUNCTION (this);
-	m_wifiNetworkStatus->PrintChannelQuality();
+	//m_wifiNetworkStatus->PrintChannelQuality();
 }
 
 TypeId

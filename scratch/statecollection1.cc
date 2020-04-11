@@ -97,8 +97,8 @@ main (int argc, char *argv[])
 		//LogComponentEnable ("WifiNetDevice", LOG_LEVEL_ALL);
 		//LogComponentEnable ("CsmaNetDevice", LOG_LEVEL_ALL);
 		//LogComponentEnable ("Simulator", LOG_LEVEL_ALL);
-		LogComponentEnable ("OFSwitch13WifiController", LOG_LEVEL_ALL);
-		LogComponentEnable ("WifiElements", LOG_LEVEL_ALL);
+		//LogComponentEnable ("OFSwitch13WifiController", LOG_LEVEL_ALL);
+		LogComponentEnable ("WifiElements", LOG_LEVEL_WARN);
 		//LogComponentEnable ("WifiPhy", LOG_LEVEL_ALL);
 		//LogComponentEnable ("SpectrumWifiPhy", LOG_LEVEL_ALL);
 		//LogComponentEnable ("UdpServer", LOG_LEVEL_ALL);
@@ -151,7 +151,7 @@ main (int argc, char *argv[])
 		= CreateObject<RandomPropagationLossModel> ();
 	Ptr<UniformRandomVariable> x = CreateObject<UniformRandomVariable>();
 	x -> SetAttribute ("Min", DoubleValue(0.0));
-	x -> SetAttribute ("Max", DoubleValue(2.0));
+	x -> SetAttribute ("Max", DoubleValue(20.0));
 	lossModel -> SetAttribute ("Variable", PointerValue(x));
 	//lossModel->SetFrequency (5.180e9);
 	spectrumChannel->AddPropagationLossModel (lossModel);

@@ -113,6 +113,7 @@ WifiNetworkStatus::UpdateChannelQuality(const Address& apAddr,
 		m_STAsChannelQuality[addr48].insert(std::make_pair(apAddr, newChannelReport));
 		NS_LOG_DEBUG ("update CQM with new AP:" << m_STAsChannelQuality[addr48][apAddr].packets);
 	}
+	PrintChannelQuality();
 	
 }
 
@@ -197,14 +198,13 @@ void
 WifiNetworkStatus::PrintChannelQuality (void)
 {
 	NS_LOG_FUNCTION(this);
-	NS_LOG_INFO ("m_STAsChannelQuality final report:");
-	for (auto itr = m_STAsChannelQuality.begin(); itr != m_STAsChannelQuality.end(); ++itr)
-	{
-		NS_LOG_INFO ("STA : " << itr->first << "****" << itr->second.size());
+	NS_LOG_WARN ("m_STAsChannelQuality final report:");
+	for (auto itr = m_STAsChannelQuality.begin(); itr != m_STAsChannelQuality.end(); ++itr) {
+		NS_LOG_WARN ("STA : " << itr->first << "****" << itr->second.size());
 		for (auto item = itr->second.begin(); item != itr->second.end(); ++item)
 		{
-			Ipv4Address apIpv4 = Ipv4Address::ConvertFrom(item->first);
-			NS_LOG_INFO("in AP:" << apIpv4 << "channel info: " <<
+			Ipv4Address apIpv4 = InetSocketAddress::ConvertFrom(item->first).GetIpv4();
+			NS_LOG_WARN("in AP:" << apIpv4 << "channel info: " <<
 						item->second.packets << ";" << 
 						item->second.rxPower_avg << ";" <<
 						item->second.rxPower_std);
@@ -213,11 +213,11 @@ WifiNetworkStatus::PrintChannelQuality (void)
 	NS_LOG_INFO ("m_APsInterference final report:");
 	for (auto itr = m_APsInterference.begin(); itr != m_APsInterference.end(); ++itr)
 	{
-		Ipv4Address ap1Ipv4 = Ipv4Address::ConvertFrom(itr->first);
+		Ipv4Address ap1Ipv4 = InetSocketAddress::ConvertFrom(itr->first).GetIpv4();
 		NS_LOG_INFO ("AP : " << ap1Ipv4 << "****" << itr->second.size());
 		for (auto item = itr->second.begin(); item != itr->second.end(); ++item)
 		{
-			Ipv4Address ap2Ipv4 = Ipv4Address::ConvertFrom(item->first);
+			Ipv4Address ap2Ipv4 = InetSocketAddress::ConvertFrom(item->first).GetIpv4();
 			NS_LOG_INFO("in AP:" << ap2Ipv4 << "channel info: " <<
 						item->second.packets << ";" << 
 						item->second.rxPower_avg << ";" <<

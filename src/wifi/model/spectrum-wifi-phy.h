@@ -31,6 +31,7 @@
 #include "ns3/spectrum-model.h"
 #include "wifi-phy.h"
 #include "ns3/mac48-address.h"
+#include <queue>
 
 namespace ns3 {
 

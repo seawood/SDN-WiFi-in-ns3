@@ -240,10 +240,10 @@ SpectrumWifiPhy::ChannelQualityRecordAdd (const Mac48Address& mac48address,
 		auto item = &(it->second);
 		item->packets++;
 		item->rxPower_records.push(rxPower);
-		if (rxPower.size() > 10)
+		if (item->rxPower_records.size() > 10)
 		{
 			item->rxPower_avg = item->rxPower_avg +
-								(item->rxPower_records.back() -) item->rxPower_records.front())/10.0;
+								(item->rxPower_records.back() - item->rxPower_records.front())/10.0;
 			item->rxPower_records.pop();
 		}
 		else
