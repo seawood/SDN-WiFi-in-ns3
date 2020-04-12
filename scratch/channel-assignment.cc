@@ -109,6 +109,8 @@ main (int argc, char *argv[])
 	// Create two AP nodes
 	NodeContainer aps;
 	aps.Create (4);
+	NodeContainer stas;
+	stas.Create (4);
 	
 	Config::SetDefault ("ns3::WifiPhy::CcaMode1Threshold", DoubleValue (-62.0));
 	//Config::SetDefault ("ns3::WifiPhy::Frequency", UintegerValue (2417));
@@ -148,11 +150,42 @@ main (int argc, char *argv[])
 	
 	//mac configuration
 	WifiMacHelper wifiMac;
-	Ssid ssid1 = Ssid ("wifi1");
+	NetDeviceContainer apWifiDevs;
+	NetDeviceContainer staWifiDevs;
 	spectrumPhy.Set ("Frequency", UintegerValue (2412));
-	wifiMac.SetType ("ns3::ApWifiMac");
-	NetDeviceContainer apWifiDevs = wifi.Install (spectrumPhy, wifiMac, aps);
 	
+	Ssid ssid1 = Ssid ("wifi1");
+	wifiMac.SetType ("ns3::ApWifiMac","Ssid", SsidValue (ssid1));
+	apWifiDevs.Add(wifi.Install (spectrumPhy, wifiMac, aps.Get(0)));
+	wifiMac.SetType ("ns3::StaWifiMac",
+					 "ActiveProbing", BooleanValue (true),
+					 "Ssid", SsidValue (ssid1));
+	staWifiDevs.Add (wifi.Install (spectrumPhy, wifiMac, stas.Get(0)));
+	
+	Ssid ssid2 = Ssid ("wifi2");
+	wifiMac.SetType ("ns3::ApWifiMac","Ssid", SsidValue (ssid2));
+	apWifiDevs.Add(wifi.Install (spectrumPhy, wifiMac, aps.Get(1)));
+	wifiMac.SetType ("ns3::StaWifiMac",
+					 "ActiveProbing", BooleanValue (true),
+					 "Ssid", SsidValue (ssid2));
+	staWifiDevs.Add (wifi.Install (spectrumPhy, wifiMac, stas.Get(1)));
+	
+	Ssid ssid3 = Ssid ("wifi3");
+	wifiMac.SetType ("ns3::ApWifiMac","Ssid", SsidValue (ssid3));
+	apWifiDevs.Add(wifi.Install (spectrumPhy, wifiMac, aps.Get(2)));
+	wifiMac.SetType ("ns3::StaWifiMac",
+					 "ActiveProbing", BooleanValue (true),
+					 "Ssid", SsidValue (ssid3));
+	staWifiDevs.Add (wifi.Install (spectrumPhy, wifiMac, stas.Get(2)));
+	
+	Ssid ssid4 = Ssid ("wifi4");
+	wifiMac.SetType ("ns3::ApWifiMac","Ssid", SsidValue (ssid4));
+	apWifiDevs.Add(wifi.Install (spectrumPhy, wifiMac, aps.Get(3)));
+	wifiMac.SetType ("ns3::StaWifiMac",
+					 "ActiveProbing", BooleanValue (true),
+					 "Ssid", SsidValue (ssid3));
+	staWifiDevs.Add (wifi.Install (spectrumPhy, wifiMac, stas.Get(3)));
+				
 	//mobility configuration
 	MobilityHelper mobility;
 	
@@ -161,11 +194,16 @@ main (int argc, char *argv[])
 	positionAlloc->Add (Vector (distance, distance, 0.0));
 	positionAlloc->Add (Vector (0.0, 0.0, 0.0));
 	positionAlloc->Add (Vector (distance, 0.0, 0.0));
+	positionAlloc->Add (Vector (0.0, distance, distance));
+	positionAlloc->Add (Vector (distance, distance, distance));
+	positionAlloc->Add (Vector (0.0, 0.0, distance));
+	positionAlloc->Add (Vector (distance, 0.0, distance));
 	mobility.SetPositionAllocator (positionAlloc);
 	
 	mobility.SetMobilityModel ("ns3::ConstantPositionMobilityModel");
 	
 	mobility.Install (aps);
+	mobility.Install (stas);
 
 	// Create the controller node
 	Ptr<Node> controllerNode = CreateObject<Node> ();
@@ -202,7 +240,7 @@ main (int argc, char *argv[])
 							 wifiControl, interval);
 		interval++;
 		std::cout << "ChannelQuality Report from:" << i+1 <<"s to:" << i+9 << "s" <<std::endl;
-		for (int j = i+1; j < j+10; ++j)
+		for (int j = i+1; j < i+10; ++j)
 		{
 			Simulator::Schedule (Seconds (j), &OFSwitch13WifiController::ChannelQualityReportStrategy,
 								 wifiControl);
