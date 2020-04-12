@@ -18,11 +18,7 @@
  * Author: XieYingying <xyynku@163.com>
  *
  * a SDN-based Wi-Fi network with 4 APs
- * channel configuration: 0s-->(1,1,1)
- *                        10s-->(1,2,3)
- *                        20s-->(1,2,5)
- *                        30s-->(1,6,9)
- *                        40s-->(1,6,11)
+ * channel configuration: (1,1,1),(1,2,3),(1,3,5),(1,4,7),(1,5,9),(1,6,11)
  */
 #include <iomanip>
 #include <string>
@@ -63,7 +59,7 @@ void MonitorSpectrumRx(bool signalType,
 int
 main (int argc, char *argv[])
 {
-	double simTime = 50;        //Seconds
+	double simTime = 70;        //Seconds
 	bool verbose = true;
 	bool trace = true;
 	std::string errorModelType = "ns3::NistErrorRateModel";
@@ -223,13 +219,12 @@ main (int argc, char *argv[])
 		spectrumPhy.EnablePcap ("apWifi", apWifiDevs);
     }
 	
-	uint16_t interval = 1;
-	for (int i = 10; i < 50; i+=10)
+	uint16_t interval = 0;
+	for (int i = 10; i < 70; i+=10)
 	{
 		Simulator::Schedule (Seconds(i), &OFSwitch13WifiController::ConfigChannelStrategyInterval, 
 							 wifiControl, interval);
 		interval++;
-		std::cout << "ChannelQuality Report from:" << i+1 <<"s to:" << i+9 << "s" <<std::endl;
 		for (int j = i+1; j < i+10; ++j)
 		{
 			Simulator::Schedule (Seconds (j), &OFSwitch13WifiController::ChannelQualityReportStrategy,

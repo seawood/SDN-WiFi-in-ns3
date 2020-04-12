@@ -113,7 +113,6 @@ WifiNetworkStatus::UpdateChannelQuality(const Address& apAddr,
 		m_STAsChannelQuality[addr48].insert(std::make_pair(apAddr, newChannelReport));
 		NS_LOG_DEBUG ("update CQM with new AP:" << m_STAsChannelQuality[addr48][apAddr].packets);
 	}
-	PrintChannelQuality();
 	
 }
 
@@ -143,6 +142,7 @@ WifiNetworkStatus::UpdateApsInterference (const Address& dstAp,
 		newChannelReport.rxPower_std = report->rxPower_std;
 		m_APsInterference[srcAp][dstAp] = newChannelReport;
 	}
+	PrintChannelQuality();
 }
 
 void
@@ -210,17 +210,18 @@ WifiNetworkStatus::PrintChannelQuality (void)
 						item->second.rxPower_std);
 		}
 	}
-	NS_LOG_WARN ("m_APsInterference final report:");
+	NS_LOG_WARN ("m_APsInterference final report:" << Simulator::Now());
 	for (auto itr = m_APsInterference.begin(); itr != m_APsInterference.end(); ++itr)
 	{
 		Ipv4Address ap1Ipv4 = InetSocketAddress::ConvertFrom(itr->first).GetIpv4();
-		NS_LOG_WARN ("AP : " << ap1Ipv4 << "****" << itr->second.size());
+		//NS_LOG_WARN ("AP : " << ap1Ipv4 << "****" << itr->second.size());
 		for (auto item = itr->second.begin(); item != itr->second.end(); ++item)
 		{
 			Ipv4Address ap2Ipv4 = InetSocketAddress::ConvertFrom(item->first).GetIpv4();
-			NS_LOG_WARN("in AP:" << ap2Ipv4 << "channel info: " <<
-						item->second.packets << ";" << 
-						item->second.rxPower_avg << ";" <<
+			NS_LOG_WARN(ap1Ipv4 << " -> " << ap2Ipv4 << "; time" << Simulator::Now() <<
+						"; channel info: " <<
+						item->second.packets << ":" << 
+						item->second.rxPower_avg << ":" <<
 						item->second.rxPower_std);
 			
 		}
