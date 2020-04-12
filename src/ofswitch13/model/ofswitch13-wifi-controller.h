@@ -49,7 +49,8 @@ public:
 		double rxPower_std;   //standard deviation
 	};
 	void ChannelQualityReportStrategy (void);
-	void ChannelQualityTriggerStrategy (void); //TODO
+	void ChannelQualityTriggerStrategy (void); 
+	void ConfigChannelStrategyInterval (uint16_t interval)
 private:
 	void ConfigChannel (const Address& address, const uint8_t& channelNumber,
 						const uint16_t frequency, const uint16_t& channelWidth);

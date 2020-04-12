@@ -143,12 +143,29 @@ OFSwitch13WifiController::ConfigChannelStrategy (void)
 	//TODO (xyy): channel allocation algorithm
 	NS_LOG_FUNCTION (this << "switch all to channel 13");
 	NS_LOG_DEBUG ("m_wifiApsMap size: " << m_wifiApsMap.size());
+	uint8_t channelNumberBase = 1;
+	uint16_t frequencyBase = 2412;
+	uint16_t intervalBase = 1;
 	for (auto it = m_wifiApsMap.begin(); it != m_wifiApsMap.end(); ++it)
 	{
 		ConfigChannel (it->first, 13, 2472, 20);
 	}
 }
 
+void 
+OFSwitch13WifiController::ConfigChannelStrategyInterval (uint16_t interval)
+{
+	NS_LOG_FUNCTION (this << interval);
+	NS_LOG_DEBUG ("m_wifiApsMap size: " << m_wifiApsMap.size());
+	uint8_t channelNumber = 1;
+	uint16_t frequency = 2412;
+	for (auto it = m_wifiApsMap.begin(); it != m_wifiApsMap.end(); ++it)
+	{
+		ConfigChannel (it->first, channelNumber, frequency, 20);
+		channelNumber += interval;
+		frequency += interval*5;
+	}
+}
 // request all
 void
 OFSwitch13WifiController::ChannelQualityReportStrategy (void)

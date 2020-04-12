@@ -198,13 +198,13 @@ void
 WifiNetworkStatus::PrintChannelQuality (void)
 {
 	NS_LOG_FUNCTION(this);
-	NS_LOG_WARN ("m_STAsChannelQuality final report:");
+	NS_LOG_INFO ("m_STAsChannelQuality final report:");
 	for (auto itr = m_STAsChannelQuality.begin(); itr != m_STAsChannelQuality.end(); ++itr) {
-		NS_LOG_WARN ("STA : " << itr->first << "****" << itr->second.size());
+		NS_LOG_INFO ("STA : " << itr->first << "****" << itr->second.size());
 		for (auto item = itr->second.begin(); item != itr->second.end(); ++item)
 		{
 			Ipv4Address apIpv4 = InetSocketAddress::ConvertFrom(item->first).GetIpv4();
-			NS_LOG_WARN("in AP:" << apIpv4 << "channel info: " <<
+			NS_LOG_INFO("in AP:" << apIpv4 << "channel info: " <<
 						item->second.packets << ";" << 
 						item->second.rxPower_avg << ";" <<
 						item->second.rxPower_std);

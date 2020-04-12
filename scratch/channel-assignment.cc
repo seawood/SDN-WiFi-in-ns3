@@ -17,14 +17,12 @@
  *
  * Author: XieYingying <xyynku@163.com>
  *
- * AP0 and AP1 connected to a single OpenFlow switch. STA0 is served by AP0. STA1 is served by AP1.
- * The switch and two APs are managed by the default learning controller application.
- * STA0 is udpclient, STA1 is udpserver.
- * 
- *      AP0---Switch---AP1
- *       |              |
- *       |              |
- *      STA0           STA1
+ * a SDN-based Wi-Fi network with 4 APs
+ * channel configuration: 0s-->(1,1,1)
+ *                        10s-->(1,2,3)
+ *                        20s-->(1,2,5)
+ *                        30s-->(1,6,9)
+ *                        40s-->(1,6,11)
  */
 #include <iomanip>
 #include <string>
@@ -41,6 +39,17 @@
 #include "ns3/udp-client-server-helper.h"
 
 using namespace ns3;
+
+void
+PrintAttributesIfEnabled (bool enabled)
+{
+	if (enabled)
+    {
+		ConfigStore outputConfig;
+		outputConfig.ConfigureAttributes ();
+    }
+}
+
 
 //NodeId : (samplesNum, rxPowerAvg)
 std::unordered_map<uint32_t, std::pair<uint32_t,double>> record;
@@ -65,11 +74,12 @@ void MonitorSpectrumRx(bool signalType,
 int
 main (int argc, char *argv[])
 {
-	double simTime = 10;        //Seconds
+	double simTime = 50;        //Seconds
 	bool verbose = true;
 	bool trace = true;
 	std::string errorModelType = "ns3::NistErrorRateModel";
 	double distance = 5;        //meters
+	bool printAttributes = false;
 
 	// Configure command line parameters
 	CommandLine cmd;
@@ -78,8 +88,13 @@ main (int argc, char *argv[])
 	cmd.AddValue ("trace", "Enable datapath stats and pcap traces", trace);
 	cmd.AddValue ("errorModelType", "select ns3::NistErrorRateModel or ns3::YansErrorRateModel", errorModelType);
 	cmd.AddValue ("distance", "distance between nodes", distance);
+	cmd.AddValue ("printAttributes", "If true, print out attributes", printAttributes);
 	cmd.Parse (argc, argv);
 
+	Config::SetDefault ("ns3::ConfigStore::Filename", StringValue ("output-attributes-.txt"));
+	Config::SetDefault ("ns3::ConfigStore::FileFormat", StringValue ("RawText"));
+	Config::SetDefault ("ns3::ConfigStore::Mode", StringValue ("Save"));
+	
 	if (verbose)
     {
 		//OFSwitch13Helper::EnableDatapathLogs ();
@@ -110,32 +125,7 @@ main (int argc, char *argv[])
 
 	// Create two AP nodes
 	NodeContainer aps;
-	aps.Create (2);
-
-	// Create the switch node
-	Ptr<Node> switchNode = CreateObject<Node> ();
-
-	// Use the CsmaHelper to connect AP nodes to the switch node
-	CsmaHelper csmaHelper;
-	csmaHelper.SetChannelAttribute ("DataRate", DataRateValue (DataRate ("100Mbps")));
-	csmaHelper.SetChannelAttribute ("Delay", TimeValue (MilliSeconds (2)));
-	//csmaHelper.SetDeviceAttribute ("EncapsulationMode", EnumValue (CsmaNetDevice::LLC));
-
-	NetDeviceContainer apDevices;   //ap CsmaNetdevice
-	NetDeviceContainer switchPorts; //switch CsmaNetdevice
-	for (size_t i = 0; i < aps.GetN (); i++)
-    {
-		NodeContainer pair (aps.Get (i), switchNode);
-		NetDeviceContainer link = csmaHelper.Install (pair);
-		apDevices.Add (link.Get (0));
-		switchPorts.Add (link.Get (1));
-    }
-
-	// Install WifiNetDevice on AP0,AP1,STA0 and STA1, configure the channel
-	NodeContainer stas;
-	stas.Create (2);
-	NetDeviceContainer staDevs;
-	NetDeviceContainer apWifiDevs; //ap WifiNetDevice
+	aps.Create (4);
 	
 	Config::SetDefault ("ns3::WifiPhy::CcaMode1Threshold", DoubleValue (-62.0));
 	//Config::SetDefault ("ns3::WifiPhy::Frequency", UintegerValue (2417));
@@ -167,7 +157,7 @@ main (int argc, char *argv[])
 	spectrumPhy.Set ("ChannelWidth", UintegerValue (20));
 
 	WifiHelper wifi;
-	wifi.SetStandard (WIFI_PHY_STANDARD_80211ac);
+	//wifi.SetStandard (WIFI_PHY_STANDARD_80211ac);
 	//StringValue DataRate = StringValue("HtMcs0");
 	//double datarate = 6.5; //?
 	//wifi.SetRemoteStationManager ("ns3::ConstantRateWifiManager","DataMode", DataRate,
@@ -176,28 +166,9 @@ main (int argc, char *argv[])
 	//mac configuration
 	WifiMacHelper wifiMac;
 	Ssid ssid1 = Ssid ("wifi1");
-	
-	//ap0 and sta0 use 2412MHz, ap1 and sta1 use 5905MHz
-	wifiMac.SetType ("ns3::StaWifiMac",
-					 "ActiveProbing", BooleanValue (true),
-					 "Ssid", SsidValue (ssid1));
 	spectrumPhy.Set ("Frequency", UintegerValue (2412));
-	staDevs.Add (wifi.Install (spectrumPhy, wifiMac, stas.Get(0)));
-	
-	wifiMac.SetType ("ns3::ApWifiMac",
-					 "Ssid", SsidValue (ssid1));
-	apWifiDevs.Add (wifi.Install (spectrumPhy, wifiMac, aps.Get(0)));
-	
-	Ssid ssid2 = Ssid ("wifi2");
-	spectrumPhy.Set ("Frequency", UintegerValue (2472));
-	wifiMac.SetType ("ns3::StaWifiMac",
-					 "ActiveProbing", BooleanValue (true),
-					 "Ssid", SsidValue (ssid2));
-	staDevs.Add (wifi.Install (spectrumPhy, wifiMac, stas.Get(1)));
-	
-	wifiMac.SetType ("ns3::ApWifiMac",
-					 "Ssid", SsidValue (ssid2));
-	apWifiDevs.Add (wifi.Install (spectrumPhy, wifiMac, aps.Get(1)));
+	wifiMac.SetType ("ns3::ApWifiMac");
+	NetDeviceContainer apWifiDevs = wifi.Install (spectrumPhy, wifiMac, aps);
 	
 	//mobility configuration
 	MobilityHelper mobility;
@@ -212,7 +183,6 @@ main (int argc, char *argv[])
 	mobility.SetMobilityModel ("ns3::ConstantPositionMobilityModel");
 	
 	mobility.Install (aps);
-	mobility.Install (stas);
 
 	// Create the controller node
 	Ptr<Node> controllerNode = CreateObject<Node> ();
@@ -221,81 +191,48 @@ main (int argc, char *argv[])
 	Ptr<OFSwitch13InternalHelper> of13Helper = CreateObject<OFSwitch13InternalHelper> ();
 	Ptr<OFSwitch13WifiController> wifiControl = CreateObject<OFSwitch13WifiController> ();
 	of13Helper->InstallController (controllerNode, wifiControl);
-	of13Helper->InstallSwitch (switchNode, switchPorts);
 	for (size_t i = 0; i < aps.GetN(); i++)
 	{
-		NetDeviceContainer tmp;
-		tmp.Add (apDevices.Get (i));
-		tmp.Add (apWifiDevs.Get(i));
-		of13Helper->InstallSwitch (aps.Get (i), tmp);
+		of13Helper->InstallSwitch (aps.Get (i), apWifiDevs.Get(i));
 	}
 	of13Helper->CreateOpenFlowChannels ();
-	
-	// Install the TCP/IP stack into STA nodes
-	InternetStackHelper internet;
-	internet.Install (stas);
-
-	// Set IPv4 addresses for STAs
-	Ipv4AddressHelper ipv4helpr;
-	ipv4helpr.SetBase ("10.1.1.0", "255.255.255.0");
-	Ipv4InterfaceContainer staIpIfaces;
-	staIpIfaces = ipv4helpr.Assign (staDevs);
-
-	// setting application
-	uint16_t port = 9;
-	UdpServerHelper server (port);
-	ApplicationContainer serverApp = server.Install (stas.Get (1));
-	serverApp.Start (Seconds (0.0));
-	serverApp.Stop (Seconds (simTime + 1));
-	
-	UdpClientHelper client (staIpIfaces.GetAddress (1), port);
-	client.SetAttribute ("MaxPackets", UintegerValue (4294967295u));
-	client.SetAttribute ("Interval", TimeValue (Time ("0.01"))); //packets/s
-	uint32_t payloadSize = 972;  //1000 bytes IPv4
-	client.SetAttribute ("PacketSize", UintegerValue (payloadSize));
-	ApplicationContainer clientApp = client.Install (stas.Get (0));
-	clientApp.Start (Seconds (1.0));
-	clientApp.Stop (Seconds (simTime + 1));
 	
 	Config::ConnectWithoutContext ("/NodeList/"+std::to_string(aps.Get(0)->GetId())+
 								   "/DeviceList/"+std::to_string(apWifiDevs.Get(0)->GetIfIndex())+
 								   "/$ns3::WifiNetDevice/Phy/$ns3::SpectrumWifiPhy/SignalArrival", 
 								   MakeCallback (&MonitorSpectrumRx));
 	
-	// Enable datapath stats and pcap traces at STAs, APs, switch(es), and controller(s)
+	// Enable datapath stats and pcap traces at APs and controller(s)
 	if (trace)
     {
 		of13Helper->EnableOpenFlowPcap ("openflow");
-		of13Helper->EnableDatapathStats ("switch-stats");
-		csmaHelper.EnablePcap ("switch", switchPorts, true);
-		csmaHelper.EnablePcap ("apCsma", apDevices);
+		of13Helper->EnableDatapathStats ("ap-openflow-stats");
 		spectrumPhy.EnablePcap ("apWifi", apWifiDevs);
-		spectrumPhy.EnablePcap ("sta", staDevs);
     }
 	
-	Simulator::Schedule (Seconds (1), &OFSwitch13WifiController::ChannelQualityReportStrategy,
-						 wifiControl);
-	Simulator::Schedule (Seconds(3), &OFSwitch13WifiController::ConfigChannelStrategy, wifiControl);
-	Simulator::Schedule (Seconds (6), &OFSwitch13WifiController::ChannelQualityReportStrategy,
-						 wifiControl);
+	uint16_t interval = 1;
+	for (int i = 10; i < 50; i+=10)
+	{
+		Simulator::Schedule (Seconds(10*i), &OFSwitch13WifiController::ConfigChannelStrategyInterval, 
+							 wifiControl, interval);
+		interval++;
+		std::cout << "ChannelQuality Report from:" << i+1 <<"s to:" << i+9 << "s" <<std::endl;
+		for (int j = i+1; j < j+10; ++j)
+		{
+			Simulator::Schedule (Seconds (j), &OFSwitch13WifiController::ChannelQualityReportStrategy,
+								 wifiControl);
+		}
+		
+	}
+	
 	Simulator::Stop (Seconds (simTime + 1));
 	
 	// Run the simulation
 	Simulator::Run ();
 	
-	// calculate throughput
-	uint64_t totalPacketThrough = DynamicCast<UdpServer>(serverApp.Get(0))->GetReceived();
-	double throughput = totalPacketThrough * payloadSize * 8 / (simTime * 1000000.0);  //Mbit/s
-	
 	//print simulation result
+	std::cout <<"***" <<std::endl;
 	std::cout << std::setprecision (4) << std::fixed;
-	
-	std::cout << std::setw(20) << "throughput" <<
-			  std::setw(20) << "receivedPackets" <<
-			  std::endl;
-	std::cout << std::setw(20) << throughput <<
-			  std::setw(20) << totalPacketThrough <<
-			  std::endl;
 	
 	std::cout << std::setw (12) << "nodeId" <<
 			  std::setw (12) << "samples" <<
