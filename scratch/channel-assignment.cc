@@ -108,9 +108,9 @@ main (int argc, char *argv[])
 
 	// Create two AP nodes
 	NodeContainer aps;
-	aps.Create (4);
+	aps.Create (3);
 	NodeContainer stas;
-	stas.Create (4);
+	stas.Create (3);
 	
 	Config::SetDefault ("ns3::WifiPhy::CcaMode1Threshold", DoubleValue (-62.0));
 	//Config::SetDefault ("ns3::WifiPhy::Frequency", UintegerValue (2417));
@@ -177,27 +177,17 @@ main (int argc, char *argv[])
 					 "ActiveProbing", BooleanValue (true),
 					 "Ssid", SsidValue (ssid3));
 	staWifiDevs.Add (wifi.Install (spectrumPhy, wifiMac, stas.Get(2)));
-	
-	Ssid ssid4 = Ssid ("wifi4");
-	wifiMac.SetType ("ns3::ApWifiMac","Ssid", SsidValue (ssid4));
-	apWifiDevs.Add(wifi.Install (spectrumPhy, wifiMac, aps.Get(3)));
-	wifiMac.SetType ("ns3::StaWifiMac",
-					 "ActiveProbing", BooleanValue (true),
-					 "Ssid", SsidValue (ssid3));
-	staWifiDevs.Add (wifi.Install (spectrumPhy, wifiMac, stas.Get(3)));
 				
 	//mobility configuration
 	MobilityHelper mobility;
 	
 	Ptr<ListPositionAllocator> positionAlloc = CreateObject<ListPositionAllocator> ();
-	positionAlloc->Add (Vector (0.0, distance, 0.0));
-	positionAlloc->Add (Vector (distance, distance, 0.0));
 	positionAlloc->Add (Vector (0.0, 0.0, 0.0));
 	positionAlloc->Add (Vector (distance, 0.0, 0.0));
-	positionAlloc->Add (Vector (0.0, distance, distance));
-	positionAlloc->Add (Vector (distance, distance, distance));
+	positionAlloc->Add (Vector (0.0, distance, 0.0));
 	positionAlloc->Add (Vector (0.0, 0.0, distance));
 	positionAlloc->Add (Vector (distance, 0.0, distance));
+	positionAlloc->Add (Vector (0.0, distance, distance));
 	mobility.SetPositionAllocator (positionAlloc);
 	
 	mobility.SetMobilityModel ("ns3::ConstantPositionMobilityModel");
@@ -236,7 +226,7 @@ main (int argc, char *argv[])
 	uint16_t interval = 1;
 	for (int i = 10; i < 50; i+=10)
 	{
-		Simulator::Schedule (Seconds(10), &OFSwitch13WifiController::ConfigChannelStrategyInterval, 
+		Simulator::Schedule (Seconds(i), &OFSwitch13WifiController::ConfigChannelStrategyInterval, 
 							 wifiControl, interval);
 		interval++;
 		std::cout << "ChannelQuality Report from:" << i+1 <<"s to:" << i+9 << "s" <<std::endl;
