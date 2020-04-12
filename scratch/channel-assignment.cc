@@ -86,17 +86,17 @@ main (int argc, char *argv[])
 		//LogComponentEnable ("OFSwitch13Port", LOG_LEVEL_ALL);
 		//LogComponentEnable ("OFSwitch13Queue", LOG_LEVEL_ALL);
 		//LogComponentEnable ("OFSwitch13SocketHandler", LOG_LEVEL_ALL);
-		//LogComponentEnable ("OFSwitch13Controller", LOG_LEVEL_ALL);
+		LogComponentEnable ("OFSwitch13Controller", LOG_LEVEL_ALL);
 		//LogComponentEnable ("OFSwitch13LearningController", LOG_LEVEL_ALL);
 		//LogComponentEnable ("OFSwitch13Helper", LOG_LEVEL_ALL);
 		//LogComponentEnable ("OFSwitch13InternalHelper", LOG_LEVEL_ALL);
-		//LogComponentEnable ("WifiNetDevice", LOG_LEVEL_ALL);
+		LogComponentEnable ("WifiNetDevice", LOG_LEVEL_ALL);
 		//LogComponentEnable ("CsmaNetDevice", LOG_LEVEL_ALL);
 		//LogComponentEnable ("Simulator", LOG_LEVEL_ALL);
-		//LogComponentEnable ("OFSwitch13WifiController", LOG_LEVEL_ALL);
+		LogComponentEnable ("OFSwitch13WifiController", LOG_LEVEL_ALL);
 		LogComponentEnable ("WifiElements", LOG_LEVEL_WARN);
-		//LogComponentEnable ("WifiPhy", LOG_LEVEL_ALL);
-		//LogComponentEnable ("SpectrumWifiPhy", LOG_LEVEL_ALL);
+		LogComponentEnable ("WifiPhy", LOG_LEVEL_ALL);
+		LogComponentEnable ("SpectrumWifiPhy", LOG_LEVEL_ALL);
 		//LogComponentEnable ("UdpServer", LOG_LEVEL_ALL);
 		//LogComponentEnable ("UdpClient", LOG_LEVEL_ALL);
 	        //LogComponentEnable ("PropagationLossModel", LOG_LEVEL_ALL);
@@ -198,7 +198,7 @@ main (int argc, char *argv[])
 	uint16_t interval = 1;
 	for (int i = 10; i < 50; i+=10)
 	{
-		Simulator::Schedule (Seconds(10*i), &OFSwitch13WifiController::ConfigChannelStrategyInterval, 
+		Simulator::Schedule (Seconds(10), &OFSwitch13WifiController::ConfigChannelStrategyInterval, 
 							 wifiControl, interval);
 		interval++;
 		std::cout << "ChannelQuality Report from:" << i+1 <<"s to:" << i+9 << "s" <<std::endl;
