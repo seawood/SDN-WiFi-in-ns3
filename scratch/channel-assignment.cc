@@ -40,17 +40,6 @@
 
 using namespace ns3;
 
-void
-PrintAttributesIfEnabled (bool enabled)
-{
-	if (enabled)
-    {
-		ConfigStore outputConfig;
-		outputConfig.ConfigureAttributes ();
-    }
-}
-
-
 //NodeId : (samplesNum, rxPowerAvg)
 std::unordered_map<uint32_t, std::pair<uint32_t,double>> record;
 void MonitorSpectrumRx(bool signalType, 
@@ -79,7 +68,6 @@ main (int argc, char *argv[])
 	bool trace = true;
 	std::string errorModelType = "ns3::NistErrorRateModel";
 	double distance = 5;        //meters
-	bool printAttributes = false;
 
 	// Configure command line parameters
 	CommandLine cmd;
@@ -88,13 +76,8 @@ main (int argc, char *argv[])
 	cmd.AddValue ("trace", "Enable datapath stats and pcap traces", trace);
 	cmd.AddValue ("errorModelType", "select ns3::NistErrorRateModel or ns3::YansErrorRateModel", errorModelType);
 	cmd.AddValue ("distance", "distance between nodes", distance);
-	cmd.AddValue ("printAttributes", "If true, print out attributes", printAttributes);
 	cmd.Parse (argc, argv);
 
-	Config::SetDefault ("ns3::ConfigStore::Filename", StringValue ("output-attributes-.txt"));
-	Config::SetDefault ("ns3::ConfigStore::FileFormat", StringValue ("RawText"));
-	Config::SetDefault ("ns3::ConfigStore::Mode", StringValue ("Save"));
-	
 	if (verbose)
     {
 		//OFSwitch13Helper::EnableDatapathLogs ();
@@ -193,7 +176,9 @@ main (int argc, char *argv[])
 	of13Helper->InstallController (controllerNode, wifiControl);
 	for (size_t i = 0; i < aps.GetN(); i++)
 	{
-		of13Helper->InstallSwitch (aps.Get (i), apWifiDevs.Get(i));
+		NetDeviceContainer tmp;
+		tmp.Add (apWifiDevs.Get(i));
+		of13Helper->InstallSwitch (aps.Get (i), tmp);
 	}
 	of13Helper->CreateOpenFlowChannels ();
 	
