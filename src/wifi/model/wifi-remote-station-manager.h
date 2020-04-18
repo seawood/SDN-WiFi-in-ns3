@@ -869,6 +869,10 @@ public:
    */
   typedef void (*RateChangeTracedCallback)(DataRate oldRate, DataRate newRate, Mac48Address remoteAddress);
 
+  typedef Callback<void, Mac48Address> AssocCallback;
+  void SetAssocCallback (AssocCallback callback);
+  typedef Callback<void, Mac48Address> DisassocCallback;
+  void SetDisassocCallback (DisassocCallback callback);
 
 protected:
   virtual void DoDispose (void);
@@ -1061,11 +1065,6 @@ protected:
    */
   Ptr<WifiMac> GetMac (void) const;
   
-  typedef Callback<void, Mac48Address> AssocCallback;
-  void SetAssocCallback (AssocCallback callback);
-  
-  typedef Callback<void Mac48Address> DisassocCallback;
-  void SetDisassocCallback (DisassocCallback callback);
 
 private:
   /**

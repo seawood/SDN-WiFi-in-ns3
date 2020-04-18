@@ -592,7 +592,7 @@ OFSwitch13Device::ReportAssoc (Mac48Address mac48address)
 	reply.num = 1;
 	reply.addresses = (struct sta_address**)malloc(sizeof(sta_address*));
 	reply.addresses[0] = (struct sta_address*)malloc(sizeof(sta_address));
-	mac48address.CopyTo(reply.addresses[0].mac48address);
+	mac48address.CopyTo(reply.addresses[0]->mac48address);
 	dp_send_message(m_datapath, (struct ofl_msg_header*)&reply, 0);
 }
 
@@ -607,7 +607,7 @@ OFSwitch13Device::ReportDisassoc (Mac48Address mac48address)
 	reply.num = 1;
 	reply.addresses = (struct sta_address**)malloc(sizeof(sta_address*));
 	reply.addresses[0] = (struct sta_address*)malloc(sizeof(sta_address));
-	mac48address.CopyTo(reply.addresses[0].mac48address);
+	mac48address.CopyTo(reply.addresses[0]->mac48address);
 	dp_send_message(m_datapath, (struct ofl_msg_header*)&reply, 0);
 }
 

@@ -66,6 +66,7 @@ public:
 	void UpdateAssocStas (const Address& apAddr, const Mac48Address& staAddr);
 	void UpdateDisassocStas (const Address& apAddr, const Mac48Address& staAddr);
 	void PrintAssocStatus(void);
+	void GetDisassocApSTA(Address& ap, Mac48Address& sta);
 private:
 	void InitializeFrequencyUnused ();
 	

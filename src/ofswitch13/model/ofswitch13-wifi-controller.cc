@@ -62,7 +62,7 @@ void
 OFSwitch13WifiController::DisassocSTA (const Address& ap, const Mac48Address& sta)
 {
 	NS_LOG_FUNCTION (this);
-	Ptr<RemoteSwitch> swtch = GetRemoteSwitch (address);
+	Ptr<RemoteSwitch> swtch = GetRemoteSwitch (ap);
 	struct ofl_ext_wifi_msg_assoc msg;
 	msg.header.header.header.type = OFPT_EXPERIMENTER;
 	msg.header.header.experimenter_id = WIFI_VENDOR_ID;
@@ -70,7 +70,7 @@ OFSwitch13WifiController::DisassocSTA (const Address& ap, const Mac48Address& st
 	msg.num = 1;
 	msg.addresses = (struct sta_address**)malloc(sizeof(struct sta_address*));
 	msg.addresses[0] = (struct sta_address*)malloc(sizeof(struct sta_address));
-	sta.CopyTo(msg.addresses[0].mac48address);
+	sta.CopyTo(msg.addresses[0]->mac48address);
 	SendToSwitch (swtch, (struct ofl_msg_header*)&msg);
 	NS_LOG_DEBUG ("sent WIFI_EXT_DISASSOC_CONFIG to wifi ap");
 }
@@ -136,19 +136,19 @@ OFSwitch13WifiController::HandleExperimenterMsg (
 			for (uint32_t i = 0; i < exp->num; ++i)
 			{
 				Mac48Address staAddr;
-				staAddr.CopyFrom(exp->addresses[i].mac48address);
+				staAddr.CopyFrom(exp->addresses[i]->mac48address);
 				m_wifiNetworkStatus->UpdateAssocStas(apAddr, staAddr);
 			}
 			ofl_msg_free((struct ofl_msg_header*)msg, &dp_exp);
 			break;
 		}
-		case (WIFI_EXT_ASSOC_TRIGGERED):
+		case (WIFI_EXT_ASSOC_TRIGGERRED):
 		{
 			struct ofl_ext_wifi_msg_assoc *exp = (struct ofl_ext_wifi_msg_assoc*)msg;
 			Ptr<WifiAp> ap = m_wifiApsMap[swtch->GetAddress()];
 			Address apAddr = swtch->GetAddress();
 			Mac48Address staAddr;
-			staAddr.CopyFrom(exp->addresses[0].mac48address);
+			staAddr.CopyFrom(exp->addresses[0]->mac48address);
 			m_wifiNetworkStatus->UpdateAssocStas(apAddr, staAddr);
 			ofl_msg_free((struct ofl_msg_header*)msg, &dp_exp);
 			break;
@@ -159,7 +159,7 @@ OFSwitch13WifiController::HandleExperimenterMsg (
 			Ptr<WifiAp> ap = m_wifiApsMap[swtch->GetAddress()];
 			Address apAddr = swtch->GetAddress();
 			Mac48Address staAddr;
-			staAddr.CopyFrom(exp->addresses[0].mac48address);
+			staAddr.CopyFrom(exp->addresses[0]->mac48address);
 			m_wifiNetworkStatus->UpdateDisassocStas(apAddr, staAddr);
 			ofl_msg_free((struct ofl_msg_header*)msg, &dp_exp);
 			break;
@@ -172,7 +172,7 @@ OFSwitch13WifiController::HandleExperimenterMsg (
 			Mac48Address staAddr;
 			staAddr.CopyFrom(exp->mac48address);
 			
-			struct WIFI_EXT_ASSOC_CONFIG reply;
+			struct ofl_ext_wifi_msg_assoc_disassoc_config reply;
 			reply.header.header.header.type = OFPT_EXPERIMENTER;
 			reply.header.header.experimenter_id = WIFI_VENDOR_ID;
 			reply.header.type = WIFI_EXT_ASSOC_CONFIG;
@@ -199,11 +199,6 @@ OFSwitch13WifiController::HandleExperimenterMsg (
 	return 0;
 }
 
-void 
-OFSwitch13WifiController::AssocSTA (void)
-{
-	
-}
 
 ofl_err
 OFSwitch13WifiController::HandleFeaturesReplyWifi (Ptr<const RemoteSwitch> swtch)
@@ -220,12 +215,15 @@ OFSwitch13WifiController::HandleFeaturesReplyWifi (Ptr<const RemoteSwitch> swtch
 	ofl_err err = SendToSwitch (swtch, (struct ofl_msg_header*)&msg);
 	NS_LOG_DEBUG ("send WIFI_EXT_CHANNEL_CONFIG_REQUEST to wifi ap");
 	
+	if(err){
+		return err;
+	}
 	// send experimenter msg to query for associated STAs
 	struct ofl_exp_wifi_msg_header msg1;
 	msg1.header.header.type = OFPT_EXPERIMENTER;
 	msg1.header.experimenter_id = WIFI_VENDOR_ID;
 	msg1.type = WIFI_EXT_ASSOC_STATUS_REQUEST;
-	ofl_err err = SendToSwitch (swtch, (struct ofl_msg_header*)&msg1);
+        err = SendToSwitch (swtch, (struct ofl_msg_header*)&msg1);
 	NS_LOG_DEBUG ("Send WIFI_EXT_ASSOC_STATUS_REQUEST to wifi ap");
 	return err;
 }

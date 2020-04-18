@@ -101,7 +101,7 @@ ofl_exp_wifi_msg_pack(struct ofl_msg_experimenter *msg,
 				struct ofl_ext_wifi_msg_assoc_disassoc_config* src = (struct ofl_ext_wifi_msg_assoc_disassoc_config*)exp;
 				struct wifi_assoc_disassoc_config* dst;
 				*buf_len = sizeof(struct wifi_assoc_disassoc_config) + src->len;
-				*buf = (struct wifi_assoc_disassoc_config*)malloc(*buf_len);
+				*buf = (uint8_t*)malloc(*buf_len);
 				dst = (struct wifi_assoc_disassoc_config*)(*buf);
 				dst->header.vendor = htonl(exp->header.experimenter_id);
 				dst->header.subtype = htonl(exp->type);
@@ -238,15 +238,15 @@ ofl_exp_wifi_msg_unpack(struct ofp_header *oh, size_t *len,
 				OFL_LOG_DBG(LOG_MODULE, "dst->header.header.experimenter_id : %x", dst->header.header.experimenter_id );
 				dst->header.type = ntohl(exp->subtype);
 				dst->num = ntohl (src->num);
-				dst->addresses = (struct sta_address**)malloc(dst->num * struct sta_address*);
+				dst->addresses = (struct sta_address**)malloc(dst->num * sizeof(struct sta_address*));
 				for (size_t i = 0; i < dst->num; ++i)
 				{
-					dst->addresses[i] = (struct sta_address*)malloc(struct sta_address);
-					memcpy(dst->addresses[i]->mac48address, src->status[i]->mac48address);
+					dst->addresses[i] = (struct sta_address*)malloc(sizeof(struct sta_address));
+					memcpy(dst->addresses[i]->mac48address, src->status[i].mac48address, 6);
 				}
 				(*msg) = (struct ofl_msg_experimenter*)dst;
 				*len -= sizeof(struct wifi_assoc_status) + dst->num * sizeof(struct assoc_status);
-				break;
+				return 0;
 			}
 			case (WIFI_EXT_DISASSOC_CONFIG_REPLY):
 			case (WIFI_EXT_ASSOC_CONFIG): {
@@ -269,7 +269,7 @@ ofl_exp_wifi_msg_unpack(struct ofp_header *oh, size_t *len,
 				memcpy(dst->data, src->data, dst->len);
 				(*msg) = (struct ofl_msg_experimenter*)dst;
 				*len -= sizeof(struct wifi_assoc_disassoc_config) + dst->len;
-				break;
+				return 0;
 			}
 			default: {
 				OFL_LOG_WARN(LOG_MODULE, "Trying to unpack unknown wifi Experimenter message.");

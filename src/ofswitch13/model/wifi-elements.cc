@@ -271,4 +271,12 @@ WifiNetworkStatus::PrintAssocStatus(void)
 		}
 	}
 }
+
+void
+WifiNetworkStatus::GetDisassocApSTA(Address& ap, Mac48Address& sta)
+{
+	NS_LOG_FUNCTION(this);
+	ap = m_associationMap.begin()->first;
+	sta = *(m_associationMap.begin()->second.begin());
+}
 } //namespace ns3

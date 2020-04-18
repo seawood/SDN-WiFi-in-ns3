@@ -103,7 +103,7 @@ struct wifi_assoc_disassoc_config {
 	uint32_t len;
 	uint8_t pad[4];
 	uint8_t mac48address[6];
-	uint8_t pad[2];
+	uint8_t pad1[2];
 	uint8_t data[0];
 };
 OFP_ASSERT(sizeof(struct wifi_assoc_disassoc_config) == 32);

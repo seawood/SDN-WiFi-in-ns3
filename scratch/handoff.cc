@@ -168,10 +168,6 @@ main (int argc, char *argv[])
 	}
 	of13Helper->CreateOpenFlowChannels ();
 	
-	Config::ConnectWithoutContext ("/NodeList/"+std::to_string(aps.Get(0)->GetId())+
-								   "/DeviceList/"+std::to_string(apWifiDevs.Get(0)->GetIfIndex())+
-								   "/$ns3::WifiNetDevice/Phy/$ns3::SpectrumWifiPhy/SignalArrival", 
-								   MakeCallback (&MonitorSpectrumRx));
 	
 	// Enable datapath stats and pcap traces at APs and controller(s)
 	if (trace)

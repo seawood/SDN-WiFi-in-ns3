@@ -24,6 +24,7 @@
 #include <ns3/csma-net-device.h>
 #include <ns3/wifi-net-device.h>
 #include <ns3/virtual-net-device.h>
+#include <ns3/wifi-remote-station-manager.h>
 #include "ofswitch13-device.h"
 #include "ofswitch13-port.h"
 #include "tunnel-id-tag.h"
@@ -216,10 +217,8 @@ OFSwitch13Port::NotifyConstructionCompleted ()
 		phy->SetChannelQualityTriggeredCallback(
 			MakeCallback(&OFSwitch13Device::ReportChannelQualityTriggered, m_openflowDev));
 		Ptr<WifiRemoteStationManager> manager = wifiDev->GetRemoteStationManager();
-		manager->SetAssocCallback(
-			MakeCallback(&OFSwitch13Device::ReportAssoc, m_openflowDev));
-		manager->SetDisassocCallback(
-			MakeCallback(&OFSwitch13Device::ReportDisassoc, m_openflowDev));
+		manager->SetAssocCallback(MakeCallback(&OFSwitch13Device::ReportAssoc, m_openflowDev));
+		manager->SetDisassocCallback(MakeCallback(&OFSwitch13Device::ReportDisassoc, m_openflowDev));
 	}
 }
 

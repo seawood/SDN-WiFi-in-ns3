@@ -135,7 +135,7 @@ void
 ApWifiMac::GetStas(std::vector<Mac48Address>& stas)
 {
 	NS_LOG_FUNCTION (this);
-	for (auto itr = staList.begin(); itr != staList.end(); itr++)
+	for (auto itr = m_staList.begin(); itr != m_staList.end(); itr++)
 	{
 		stas.push_back(itr->second);
 	}
@@ -201,7 +201,7 @@ ApWifiMac::DisassocSTA(const Mac48Address& from)
 }
 
 Buffer
-ApWifiMac::GetMgtHeader(const mac48Address& sta)
+ApWifiMac::GetMgtHeader(const Mac48Address& sta)
 {
 	NS_LOG_FUNCTION (this);
 	return m_staMgtAssocReqHeaders[sta];
@@ -365,7 +365,7 @@ ApWifiMac::AssocSTA(const Mac48Address& from, const Buffer& mgtHeader)
 					WifiMode mcs = m_phy->GetMcs (i);
 					if (mcs.GetModulationClass () == WIFI_MOD_CLASS_VHT && vhtCapabilities.IsSupportedTxMcs (mcs.GetMcsValue ()))
 					{
-						m_stationManager->AddSupportedMcs (hdr->GetAddr2 (), mcs);
+						m_stationManager->AddSupportedMcs (from, mcs);
 						//here should add a control to add basic MCS when it is implemented
 					}
 				}
@@ -386,7 +386,7 @@ ApWifiMac::AssocSTA(const Mac48Address& from, const Buffer& mgtHeader)
 				WifiMode mcs = m_phy->GetMcs (i);
 				if (mcs.GetModulationClass () == WIFI_MOD_CLASS_HE && heCapabilities.IsSupportedTxMcs (mcs.GetMcsValue ()))
 				{
-					m_stationManager->AddSupportedMcs (hdr->GetAddr2 (), mcs);
+					m_stationManager->AddSupportedMcs (from, mcs);
 					//here should add a control to add basic MCS when it is implemented
 				}
 			}
@@ -394,12 +394,12 @@ ApWifiMac::AssocSTA(const Mac48Address& from, const Buffer& mgtHeader)
 		m_stationManager->RecordWaitAssocTxOk (from);
 		if (!isHtStation)
 		{
-			m_nonHtStations.push_back (hdr->GetAddr2 ());
+			m_nonHtStations.push_back (from);
 			m_nonHtStations.unique ();
 		}
 		if (!isErpStation && isDsssStation)
 		{
-			m_nonErpStations.push_back (hdr->GetAddr2 ());
+			m_nonErpStations.push_back (from);
 			m_nonErpStations.unique ();
 		}
 	}

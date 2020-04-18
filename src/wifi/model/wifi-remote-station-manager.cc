@@ -27,6 +27,7 @@
 #include "ns3/tag.h"
 #include "wifi-remote-station-manager.h"
 #include "wifi-phy.h"
+#include "ap-wifi-mac.h"
 #include "wifi-mac.h"
 #include "wifi-utils.h"
 #include "wifi-mac-header.h"
@@ -731,7 +732,7 @@ WifiRemoteStationManager::RecordGotAssocTxOk (Mac48Address address)
 {
   NS_ASSERT (!address.IsGroup ());
   LookupState (address)->m_state = WifiRemoteStationState::GOT_ASSOC_TX_OK;
-  if (m_wifiMac->GetAssocTrigger())
+  if (DynamicCast<ApWifiMac, WifiMac>(m_wifiMac)->GetAssocTrigger())
   {
 	  m_assocCallback(address);
   }
@@ -749,7 +750,7 @@ WifiRemoteStationManager::RecordDisassociated (Mac48Address address)
 {
   NS_ASSERT (!address.IsGroup ());
   LookupState (address)->m_state = WifiRemoteStationState::DISASSOC;
-  if (m_wifiMac->GetAssocTrigger())
+  if (DynamicCast<ApWifiMac, WifiMac>(m_wifiMac)->GetAssocTrigger())
   {
 	  m_disassocCallback(address);
   }

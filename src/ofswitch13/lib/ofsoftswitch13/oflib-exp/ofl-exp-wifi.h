@@ -77,7 +77,7 @@ struct ofl_ext_wifi_msg_assoc_disassoc_config {
 	uint8_t mac48address[6];
 	uint32_t len;
 	uint8_t* data;
-}
+};
 /**------------------------------------------------***/
 int
 ofl_exp_wifi_msg_pack(struct ofl_msg_experimenter *msg, uint8_t **buf, size_t *buf_len);
@@ -87,6 +87,12 @@ ofl_exp_wifi_msg_unpack(struct ofp_header *oh, size_t *len, struct ofl_msg_exper
 
 int
 ofl_exp_wifi_msg_free(struct ofl_msg_experimenter *msg);
+
+void
+wifi_assoc_status_to_string(FILE* stream, struct ofl_msg_experimenter* msg);
+
+void
+wifi_assoc_disassoc_config_to_string(FILE* stream, struct ofl_msg_experimenter* msg);
 
 char *
 ofl_exp_wifi_msg_to_string(struct ofl_msg_experimenter *msg);

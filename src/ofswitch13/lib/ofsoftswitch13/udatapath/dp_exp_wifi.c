@@ -57,25 +57,25 @@ dp_handle_wifi_chanqua_trigger_set (struct datapath *dp UNUSED,
 }
 
 ofl_err
-dp_handle_wifi_assoc_status_request (struct datapath *dp, 
-		struct ofl_exp_wifi_msg_channel_re *msg, 
-		const struct sender *sender) {
+dp_handle_wifi_assoc_status_request (struct datapath *dp UNUSED, 
+		struct ofl_exp_wifi_msg_channel_req *msg UNUSED, 
+		const struct sender *sender UNUSED) {
 	VLOG_DBG_RL(LOG_MODULE, &rl, "handle WIFI_EXT_ASSOC_STATUS_REQUEST msg");
 	return 0;
 }
 
 ofl_err 
-dp_handle_wifi_disassoc_config (struct datapath *dp, 
-								struct ofl_ext_wifi_msg_assoc *msg, 
-								const struct sender *sender) {
+dp_handle_wifi_disassoc_config (struct datapath *dp UNUSED, 
+								struct ofl_ext_wifi_msg_assoc *msg UNUSED, 
+								const struct sender *sender UNUSED) {
 	VLOG_DBG_RL(LOG_MODULE, &rl, "handle WIFI_EXT_DISASSOC_CONFIG msg");
 	return 0;
 }
 
 ofl_err 
-dp_handle_wifi_assoc_config (struct datapath *dp, 
-							struct ofl_ext_wifi_msg_assoc_disassoc_config *msg, 
-							const struct sender *sender) {
+dp_handle_wifi_assoc_config (struct datapath *dp UNUSED, 
+							struct ofl_ext_wifi_msg_assoc_disassoc_config *msg UNUSED, 
+							const struct sender *sender UNUSED) {
 	VLOG_DBG_RL(LOG_MODULE, &rl, "handle WIFI_EXT_ASSOC_CONFIG msg");
 	return 0;
 }

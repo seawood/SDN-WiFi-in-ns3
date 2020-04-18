@@ -52,7 +52,7 @@ public:
 	void ChannelQualityTriggerStrategy (void); 
 	void ConfigChannelStrategyInterval (uint16_t interval);
 	void ConfigAssocStrategy (void); // two AP, one STA scenario
-	void PrintAssocStatus(void)
+	void PrintAssocStatus(void);
 private:
 	void ConfigChannel (const Address& address, const uint8_t& channelNumber,
 						const uint16_t frequency, const uint16_t& channelWidth);
