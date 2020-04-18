@@ -229,7 +229,7 @@ WifiNetworkStatus::PrintChannelQuality (void)
 }
 
 void
-UpdateAssocStas (const Address& apAddr, const Mac48Address& staAddr)
+WifiNetworkStatus::UpdateAssocStas (const Address& apAddr, const Mac48Address& staAddr)
 {
 	NS_LOG_FUNCTION (this);
 	Ipv4Address ap = InetSocketAddress::ConvertFrom(apAddr).GetIpv4();
@@ -247,7 +247,7 @@ UpdateAssocStas (const Address& apAddr, const Mac48Address& staAddr)
 }
 
 void
-UpdateDisassocStas (const Address& apAddr, const Mac48Address& staAddr)
+WifiNetworkStatus::UpdateDisassocStas (const Address& apAddr, const Mac48Address& staAddr)
 {
 	NS_LOG_FUNCTION (this);
 	Ipv4Address ap = InetSocketAddress::ConvertFrom(apAddr).GetIpv4();
@@ -255,5 +255,20 @@ UpdateDisassocStas (const Address& apAddr, const Mac48Address& staAddr)
 	NS_ASSERT (m_associationMap.find(apAddr) != m_associationMap.end());
 	NS_ASSERT (m_associationMap[apAddr].find(staAddr) != m_associationMap[apAddr].end());
 	m_associationMap[apAddr].erase(staAddr);
+}
+
+void 
+WifiNetworkStatus::PrintAssocStatus(void)
+{
+	NS_LOG_FUNCTION(this);
+	for (auto itr = m_associationMap.begin(); itr != m_associationMap.end(); ++itr)
+	{
+		Ipv4Address ap = InetSocketAddress::ConvertFrom(itr->first).GetIpv4();
+		NS_LOG_INFO("AP:" << ap);
+		for (auto i = itr->second.begin(); i != itr->second.end(); i++)
+		{
+			NS_LOG_INFO("STA" << *i);
+		}
+	}
 }
 } //namespace ns3

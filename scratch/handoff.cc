@@ -17,8 +17,8 @@
  *
  * Author: XieYingying <xyynku@163.com>
  *
- * a SDN-based Wi-Fi network with 3 APs and 3 STAs
- * channel configuration: (1,1,1),(1,2,3),(1,3,5),(1,4,7),(1,5,9),(1,6,11)
+ * a SDN-based Wi-Fi network with 2 APs and 1 STA
+ * STA is handoffed from AP1 to AP2
  */
 #include <iomanip>
 #include <string>
@@ -36,30 +36,10 @@
 
 using namespace ns3;
 
-//NodeId : (samplesNum, rxPowerAvg)
-std::unordered_map<uint32_t, std::pair<uint32_t,double>> record;
-void MonitorSpectrumRx(bool signalType, 
-					   uint32_t senderNodeId,
-					   double rxPower,
-					   Time duration)
-{
-	if (record.find(senderNodeId) != record.end())
-	{
-		record[senderNodeId].first++;
-		record[senderNodeId].second += ((rxPower - record[senderNodeId].second)/record[senderNodeId].first);
-	}
-	else
-	{
-		record[senderNodeId] = std::make_pair(1, rxPower);
-	}
-	std::cout << "nodeId:" << senderNodeId << "; rxPower:" << rxPower << "; rxPowerAvg:" << record[senderNodeId].second <<std::endl;
-	
-}
-
 int
 main (int argc, char *argv[])
 {
-	double simTime = 70;        //Seconds
+	double simTime = 20;        //Seconds
 	bool verbose = true;
 	bool trace = true;
 	std::string errorModelType = "ns3::NistErrorRateModel";
@@ -89,13 +69,13 @@ main (int argc, char *argv[])
 		//LogComponentEnable ("WifiNetDevice", LOG_LEVEL_ALL);
 		//LogComponentEnable ("CsmaNetDevice", LOG_LEVEL_ALL);
 		//LogComponentEnable ("Simulator", LOG_LEVEL_ALL);
-		//LogComponentEnable ("OFSwitch13WifiController", LOG_LEVEL_ALL);
+		LogComponentEnable ("OFSwitch13WifiController", LOG_LEVEL_ALL);
 		LogComponentEnable ("WifiElements", LOG_LEVEL_WARN);
 		//LogComponentEnable ("WifiPhy", LOG_LEVEL_ALL);
 		//LogComponentEnable ("SpectrumWifiPhy", LOG_LEVEL_ALL);
 		//LogComponentEnable ("UdpServer", LOG_LEVEL_ALL);
 		//LogComponentEnable ("UdpClient", LOG_LEVEL_ALL);
-	        //LogComponentEnable ("PropagationLossModel", LOG_LEVEL_ALL);
+	    //LogComponentEnable ("PropagationLossModel", LOG_LEVEL_ALL);
     }
 	
 
@@ -104,9 +84,9 @@ main (int argc, char *argv[])
 
 	// Create two AP nodes
 	NodeContainer aps;
-	aps.Create (3);
+	aps.Create (2);
 	NodeContainer stas;
-	stas.Create (3);
+	stas.Create (1);
 	
 	Config::SetDefault ("ns3::WifiPhy::CcaMode1Threshold", DoubleValue (-62.0));
 	//Config::SetDefault ("ns3::WifiPhy::Frequency", UintegerValue (2417));
@@ -150,40 +130,22 @@ main (int argc, char *argv[])
 	NetDeviceContainer staWifiDevs;
 	spectrumPhy.Set ("Frequency", UintegerValue (2412));
 	
-	Ssid ssid1 = Ssid ("wifi1");
-	wifiMac.SetType ("ns3::ApWifiMac","Ssid", SsidValue (ssid1));
+	Ssid ssid = Ssid ("wifi1");
+	wifiMac.SetType ("ns3::ApWifiMac","Ssid", SsidValue (ssid));
 	apWifiDevs.Add(wifi.Install (spectrumPhy, wifiMac, aps.Get(0)));
-	wifiMac.SetType ("ns3::StaWifiMac",
-					 "ActiveProbing", BooleanValue (true),
-					 "Ssid", SsidValue (ssid1));
-	staWifiDevs.Add (wifi.Install (spectrumPhy, wifiMac, stas.Get(0)));
-	
-	Ssid ssid2 = Ssid ("wifi2");
-	wifiMac.SetType ("ns3::ApWifiMac","Ssid", SsidValue (ssid2));
 	apWifiDevs.Add(wifi.Install (spectrumPhy, wifiMac, aps.Get(1)));
 	wifiMac.SetType ("ns3::StaWifiMac",
 					 "ActiveProbing", BooleanValue (true),
-					 "Ssid", SsidValue (ssid2));
-	staWifiDevs.Add (wifi.Install (spectrumPhy, wifiMac, stas.Get(1)));
+					 "Ssid", SsidValue (ssid));
+	staWifiDevs.Add (wifi.Install (spectrumPhy, wifiMac, stas.Get(0)));
 	
-	Ssid ssid3 = Ssid ("wifi3");
-	wifiMac.SetType ("ns3::ApWifiMac","Ssid", SsidValue (ssid3));
-	apWifiDevs.Add(wifi.Install (spectrumPhy, wifiMac, aps.Get(2)));
-	wifiMac.SetType ("ns3::StaWifiMac",
-					 "ActiveProbing", BooleanValue (true),
-					 "Ssid", SsidValue (ssid3));
-	staWifiDevs.Add (wifi.Install (spectrumPhy, wifiMac, stas.Get(2)));
-				
 	//mobility configuration
 	MobilityHelper mobility;
 	
 	Ptr<ListPositionAllocator> positionAlloc = CreateObject<ListPositionAllocator> ();
 	positionAlloc->Add (Vector (0.0, 0.0, 0.0));
+	positionAlloc->Add (Vector (distance*2, 0.0, 0.0));
 	positionAlloc->Add (Vector (distance, 0.0, 0.0));
-	positionAlloc->Add (Vector (0.0, distance, 0.0));
-	positionAlloc->Add (Vector (0.0, 0.0, distance));
-	positionAlloc->Add (Vector (distance, 0.0, distance));
-	positionAlloc->Add (Vector (0.0, distance, distance));
 	mobility.SetPositionAllocator (positionAlloc);
 	
 	mobility.SetMobilityModel ("ns3::ConstantPositionMobilityModel");
@@ -217,43 +179,21 @@ main (int argc, char *argv[])
 		of13Helper->EnableOpenFlowPcap ("openflow");
 		of13Helper->EnableDatapathStats ("ap-openflow-stats");
 		spectrumPhy.EnablePcap ("apWifi", apWifiDevs);
+		spectrumPhy.EnablePcap ("staWifi", staWifiDevs);
     }
 	
-	uint16_t interval = 0;
-	for (int i = 10; i < 70; i+=10)
-	{
-		Simulator::Schedule (Seconds(i), &OFSwitch13WifiController::ConfigChannelStrategyInterval, 
-							 wifiControl, interval);
-		interval++;
-		for (int j = i+1; j < i+10; ++j)
-		{
-			Simulator::Schedule (Seconds (j), &OFSwitch13WifiController::ChannelQualityReportStrategy,
-								 wifiControl);
-		}
-		
-	}
-	
+	Simulator::Schedule(Seconds(5), &OFSwitch13WifiController::PrintAssocStatus,
+					   wifiControl);
+	Simulator::Schedule (Seconds(10), &OFSwitch13WifiController::ConfigAssocStrategy,
+						 wifiControl);
+	Simulator::Schedule(Seconds(15), &OFSwitch13WifiController::PrintAssocStatus,
+						wifiControl);
 	Simulator::Stop (Seconds (simTime + 1));
 	
 	// Run the simulation
 	Simulator::Run ();
 	
-	//print simulation result
-	std::cout <<"***" <<std::endl;
-	std::cout << std::setprecision (4) << std::fixed;
-	
-	std::cout << std::setw (12) << "nodeId" <<
-			  std::setw (12) << "samples" <<
-			  std::setw (12) << "rxPower" <<
-			  std::endl;
-	for (const auto& item : record)
-	{
-		std::cout << std::setw (12) << item.first <<
-				  std::setw (12) << item.second.first <<
-				  std::setw (12) <<item.second.second <<
-				  std::endl;
-	}
-	
 	Simulator::Destroy ();
 	return 0;
 }
+

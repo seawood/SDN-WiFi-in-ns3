@@ -250,7 +250,25 @@ ofl_exp_wifi_msg_unpack(struct ofp_header *oh, size_t *len,
 			}
 			case (WIFI_EXT_DISASSOC_CONFIG_REPLY):
 			case (WIFI_EXT_ASSOC_CONFIG): {
-				
+				struct wifi_assoc_disassoc_config* src;
+				struct ofl_ext_wifi_msg_assoc_disassoc_config* dst;
+				if (*len < sizeof(struct wifi_assoc_disassoc_config))
+				{
+					OFL_LOG_WARN(LOG_MODULE, "Received  message wifi_assoc_disassoc_config has invalid length (%zu).", *len);
+                    return ofl_error(OFPET_BAD_REQUEST, OFPBRC_BAD_LEN);
+				}
+				OFL_LOG_WARN(LOG_MODULE, "unpack wifi_assoc_disassoc_config");
+				src = (struct wifi_assoc_disassoc_config*)exp;
+				dst = (struct ofl_ext_wifi_msg_assoc_disassoc_config*)malloc(sizeof(struct ofl_ext_wifi_msg_assoc_disassoc_config));
+				dst->header.header.experimenter_id = ntohl(exp->vendor);
+				OFL_LOG_DBG(LOG_MODULE, "dst->header.header.experimenter_id : %x", dst->header.header.experimenter_id );
+				dst->header.type = ntohl(exp->subtype);
+				dst->len = ntohl(src->len);
+				memcpy(dst->mac48address, src->mac48address, 6);
+				dst->data = (uint8_t*)malloc(dst->len);
+				memcpy(dst->data, src->data, dst->len);
+				(*msg) = (struct ofl_msg_experimenter*)dst;
+				*len -= sizeof(struct wifi_assoc_disassoc_config) + dst->len;
 				break;
 			}
 			default: {

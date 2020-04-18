@@ -350,11 +350,15 @@ OFSwitch13WifiController::SetChannelQualityTrigger (const Address& address,
 	NS_LOG_DEBUG ("sent WIFI_EXT_CHANNEL_QUALITY_TRIGGER_SET to wifi ap");
 }
 
+void OFSwitch13WifiController::PrintAssocStatus(void)
+{
+	NS_LOG_FUNCTION(this);
+	m_wifiNetworkStatus->PrintAssocStatus();
+}
 void 
 OFSwitch13WifiController::ConfigAssocStrategy (void)
 {
 	NS_LOG_FUNCTION(this);
-	
 	Address disassocAp;
 	Address assocAp;
 	Mac48Address sta;
@@ -372,6 +376,7 @@ OFSwitch13WifiController::ConfigAssocStrategy (void)
 	NS_LOG_INFO("disassoc AP: " << ap1 << ";sta:" << sta << ";assoc AP:" << ap2);
 	DisassocSTA(disassocAp, sta);
 	AssocControlMap[disassocAp] = assocAp;
+	NS_LOG_INFO("AssocStatus after:");
 }
 
 } // namespace ns3

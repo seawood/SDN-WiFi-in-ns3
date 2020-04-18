@@ -65,6 +65,7 @@ public:
 	void PrintChannelQuality (void); //temporary, when receive reply or trigger
 	void UpdateAssocStas (const Address& apAddr, const Mac48Address& staAddr);
 	void UpdateDisassocStas (const Address& apAddr, const Mac48Address& staAddr);
+	void PrintAssocStatus(void);
 private:
 	void InitializeFrequencyUnused ();
 	
