@@ -283,6 +283,11 @@ public:
   ReportChannelQualityTriggered (Mac48Address mac48address, uint64_t packets,
 				double rxPower_avg, double rxPower_std);
 
+  void
+  ReportAssoc (Mac48Address mac48address);
+  
+  void
+  ReportDisassoc (Mac48Address mac48address);
   /**
    * Overriding ofsoftswitch13 dp_actions_output_port weak function from
    * udatapath/dp_actions.c. Outputs a datapath packet on switch port. This

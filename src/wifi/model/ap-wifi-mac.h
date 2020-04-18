@@ -56,6 +56,13 @@ public:
   ApWifiMac ();
   virtual ~ApWifiMac ();
 
+  void GetStas(std::vector<Mac48Address>& stas);
+  
+  void SetAssocTrigger(void);
+  bool GetAssocTrigger(void);
+  void DisassocSTA(const Mac48Address& sta);
+  Buffer GetMgtHeader(const mac48Address& sta);
+  int AssocSTA(const Mac48Address& from, const Buffer& mgtHeader);
   /**
    * \param stationManager the station manager attached to this MAC.
    */
@@ -339,6 +346,9 @@ private:
   std::list<Mac48Address>::iterator m_itCfPollingList; //!< Iterator to the list of all PCF stations currently associated to the AP
   bool m_enableNonErpProtection;             //!< Flag whether protection mechanism is used or not when non-ERP STAs are present within the BSS
   bool m_disableRifs;                        //!< Flag whether to force RIFS to be disabled within the BSS If non-HT STAs are detected
+  
+  std::map<Mac48Address, Buffer> m_staMgtAssocReqHeaders;  //!< Record MgtAssocRequestHeader for STAs
+  bool m_assocTrigger;
 };
 
 } //namespace ns3

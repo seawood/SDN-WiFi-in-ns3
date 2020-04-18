@@ -1060,7 +1060,12 @@ protected:
    * \return WifiMac
    */
   Ptr<WifiMac> GetMac (void) const;
-
+  
+  typedef Callback<void, Mac48Address> AssocCallback;
+  void SetAssocCallback (AssocCallback callback);
+  
+  typedef Callback<void Mac48Address> DisassocCallback;
+  void SetDisassocCallback (DisassocCallback callback);
 
 private:
   /**
@@ -1450,6 +1455,8 @@ private:
   ProtectionMode m_erpProtectionMode; //!< Protection mode for ERP stations when non-ERP stations are detected
   ProtectionMode m_htProtectionMode;  //!< Protection mode for HT stations when non-HT stations are detected
 
+  AssocCallback m_assocCallback;
+  DisassocCallback m_disassocCallback;
   /**
    * The trace source fired when the transmission of a single RTS has failed
    */

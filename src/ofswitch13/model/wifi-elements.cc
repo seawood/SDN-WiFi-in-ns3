@@ -180,7 +180,7 @@ WifiNetworkStatus::UpdateFrequencyUsed (Address address,
 	
 }
 
-void 
+void
 WifiNetworkStatus::GetOneSTA (Address* ap, Mac48Address* sta)
 {
 	NS_LOG_FUNCTION(this);
@@ -228,5 +228,32 @@ WifiNetworkStatus::PrintChannelQuality (void)
 	}
 }
 
+void
+UpdateAssocStas (const Address& apAddr, const Mac48Address& staAddr)
+{
+	NS_LOG_FUNCTION (this);
+	Ipv4Address ap = InetSocketAddress::ConvertFrom(apAddr).GetIpv4();
+	NS_LOG_INFO ("ap:" << ap << ", assoc sta:" << staAddr);
+	if (m_associationMap.find(apAddr) != m_associationMap.end())
+	{
+		m_associationMap[apAddr].insert(staAddr);
+	}
+	else
+	{
+		std::set<Mac48Address> stas;
+		stas.insert(staAddr);
+		m_associationMap[apAddr] = stas;
+	}
+}
 
+void
+UpdateDisassocStas (const Address& apAddr, const Mac48Address& staAddr)
+{
+	NS_LOG_FUNCTION (this);
+	Ipv4Address ap = InetSocketAddress::ConvertFrom(apAddr).GetIpv4();
+	NS_LOG_INFO ("ap:" << ap << ", disassoc sta:" << staAddr);
+	NS_ASSERT (m_associationMap.find(apAddr) != m_associationMap.end());
+	NS_ASSERT (m_associationMap[apAddr].find(staAddr) != m_associationMap[apAddr].end());
+	m_associationMap[apAddr].erase(staAddr);
+}
 } //namespace ns3

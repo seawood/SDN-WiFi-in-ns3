@@ -21,6 +21,7 @@ struct ofl_channel_info {
 };
 
 //WIFI_EXT_CHANNEL_CONFIG_REQUEST
+//WIFI_EXT_ASSOC_STATUS_REQUEST
 struct ofl_exp_wifi_msg_channel_req {
 	struct ofl_exp_wifi_msg_header header;
 };
@@ -55,6 +56,28 @@ struct ofl_exp_wifi_msg_chaqua {
 	struct chaqua_report** reports;
 };
 
+/**------------------------------------------------***/
+//WIFI_EXT_ASSOC_STATUS_REPLY
+//WIFI_EXT_ASSOC_TRIGGERRED,
+//WIFI_EXT_DIASSOC_TRIGGERED,
+//WIFI_EXT_DISASSOC_CONFIG
+struct sta_address {
+	uint8_t mac48address[6];
+};
+struct ofl_ext_wifi_msg_assoc {
+	struct ofl_exp_wifi_msg_header header;
+	uint32_t num;
+	struct sta_address** addresses;
+};
+
+//WIFI_EXT_DISASSOC_CONFIG_REPLY,
+//WIFI_EXT_ASSOC_CONFIG
+struct ofl_ext_wifi_msg_assoc_disassoc_config {
+	struct ofl_exp_wifi_msg_header header;
+	uint8_t mac48address[6];
+	uint32_t len;
+	uint8_t* data;
+}
 /**------------------------------------------------***/
 int
 ofl_exp_wifi_msg_pack(struct ofl_msg_experimenter *msg, uint8_t **buf, size_t *buf_len);

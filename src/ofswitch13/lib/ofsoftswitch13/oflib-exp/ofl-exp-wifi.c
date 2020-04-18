@@ -22,8 +22,8 @@ ofl_exp_wifi_msg_pack(struct ofl_msg_experimenter *msg,
 	if (msg->experimenter_id == WIFI_VENDOR_ID) {
 		struct ofl_exp_wifi_msg_header *exp = (struct ofl_exp_wifi_msg_header*)msg;
 		switch (exp->type){
-			case (WIFI_EXT_CHANNEL_CONFIG_REQUEST): {
-				//struct ofl_exp_wifi_msg_channel_req* c = (struct ofl_exp_wifi_msg_channel_req*)exp;
+			case (WIFI_EXT_CHANNEL_CONFIG_REQUEST): 
+			case (WIFI_EXT_ASSOC_STATUS_REQUEST): {
 				struct wifi_extension_header* wifi;
 				*buf_len = sizeof(struct wifi_extension_header);
 				*buf = (uint8_t*)calloc(1, *buf_len);
@@ -78,6 +78,38 @@ ofl_exp_wifi_msg_pack(struct ofl_msg_experimenter *msg,
 				}
 				break;
 			}
+			case (WIFI_EXT_ASSOC_STATUS_REPLY):
+			case (WIFI_EXT_ASSOC_TRIGGERRED):
+			case (WIFI_EXT_DIASSOC_TRIGGERED):
+			case (WIFI_EXT_DISASSOC_CONFIG): {
+				struct ofl_ext_wifi_msg_assoc* src = (struct ofl_ext_wifi_msg_assoc*)exp;
+				struct wifi_assoc_status* dst;
+				*buf_len = sizeof(struct wifi_assoc_status) + src->num * sizeof(struct assoc_status);
+				*buf = (uint8_t*)malloc(*buf_len);
+				dst = (struct wifi_assoc_status*)(*buf);
+				dst->header.vendor = htonl(exp->header.experimenter_id);
+				dst->header.subtype = htonl(exp->type);
+				dst->num = htonl(src->num);
+				for(size_t i = 0; i < src->num; ++i)
+				{
+					memcpy(dst->status[i].mac48address, src->addresses[i]->mac48address, 6);
+				}
+				break;
+			}
+			case (WIFI_EXT_DISASSOC_CONFIG_REPLY):
+			case (WIFI_EXT_ASSOC_CONFIG): {
+				struct ofl_ext_wifi_msg_assoc_disassoc_config* src = (struct ofl_ext_wifi_msg_assoc_disassoc_config*)exp;
+				struct wifi_assoc_disassoc_config* dst;
+				*buf_len = sizeof(struct wifi_assoc_disassoc_config) + src->len;
+				*buf = (struct wifi_assoc_disassoc_config*)malloc(*buf_len);
+				dst = (struct wifi_assoc_disassoc_config*)(*buf);
+				dst->header.vendor = htonl(exp->header.experimenter_id);
+				dst->header.subtype = htonl(exp->type);
+				dst->len = htonl(src->len);
+				memcpy(dst->mac48address, src->mac48address, 6);
+				memcpy(dst->data, src->data, src->len);
+				break;
+			}
 			default: {
 				OFL_LOG_WARN(LOG_MODULE, "Trying to pack unknown Openflow Experimenter message.");
                 return -1;
@@ -105,7 +137,8 @@ ofl_exp_wifi_msg_unpack(struct ofp_header *oh, size_t *len,
 	OFL_LOG_DBG(LOG_MODULE, "exp->vendor:: %x", ntohl(exp->vendor));
 	if (ntohl(exp->vendor) == WIFI_VENDOR_ID) {
 		switch (ntohl(exp->subtype)) {
-			case (WIFI_EXT_CHANNEL_CONFIG_REQUEST): {
+			case (WIFI_EXT_CHANNEL_CONFIG_REQUEST):
+			case (WIFI_EXT_ASSOC_STATUS_REQUEST): {
 				struct ofl_exp_wifi_msg_channel_req* dst;
 				dst = (struct ofl_exp_wifi_msg_channel_req*)malloc(sizeof(struct ofl_exp_wifi_msg_channel_req));
 				dst->header.header.experimenter_id = ntohl(exp->vendor);
@@ -187,6 +220,39 @@ ofl_exp_wifi_msg_unpack(struct ofp_header *oh, size_t *len,
 				*len -= sizeof(struct wifi_channel_quality) + dst->num * sizeof(struct channel_quality_report);
 				return 0;
 			}
+			case (WIFI_EXT_ASSOC_STATUS_REPLY):
+			case (WIFI_EXT_ASSOC_TRIGGERRED):
+			case (WIFI_EXT_DIASSOC_TRIGGERED):
+			case (WIFI_EXT_DISASSOC_CONFIG): {
+				struct wifi_assoc_status* src;
+				struct ofl_ext_wifi_msg_assoc* dst;
+				if (*len < sizeof(struct wifi_assoc_status))
+				{
+					OFL_LOG_WARN(LOG_MODULE, "Received  message wifi_assoc_status has invalid length (%zu).", *len);
+                    return ofl_error(OFPET_BAD_REQUEST, OFPBRC_BAD_LEN);
+				}
+				OFL_LOG_WARN(LOG_MODULE, "unpack wifi_assoc_status");
+				src = (struct wifi_assoc_status*)exp;
+				dst = (struct ofl_ext_wifi_msg_assoc*)malloc(sizeof(struct ofl_ext_wifi_msg_assoc));
+				dst->header.header.experimenter_id = ntohl(exp->vendor);
+				OFL_LOG_DBG(LOG_MODULE, "dst->header.header.experimenter_id : %x", dst->header.header.experimenter_id );
+				dst->header.type = ntohl(exp->subtype);
+				dst->num = ntohl (src->num);
+				dst->addresses = (struct sta_address**)malloc(dst->num * struct sta_address*);
+				for (size_t i = 0; i < dst->num; ++i)
+				{
+					dst->addresses[i] = (struct sta_address*)malloc(struct sta_address);
+					memcpy(dst->addresses[i]->mac48address, src->status[i]->mac48address);
+				}
+				(*msg) = (struct ofl_msg_experimenter*)dst;
+				*len -= sizeof(struct wifi_assoc_status) + dst->num * sizeof(struct assoc_status);
+				break;
+			}
+			case (WIFI_EXT_DISASSOC_CONFIG_REPLY):
+			case (WIFI_EXT_ASSOC_CONFIG): {
+				
+				break;
+			}
 			default: {
 				OFL_LOG_WARN(LOG_MODULE, "Trying to unpack unknown wifi Experimenter message.");
                 return ofl_error(OFPET_BAD_REQUEST, OFPBRC_BAD_EXPERIMENTER);
@@ -205,6 +271,7 @@ ofl_exp_wifi_msg_free(struct ofl_msg_experimenter *msg)
 		struct ofl_exp_wifi_msg_header *exp = (struct ofl_exp_wifi_msg_header*)msg;
 		switch (exp->type) {
 			case (WIFI_EXT_CHANNEL_CONFIG_REQUEST):
+			case (WIFI_EXT_ASSOC_STATUS_REQUEST):
 				break;
 			case (WIFI_EXT_CHANNEL_CONFIG_REPLY):
 			case (WIFI_EXT_CHANNEL_SET): {
@@ -225,6 +292,26 @@ ofl_exp_wifi_msg_free(struct ofl_msg_experimenter *msg)
 				}
 				break;
 			}
+			case (WIFI_EXT_ASSOC_STATUS_REPLY):
+			case (WIFI_EXT_ASSOC_TRIGGERRED):
+			case (WIFI_EXT_DIASSOC_TRIGGERED):
+			case (WIFI_EXT_DISASSOC_CONFIG):
+			{
+				struct ofl_ext_wifi_msg_assoc* c = (struct ofl_ext_wifi_msg_assoc*)exp;
+				for (uint32_t i = 0; i < c->num; ++i)
+				{
+					free(c->addresses[i]);
+				}
+				free(c->addresses);
+				break;
+			}
+			case (WIFI_EXT_DISASSOC_CONFIG_REPLY):
+			case (WIFI_EXT_ASSOC_CONFIG):
+			{
+				struct ofl_ext_wifi_msg_assoc_disassoc_config* c = (struct ofl_ext_wifi_msg_assoc_disassoc_config*)exp;
+				free(c->data);
+				break;
+			}
 			default: {
 				OFL_LOG_WARN(LOG_MODULE, "Trying to free unknown wifi Experimenter message.");
 			}
@@ -236,6 +323,23 @@ ofl_exp_wifi_msg_free(struct ofl_msg_experimenter *msg)
 	}
 	free(msg);
 	return 0;
+}
+
+void wifi_assoc_status_to_string (FILE* stream, struct ofl_msg_experimenter *msg)
+{
+	struct ofl_ext_wifi_msg_assoc *exp = (struct ofl_ext_wifi_msg_assoc *)msg;
+	for (uint32_t i = 0; i < exp->num; ++i)
+	{
+		fprintf(stream, "sta=%s", exp->addresses[i]->mac48address);
+	}
+}
+
+void wifi_assoc_disassoc_config_to_string(FILE* stream, struct ofl_msg_experimenter *msg)
+{
+	struct ofl_ext_wifi_msg_assoc_disassoc_config *exp = (struct ofl_ext_wifi_msg_assoc_disassoc_config*)msg;
+	fprintf(stream, "sta=%s", exp->mac48address);
+	fprintf(stream, "len=%u", exp->len);
+	//TODO: print data
 }
 
 char *
@@ -287,6 +391,40 @@ ofl_exp_wifi_msg_to_string(struct ofl_msg_experimenter *msg)
 					fprintf (stream, "rxPower_avg: %f", c->reports[i]->rxPower_avg);
 					fprintf (stream, "rxPower_std: %f", c->reports[i]->rxPower_std);
 				}
+				break;
+			}
+			case (WIFI_EXT_ASSOC_STATUS_REQUEST): {
+				fprintf (stream, "request for initial association status");
+				break;
+			}
+			case (WIFI_EXT_ASSOC_STATUS_REPLY): {
+				fprintf (stream, "reply for initial association status");
+				wifi_assoc_status_to_string(stream, msg);
+				break;
+			}
+			case (WIFI_EXT_ASSOC_TRIGGERRED): {
+				fprintf (stream, "new associated STA trigger msg");
+				wifi_assoc_status_to_string(stream, msg);
+				break;
+			}
+			case (WIFI_EXT_DIASSOC_TRIGGERED): {
+				fprintf (stream, "disassociated STA trigger msg");
+				wifi_assoc_status_to_string(stream, msg);
+				break;
+			}
+			case (WIFI_EXT_DISASSOC_CONFIG): {
+				fprintf (stream, "disassocate STA from AP config msg");
+				wifi_assoc_status_to_string(stream, msg);
+				break;
+			}
+			case (WIFI_EXT_DISASSOC_CONFIG_REPLY): {
+				fprintf (stream, "disassocate STA from AP config reply");
+				wifi_assoc_disassoc_config_to_string(stream, msg);
+				break;
+			}
+			case (WIFI_EXT_ASSOC_CONFIG): {
+				fprintf (stream, "associate STA to AP config msg");
+				wifi_assoc_disassoc_config_to_string(stream, msg);
 				break;
 			}
 			default: {

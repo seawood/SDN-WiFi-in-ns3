@@ -46,8 +46,6 @@ private:
 	uint16_t m_frequency;
 	uint16_t m_channelWidth;
 	WifiPhyStandard m_standard;
-	
-  
 		  
 }; //class WifiAp
 
@@ -65,6 +63,8 @@ public:
 	void UpdateApsInterference (const Address& dstAp, const Address& srcAp, struct chaqua_report* report);
 	void GetOneSTA (Address* ap, Mac48Address* sta); //temporary
 	void PrintChannelQuality (void); //temporary, when receive reply or trigger
+	void UpdateAssocStas (const Address& apAddr, const Mac48Address& staAddr);
+	void UpdateDisassocStas (const Address& apAddr, const Mac48Address& staAddr);
 private:
 	void InitializeFrequencyUnused ();
 	
@@ -81,7 +81,8 @@ private:
 	};
 	std::map<Mac48Address, std::map<Address, struct ChannelReport>> m_STAsChannelQuality;
 	std::map<Address, std::map<Address, struct ChannelReport>> m_APsInterference;
-	  
+	
+	std::map<Address, std::set<Mac48Address>> m_associationMap;
 }; // class WifiNetworkStatus
 
 } // namespace ns3

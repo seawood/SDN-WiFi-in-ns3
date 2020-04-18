@@ -582,6 +582,36 @@ OFSwitch13Device::ReportChannelQualityTriggered (Mac48Address mac48address, uint
 }
 
 void
+OFSwitch13Device::ReportAssoc (Mac48Address mac48address)
+{
+	NS_LOG_INFO ("send WIFI_EXT_ASSOC_TRIGGERRED to controller");
+	struct ofl_ext_wifi_msg_assoc reply;
+	reply.header.header.header.type = OFPT_EXPERIMENTER;
+	reply.header.header.experimenter_id = WIFI_VENDOR_ID;
+	reply.header.type = WIFI_EXT_ASSOC_TRIGGERRED;
+	reply.num = 1;
+	reply.addresses = (struct sta_address**)malloc(sizeof(sta_address*));
+	reply.addresses[0] = (struct sta_address*)malloc(sizeof(sta_address));
+	mac48address.CopyTo(reply.addresses[0].mac48address);
+	dp_send_message(m_datapath, (struct ofl_msg_header*)&reply, 0);
+}
+
+void
+OFSwitch13Device::ReportDisassoc (Mac48Address mac48address)
+{
+	NS_LOG_INFO ("send WIFI_EXT_DIASSOC_TRIGGERED to controller");
+	struct ofl_ext_wifi_msg_assoc reply;
+	reply.header.header.header.type = OFPT_EXPERIMENTER;
+	reply.header.header.experimenter_id = WIFI_VENDOR_ID;
+	reply.header.type = WIFI_EXT_DIASSOC_TRIGGERED;
+	reply.num = 1;
+	reply.addresses = (struct sta_address**)malloc(sizeof(sta_address*));
+	reply.addresses[0] = (struct sta_address*)malloc(sizeof(sta_address));
+	mac48address.CopyTo(reply.addresses[0].mac48address);
+	dp_send_message(m_datapath, (struct ofl_msg_header*)&reply, 0);
+}
+
+void
 OFSwitch13Device::DpActionsOutputPort (struct packet *pkt, uint32_t outPort,
                                        uint32_t outQueue, uint16_t maxLength,
                                        uint64_t cookie)

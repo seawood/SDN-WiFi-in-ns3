@@ -17,10 +17,18 @@ enum wifi_extension_subtype {
 	WIFI_EXT_CHANNEL_QUALITY_REQUEST,
 	WIFI_EXT_CHANNEL_QUALITY_REPLY,
 	WIFI_EXT_CHANNEL_QUALITY_TRIGGER_SET,
-	WIFI_EXT_CHANNEL_QUALITY_TRIGGERED
+	WIFI_EXT_CHANNEL_QUALITY_TRIGGERED,
+	WIFI_EXT_ASSOC_STATUS_REQUEST,
+	WIFI_EXT_ASSOC_STATUS_REPLY,
+	WIFI_EXT_ASSOC_TRIGGERRED,
+	WIFI_EXT_DIASSOC_TRIGGERED,
+	WIFI_EXT_DISASSOC_CONFIG,
+	WIFI_EXT_DISASSOC_CONFIG_REPLY,
+	WIFI_EXT_ASSOC_CONFIG
 };
 
 //WIFI_EXT_CHANNEL_CONFIG_REQUEST
+//WIFI_EXT_ASSOC_STATUS_REQUEST
 struct wifi_extension_header {
     struct ofp_header header;
     uint32_t vendor;            /* OPENFLOW_VENDOR_ID. */
@@ -69,6 +77,36 @@ struct wifi_channel_quality {
 };
 OFP_ASSERT(sizeof(struct wifi_channel_quality) == 24);
 
+
+struct assoc_status {
+	uint8_t mac48address[6];
+	uint8_t pad[2];
+};
+OFP_ASSERT(sizeof(struct assoc_status) == 8);
+//WIFI_EXT_ASSOC_STATUS_REPLY
+//WIFI_EXT_ASSOC_TRIGGERRED,
+//WIFI_EXT_DIASSOC_TRIGGERED,
+//WIFI_EXT_DISASSOC_CONFIG
+struct wifi_assoc_status {
+	struct wifi_extension_header header;
+	uint32_t num;
+	uint8_t pad[4];
+	struct assoc_status status[0];
+};
+OFP_ASSERT(sizeof(struct wifi_assoc_status) == 24);
+
+
+//WIFI_EXT_DISASSOC_CONFIG_REPLY,
+//WIFI_EXT_ASSOC_CONFIG
+struct wifi_assoc_disassoc_config {
+	struct wifi_extension_header header;
+	uint32_t len;
+	uint8_t pad[4];
+	uint8_t mac48address[6];
+	uint8_t pad[2];
+	uint8_t data[0];
+};
+OFP_ASSERT(sizeof(struct wifi_assoc_disassoc_config) == 32);
 
 #endif  /*OPENFLOW_WIFI_EXT_H*/
 

@@ -107,6 +107,7 @@ ApWifiMac::ApWifiMac ()
   SetTypeOfStation (AP);
 
   m_itCfPollingList = m_cfPollingList.begin ();
+  m_assocTrigger = false;
 }
 
 ApWifiMac::~ApWifiMac ()
@@ -128,6 +129,282 @@ ApWifiMac::DoDispose ()
   m_beaconEvent.Cancel ();
   m_cfpEvent.Cancel ();
   RegularWifiMac::DoDispose ();
+}
+
+void
+ApWifiMac::GetStas(std::vector<Mac48Address>& stas)
+{
+	NS_LOG_FUNCTION (this);
+	for (auto itr = staList.begin(); itr != staList.end(); itr++)
+	{
+		stas.push_back(itr->second);
+	}
+}
+
+void
+ApWifiMac::SetAssocTrigger(void)
+{
+	NS_LOG_FUNCTION (this);
+	m_assocTrigger = true;
+}
+
+bool
+ApWifiMac::GetAssocTrigger(void)
+{
+	NS_LOG_FUNCTION (this);
+	return m_assocTrigger;
+}
+
+void 
+ApWifiMac::DisassocSTA(const Mac48Address& from)
+{
+	NS_LOG_FUNCTION (this);
+	
+	NS_LOG_DEBUG ("Disassociate STA controller config:" << from);
+	m_stationManager->RecordDisassociated (from);
+	
+	m_staMgtAssocReqHeaders.erase(from);
+	
+	for (std::map<uint16_t, Mac48Address>::const_iterator j = m_staList.begin (); j != m_staList.end (); j++)
+	{
+		if (j->second == from)
+		{
+			m_staList.erase (j);
+			break;
+		}
+	}
+	for (std::list<Mac48Address>::const_iterator j = m_nonErpStations.begin (); j != m_nonErpStations.end (); j++)
+	{
+		if ((*j) == from)
+		{
+			m_nonErpStations.erase (j);
+			break;
+		}
+	}
+	for (std::list<Mac48Address>::const_iterator j = m_nonHtStations.begin (); j != m_nonHtStations.end (); j++)
+	{
+		if ((*j) == from)
+		{
+			m_nonHtStations.erase (j);
+			break;
+		}
+	}
+	for (std::list<Mac48Address>::const_iterator j = m_cfPollingList.begin (); j != m_cfPollingList.end (); ++j)
+	{
+		if ((*j) == from)
+		{
+			m_cfPollingList.erase (j);
+			break;
+		}
+	}
+	
+}
+
+Buffer
+ApWifiMac::GetMgtHeader(const mac48Address& sta)
+{
+	NS_LOG_FUNCTION (this);
+	return m_staMgtAssocReqHeaders[sta];
+}
+
+int
+ApWifiMac::AssocSTA(const Mac48Address& from, const Buffer& mgtHeader)
+{
+	NS_LOG_FUNCTION(this);
+	NS_LOG_DEBUG ("Associate STA controller config:" << from);
+	MgtAssocRequestHeader assocReq;
+	assocReq.Deserialize(mgtHeader.Begin());
+	if (m_staMgtAssocReqHeaders.find(from) != m_staMgtAssocReqHeaders.end())
+	{
+		NS_LOG_ERROR("Associate STA controller config failed: alerady associated");
+		return 1;
+	}
+	m_staMgtAssocReqHeaders[from] = mgtHeader;
+	CapabilityInformation capabilities = assocReq.GetCapabilities ();
+	m_stationManager->AddSupportedPlcpPreamble (from, capabilities.IsShortPreamble ());
+	SupportedRates rates = assocReq.GetSupportedRates ();
+	bool problem = false;
+	bool isHtStation = false;
+	bool isOfdmStation = false;
+	bool isErpStation = false;
+	bool isDsssStation = false;
+	for (uint8_t i = 0; i < m_stationManager->GetNBasicModes (); i++)
+	{
+		WifiMode mode = m_stationManager->GetBasicMode (i);
+		if (!rates.IsSupportedRate (mode.GetDataRate (m_phy->GetChannelWidth ())))
+		{
+			if ((mode.GetModulationClass () == WIFI_MOD_CLASS_DSSS) || (mode.GetModulationClass () == WIFI_MOD_CLASS_HR_DSSS))
+			{
+				isDsssStation = false;
+			}
+			else if (mode.GetModulationClass () == WIFI_MOD_CLASS_ERP_OFDM)
+			{
+				isErpStation = false;
+			}
+			else if (mode.GetModulationClass () == WIFI_MOD_CLASS_OFDM)
+			{
+				isOfdmStation = false;
+			}
+			if (isDsssStation == false && isErpStation == false && isOfdmStation == false)
+			{
+				problem = true;
+				break;
+			}
+		}
+		else
+		{
+			if ((mode.GetModulationClass () == WIFI_MOD_CLASS_DSSS) || (mode.GetModulationClass () == WIFI_MOD_CLASS_HR_DSSS))
+			{
+				isDsssStation = true;
+			}
+			else if (mode.GetModulationClass () == WIFI_MOD_CLASS_ERP_OFDM)
+			{
+				isErpStation = true;
+			}
+			else if (mode.GetModulationClass () == WIFI_MOD_CLASS_OFDM)
+			{
+				isOfdmStation = true;
+			}
+		}
+	}
+	m_stationManager->AddSupportedErpSlotTime (from, capabilities.IsShortSlotTime () && isErpStation);
+	if (GetHtSupported ())
+	{
+		//check whether the HT STA supports all MCSs in Basic MCS Set
+		HtCapabilities htcapabilities = assocReq.GetHtCapabilities ();
+		if (htcapabilities.IsSupportedMcs (0))
+		{
+			isHtStation = true;
+			for (uint8_t i = 0; i < m_stationManager->GetNBasicMcs (); i++)
+			{
+				WifiMode mcs = m_stationManager->GetBasicMcs (i);
+				if (!htcapabilities.IsSupportedMcs (mcs.GetMcsValue ()))
+				{
+					problem = true;
+					break;
+				}
+			}
+		}
+	}
+	if (GetVhtSupported ())
+	{
+		//check whether the VHT STA supports all MCSs in Basic MCS Set
+		VhtCapabilities vhtcapabilities = assocReq.GetVhtCapabilities ();
+		if (vhtcapabilities.GetVhtCapabilitiesInfo () != 0)
+		{
+			for (uint8_t i = 0; i < m_stationManager->GetNBasicMcs (); i++)
+			{
+				WifiMode mcs = m_stationManager->GetBasicMcs (i);
+				if (!vhtcapabilities.IsSupportedTxMcs (mcs.GetMcsValue ()))
+				{
+					problem = true;
+					break;
+				}
+			}
+		}
+	}
+	if (GetHeSupported ())
+	{
+		//check whether the HE STA supports all MCSs in Basic MCS Set
+		HeCapabilities hecapabilities = assocReq.GetHeCapabilities ();
+		if (hecapabilities.GetSupportedMcsAndNss () != 0)
+		{
+			for (uint8_t i = 0; i < m_stationManager->GetNBasicMcs (); i++)
+			{
+				WifiMode mcs = m_stationManager->GetBasicMcs (i);
+				if (!hecapabilities.IsSupportedTxMcs (mcs.GetMcsValue ()))
+				{
+					problem = true;
+					break;
+				}
+			}
+		}
+	}
+	if (problem)
+	{
+		NS_LOG_ERROR ("One of the Basic Rate set mode is not supported by the station: send association response with an error status");
+		return 1;
+	}
+	else
+	{
+		NS_LOG_DEBUG ("The Basic Rate set modes are supported by the station");
+		//record all its supported modes in its associated WifiRemoteStation
+		for (uint8_t j = 0; j < m_phy->GetNModes (); j++)
+		{
+			WifiMode mode = m_phy->GetMode (j);
+			if (rates.IsSupportedRate (mode.GetDataRate (m_phy->GetChannelWidth ())))
+			{
+				m_stationManager->AddSupportedMode (from, mode);
+			}
+		}
+		if (GetPcfSupported () && capabilities.IsCfPollable ())
+		{
+			m_cfPollingList.push_back (from);
+			if (m_itCfPollingList == m_cfPollingList.end ())
+			{
+				IncrementPollingListIterator ();
+			}
+		}
+		if (GetHtSupported ())
+		{
+			HtCapabilities htCapabilities = assocReq.GetHtCapabilities ();
+			if (htCapabilities.IsSupportedMcs (0))
+			{
+				m_stationManager->AddStationHtCapabilities (from, htCapabilities);
+			}
+		}
+		if (GetVhtSupported ())
+		{
+			VhtCapabilities vhtCapabilities = assocReq.GetVhtCapabilities ();
+			//we will always fill in RxHighestSupportedLgiDataRate field at TX, so this can be used to check whether it supports VHT
+			if (vhtCapabilities.GetRxHighestSupportedLgiDataRate () > 0)
+			{
+				m_stationManager->AddStationVhtCapabilities (from, vhtCapabilities);
+				for (uint8_t i = 0; i < m_phy->GetNMcs (); i++)
+				{
+					WifiMode mcs = m_phy->GetMcs (i);
+					if (mcs.GetModulationClass () == WIFI_MOD_CLASS_VHT && vhtCapabilities.IsSupportedTxMcs (mcs.GetMcsValue ()))
+					{
+						m_stationManager->AddSupportedMcs (hdr->GetAddr2 (), mcs);
+						//here should add a control to add basic MCS when it is implemented
+					}
+				}
+			}
+		}
+		if (GetHtSupported () || GetVhtSupported ())
+		{
+			ExtendedCapabilities extendedCapabilities = assocReq.GetExtendedCapabilities ();
+			//TODO: to be completed
+		}
+		if (GetHeSupported ())
+		{
+			HeCapabilities heCapabilities = assocReq.GetHeCapabilities ();
+			//todo: once we support non constant rate managers, we should add checks here whether HE is supported by the peer
+			m_stationManager->AddStationHeCapabilities (from, heCapabilities);
+			for (uint8_t i = 0; i < m_phy->GetNMcs (); i++)
+			{
+				WifiMode mcs = m_phy->GetMcs (i);
+				if (mcs.GetModulationClass () == WIFI_MOD_CLASS_HE && heCapabilities.IsSupportedTxMcs (mcs.GetMcsValue ()))
+				{
+					m_stationManager->AddSupportedMcs (hdr->GetAddr2 (), mcs);
+					//here should add a control to add basic MCS when it is implemented
+				}
+			}
+		}
+		m_stationManager->RecordWaitAssocTxOk (from);
+		if (!isHtStation)
+		{
+			m_nonHtStations.push_back (hdr->GetAddr2 ());
+			m_nonHtStations.unique ();
+		}
+		if (!isErpStation && isDsssStation)
+		{
+			m_nonErpStations.push_back (hdr->GetAddr2 ());
+			m_nonErpStations.unique ();
+		}
+	}
+
+	return 0;
 }
 
 void
@@ -1085,6 +1362,12 @@ ApWifiMac::Receive (Ptr<Packet> packet, const WifiMacHeader *hdr)
               //rate set is compatible with our Basic Rate set
               MgtAssocRequestHeader assocReq;
               packet->RemoveHeader (assocReq);
+			  
+			  //record MgtAssocRequestHeader
+			  Buffer buf (assocReq.GetSerializedSize());
+			  assocReq.Serialize (buf.Begin());
+			  m_staMgtAssocReqHeaders[from] = buf;
+			  
               CapabilityInformation capabilities = assocReq.GetCapabilities ();
               m_stationManager->AddSupportedPlcpPreamble (from, capabilities.IsShortPreamble ());
               SupportedRates rates = assocReq.GetSupportedRates ();
@@ -1462,6 +1745,9 @@ ApWifiMac::Receive (Ptr<Packet> packet, const WifiMacHeader *hdr)
             {
               NS_LOG_DEBUG ("Disassociation received from " << from);
               m_stationManager->RecordDisassociated (from);
+			  
+			  m_staMgtAssocReqHeaders.erase(from);
+			  
               for (std::map<uint16_t, Mac48Address>::const_iterator j = m_staList.begin (); j != m_staList.end (); j++)
                 {
                   if (j->second == from)

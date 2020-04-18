@@ -327,3 +327,83 @@ dp_handle_wifi_chanqua_trigger_set (struct datapath *dp,
 	}
 	return error;
 }
+
+ofl_err dp_handle_wifi_assoc_status_request (struct datapath *dp, 
+											struct ofl_exp_wifi_msg_channel_re *msg, 
+											const struct sender *sender)
+{
+	NS_LOG_DEBUG ("dp_handle_wifi_assoc_status_request: overide version");
+	Ptr<WifiNetDevice> wifiDev = OFSwitch13Device::GetWifiNetDevice(dp->id);
+	ofl_err error = 1;
+	if (wifiDev)
+	{
+		Ptr<ApWifiMac> mac = DynamicCast<ApWifiMac, WifiMac>(wifiDev.GetMac());
+		std::vector<Mac48Address> stas;
+		mac->GetStas(stas);
+		mac->SetAssocTrigger();
+		struct ofl_ext_wifi_msg_assoc reply;
+		reply.header.header.header.type = OFPT_EXPERIMENTER;
+		reply.header.header.experimenter_id = WIFI_VENDOR_ID;
+		reply.header.type = WIFI_EXT_ASSOC_STATUS_REPLY;
+		reply.num = stas.size();
+		reply.reports = (struct sta_address**)malloc(reply.num * sizeof(struct sta_address*));
+		for (int i = 0; i <reply.num; ++i)
+		{
+			reply.reports[i] = (struct sta_address*)malloc(sizeof(struct sta_address));
+			stas.CopyTo(reply.reports[i]->mac48address);
+		}
+		error = dp_send_message(dp, (struct ofl_msg_header*)&reply, sender);
+	}
+	return error;
+}
+
+
+ofl_err 
+dp_handle_wifi_disassoc_config (struct datapath *dp, 
+								struct ofl_ext_wifi_msg_assoc *msg, 
+								const struct sender *sender)
+{
+	NS_LOG_DEBUG ("dp_handle_wifi_disassoc_config: overide version");
+	Ptr<WifiNetDevice> wifiDev = OFSwitch13Device::GetWifiNetDevice(dp->id);
+	
+	ofl_err error = 1;
+	if (wifiDev)
+	{
+		Mac48Address sta;
+		sta.CopyFrom (msg->addresses.mac48address);
+		Ptr<ApWifiMac> mac = DynamicCast<ApWifiMac, WifiMac>(wifiDev.GetMac());
+		Buffer mgtHeader = mac->GetMgtHeader(sta);
+		mac->DisassocSTA (sta);
+		struct ofl_ext_wifi_msg_assoc reply;
+		reply.header.header.header.type = OFPT_EXPERIMENTER;
+		reply.header.header.experimenter_id = WIFI_VENDOR_ID;
+		reply.header.type = ofl_ext_wifi_msg_assoc_disassoc_config;
+		sta.CopyTo(reply.mac48address);
+		reply.len = mgtHeader.GetSerializedSize();
+		uint8_t *data = (uint8_t*)malloc(reply.len);
+		mgtHeader.Serialize(data, reply.len);
+		reply.data = (uint8_t**)malloc(sizeof(uint8_t*));
+		reply.data[0] = data;
+		error = dp_send_message(dp, (struct ofl_msg_header*)&reply, sender);
+	}
+	return error;
+}
+
+ofl_err 
+dp_handle_wifi_assoc_config (struct datapath *dp, 
+							 struct ofl_ext_wifi_msg_assoc_disassoc_config *msg, 
+							 const struct sender *sender) {
+	NS_LOG_DEBUG ("dp_handle_wifi_assoc_config: overide version");
+	Ptr<WifiNetDevice> wifiDev = OFSwitch13Device::GetWifiNetDevice(dp->id);
+	ofl_err error = 1;
+	if (wifiDev)
+	{
+		Mac48Address sta;
+		sta.CopyFrom (msg->addresses.mac48address);
+		Ptr<ApWifiMac> mac = DynamicCast<ApWifiMac, WifiMac>(wifiDev.GetMac());
+		Buffer mgtHeader(msg->len);
+		mgtHeader.Deserialize(msg->data,msg->len);
+		error = mac->AssocSTA(sta, mgtHeader);
+	}
+	return error;
+}

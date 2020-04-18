@@ -731,6 +731,10 @@ WifiRemoteStationManager::RecordGotAssocTxOk (Mac48Address address)
 {
   NS_ASSERT (!address.IsGroup ());
   LookupState (address)->m_state = WifiRemoteStationState::GOT_ASSOC_TX_OK;
+  if (m_wifiMac->GetAssocTrigger())
+  {
+	  m_assocCallback(address);
+  }
 }
 
 void
@@ -745,6 +749,10 @@ WifiRemoteStationManager::RecordDisassociated (Mac48Address address)
 {
   NS_ASSERT (!address.IsGroup ());
   LookupState (address)->m_state = WifiRemoteStationState::DISASSOC;
+  if (m_wifiMac->GetAssocTrigger())
+  {
+	  m_disassocCallback(address);
+  }
 }
 
 void
@@ -2126,6 +2134,20 @@ Ptr<WifiMac>
 WifiRemoteStationManager::GetMac (void) const
 {
   return m_wifiMac;
+}
+
+void
+WifiRemoteStationManager::SetAssocCallback (AssocCallback callback)
+{
+	NS_LOG_FUNCTION (this);
+	m_assocCallback = callback;
+}
+
+void 
+WifiRemoteStationManager::SetDisassocCallback (DisassocCallback callback)
+{
+	NS_LOG_FUNCTION (this);
+	m_disassocCallback = callback;
 }
 
 uint8_t

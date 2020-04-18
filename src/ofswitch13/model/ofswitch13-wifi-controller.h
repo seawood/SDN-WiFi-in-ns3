@@ -51,12 +51,16 @@ public:
 	void ChannelQualityReportStrategy (void);
 	void ChannelQualityTriggerStrategy (void); 
 	void ConfigChannelStrategyInterval (uint16_t interval);
+	void ConfigAssocStrategy (void); // two AP, one STA scenario
 private:
 	void ConfigChannel (const Address& address, const uint8_t& channelNumber,
 						const uint16_t frequency, const uint16_t& channelWidth);
 	
 	void RequestChannelQuality (const Address& address, const Mac48Address& mac48address);
 	void SetChannelQualityTrigger (const Address& address, const std::vector<struct OneReport>& triggers);
+	
+	void DisassocSTA (const Address& ap, const Mac48Address& sta);
+	
 	
 	/** Map to store Wifi AP info by Address */
 	typedef std::map <Address, Ptr<WifiAp>> WifiApsMap_t;
@@ -65,6 +69,7 @@ private:
 	WifiApsMac48Map_t m_wifiApsMac48Map;
 	
 	Ptr<WifiNetworkStatus> m_wifiNetworkStatus;
+	std::map<Address, Address> AssocControlMap;
 };
 
 }  //namespace ns3
