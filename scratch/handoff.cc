@@ -56,9 +56,9 @@ main (int argc, char *argv[])
 
 	if (verbose)
     {
-		//OFSwitch13Helper::EnableDatapathLogs ();
-		//LogComponentEnable ("OFSwitch13Interface", LOG_LEVEL_ALL);
-		//LogComponentEnable ("OFSwitch13Device", LOG_LEVEL_ALL);
+		OFSwitch13Helper::EnableDatapathLogs ();
+		LogComponentEnable ("OFSwitch13Interface", LOG_LEVEL_ALL);
+		LogComponentEnable ("OFSwitch13Device", LOG_LEVEL_ALL);
 		//LogComponentEnable ("OFSwitch13Port", LOG_LEVEL_ALL);
 		//LogComponentEnable ("OFSwitch13Queue", LOG_LEVEL_ALL);
 		//LogComponentEnable ("OFSwitch13SocketHandler", LOG_LEVEL_ALL);
@@ -70,12 +70,13 @@ main (int argc, char *argv[])
 		//LogComponentEnable ("CsmaNetDevice", LOG_LEVEL_ALL);
 		//LogComponentEnable ("Simulator", LOG_LEVEL_ALL);
 		LogComponentEnable ("OFSwitch13WifiController", LOG_LEVEL_ALL);
-		LogComponentEnable ("WifiElements", LOG_LEVEL_WARN);
+		LogComponentEnable ("WifiElements", LOG_LEVEL_ALL);
 		//LogComponentEnable ("WifiPhy", LOG_LEVEL_ALL);
 		//LogComponentEnable ("SpectrumWifiPhy", LOG_LEVEL_ALL);
 		//LogComponentEnable ("UdpServer", LOG_LEVEL_ALL);
 		//LogComponentEnable ("UdpClient", LOG_LEVEL_ALL);
-	    //LogComponentEnable ("PropagationLossModel", LOG_LEVEL_ALL);
+	        //LogComponentEnable ("PropagationLossModel", LOG_LEVEL_ALL);
+		LogComponentEnable ("ApWifiMac", LOG_LEVEL_ALL);
     }
 	
 

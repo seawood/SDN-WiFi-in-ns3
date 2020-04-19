@@ -1363,10 +1363,11 @@ ApWifiMac::Receive (Ptr<Packet> packet, const WifiMacHeader *hdr)
               MgtAssocRequestHeader assocReq;
               packet->RemoveHeader (assocReq);
 			  
-			  //record MgtAssocRequestHeader
-			  Buffer buf (assocReq.GetSerializedSize());
-			  assocReq.Serialize (buf.Begin());
-			  m_staMgtAssocReqHeaders[from] = buf;
+             //record MgtAssocRequestHeader
+             Buffer buf (assocReq.GetSerializedSize(), false);
+	     assocReq.Serialize (buf.Begin());
+	     m_staMgtAssocReqHeaders[from] = buf;
+	     NS_LOG_INFO("record MgtAssocRequestHeader");
 			  
               CapabilityInformation capabilities = assocReq.GetCapabilities ();
               m_stationManager->AddSupportedPlcpPreamble (from, capabilities.IsShortPreamble ());
