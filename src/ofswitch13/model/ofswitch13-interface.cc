@@ -372,20 +372,17 @@ dp_handle_wifi_disassoc_config (struct datapath *dp,
 		Mac48Address sta;
 		sta.CopyFrom (msg->addresses[0]->mac48address);
 		Ptr<ApWifiMac> mac = DynamicCast<ApWifiMac, WifiMac>(wifiDev->GetMac());
-		Buffer mgtHeader = mac->GetMgtHeader(sta);
+		Ptr<Packet> pkt = mac->GetMgtHeader();
 		mac->DisassocSTA (sta);
 		struct ofl_ext_wifi_msg_assoc_disassoc_config reply;
 		reply.header.header.header.type = OFPT_EXPERIMENTER;
 		reply.header.header.experimenter_id = WIFI_VENDOR_ID;
 		reply.header.type = WIFI_EXT_DISASSOC_CONFIG_REPLY;
 		sta.CopyTo(reply.mac48address);
-		reply.len = mgtHeader.GetSerializedSize();
+		reply.len = pkt->GetSize();
 		NS_LOG_INFO("reply.len:" << reply.len);
-		NS_LOG_INFO("GetSize:" << mgtHeader.GetSize());
-		reply.data = (uint8_t*)calloc(reply.len, 1);
-		NS_LOG_INFO("22");
-		mgtHeader.Serialize(reply.data, reply.len);
-		NS_LOG_INFO("33");
+		reply.data = (uint8_t*)malloc(reply.len);
+		pkt->CopyData(reply.data, reply.len);
 		error = dp_send_message(dp, (struct ofl_msg_header*)&reply, sender);
 	}
 	return error;
@@ -403,9 +400,8 @@ dp_handle_wifi_assoc_config (struct datapath *dp,
 		Mac48Address sta;
 		sta.CopyFrom (msg->mac48address);
 		Ptr<ApWifiMac> mac = DynamicCast<ApWifiMac, WifiMac>(wifiDev->GetMac());
-		Buffer mgtHeader(msg->len);
-		mgtHeader.Deserialize(msg->data,msg->len);
-		error = mac->AssocSTA(sta, mgtHeader);
+		Ptr<Packet> pkt = Create<Packet>(msg->data, msg->len);
+		error = mac->AssocSTA(sta, pkt);
 	}
 	return error;
 }

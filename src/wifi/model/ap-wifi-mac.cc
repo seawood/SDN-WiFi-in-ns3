@@ -202,7 +202,7 @@ ApWifiMac::DisassocSTA(const Mac48Address& from)
 	
 }
 
-Buffer
+Ptr<Packet>
 ApWifiMac::GetMgtHeader(const Mac48Address& sta)
 {
 	NS_LOG_FUNCTION (this);
@@ -210,18 +210,18 @@ ApWifiMac::GetMgtHeader(const Mac48Address& sta)
 }
 
 int
-ApWifiMac::AssocSTA(const Mac48Address& from, const Buffer& mgtHeader)
+ApWifiMac::AssocSTA(const Mac48Address& from, const Ptr<Packet>& pkt)
 {
 	NS_LOG_FUNCTION(this);
 	NS_LOG_DEBUG ("Associate STA controller config:" << from);
 	MgtAssocRequestHeader assocReq;
-	assocReq.Deserialize(mgtHeader.Begin());
+	pkt->RemoveHeader(assocReq);
 	if (m_staMgtAssocReqHeaders.find(from) != m_staMgtAssocReqHeaders.end())
 	{
 		NS_LOG_ERROR("Associate STA controller config failed: alerady associated");
 		return 1;
 	}
-	m_staMgtAssocReqHeaders[from] = mgtHeader;
+	m_staMgtAssocReqHeaders[from] = pkt;
 	CapabilityInformation capabilities = assocReq.GetCapabilities ();
 	m_stationManager->AddSupportedPlcpPreamble (from, capabilities.IsShortPreamble ());
 	SupportedRates rates = assocReq.GetSupportedRates ();
@@ -1366,12 +1366,12 @@ ApWifiMac::Receive (Ptr<Packet> packet, const WifiMacHeader *hdr)
               packet->RemoveHeader (assocReq);
 			  
              //record MgtAssocRequestHeader
-	     NS_LOG_INFO("MgtAssocRequestHeader Size:" << assocReq.GetSerializedSize());
-             Buffer buf (assocReq.GetSerializedSize(), false);
-	     assocReq.Serialize (buf.Begin());
-	     m_staMgtAssocReqHeaders[from] = buf;
-	     NS_LOG_INFO("m_staMgtAssocReqHeaders[from].GetSerializedSize():" << m_staMgtAssocReqHeaders[from].GetSerializedSize());
-	     NS_LOG_INFO("record MgtAssocRequestHeader");
+			 Ptr<Packet> pkt = Create<Packet>();
+			 pkt->AddHeader(assocReq);
+			 
+			 m_staMgtAssocReqHeaders[from] = pkt;
+			 NS_LOG_INFO("record MgtAssocRequestHeader:" << 
+						 assocReq.GetSerializedSize() << ";" <<pkt->GetSize());
 			  
               CapabilityInformation capabilities = assocReq.GetCapabilities ();
               m_stationManager->AddSupportedPlcpPreamble (from, capabilities.IsShortPreamble ());
