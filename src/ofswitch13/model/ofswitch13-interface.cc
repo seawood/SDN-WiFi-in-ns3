@@ -372,7 +372,7 @@ dp_handle_wifi_disassoc_config (struct datapath *dp,
 		Mac48Address sta;
 		sta.CopyFrom (msg->addresses[0]->mac48address);
 		Ptr<ApWifiMac> mac = DynamicCast<ApWifiMac, WifiMac>(wifiDev->GetMac());
-		Ptr<Packet> pkt = mac->GetMgtHeader();
+		Ptr<Packet> pkt = mac->GetMgtHeader(sta);
 		mac->DisassocSTA (sta);
 		struct ofl_ext_wifi_msg_assoc_disassoc_config reply;
 		reply.header.header.header.type = OFPT_EXPERIMENTER;
