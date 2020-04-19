@@ -15,13 +15,14 @@
 	// Define these functions as weak, 
 	// so ns3 can override it and send the buffer over switch port.
 	#pragma message "weak function: wifi"
+	#pragma weak dp_handle_wifi_assoc_status_request
+        #pragma message "assoc_status_request"
 	#pragma weak dp_handle_wifi_config_request
 	#pragma weak dp_handle_wifi_channel_set
 	#pragma weak dp_handle_wifi_chanqua_request
 	#pragma weak dp_handle_wifi_chanqua_trigger_set
-	#pragma weak dp_handle_wifi_assoc_status_request
-    #pragma weak dp_handle_wifi_disassoc_config
-    #pragma weak dp_handle_wifi_assoc_config
+        #pragma weak dp_handle_wifi_disassoc_config
+        #pragma weak dp_handle_wifi_assoc_config
 #endif
 
 static struct vlog_rate_limit rl = VLOG_RATE_LIMIT_INIT(60, 60);

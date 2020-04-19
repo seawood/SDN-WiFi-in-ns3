@@ -374,7 +374,6 @@ OFSwitch13WifiController::ConfigAssocStrategy (void)
 	NS_LOG_INFO("disassoc AP: " << ap1 << ";sta:" << sta << ";assoc AP:" << ap2);
 	DisassocSTA(disassocAp, sta);
 	AssocControlMap[disassocAp] = assocAp;
-	NS_LOG_INFO("AssocStatus after:");
 }
 
 } // namespace ns3
