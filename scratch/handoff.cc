@@ -77,6 +77,7 @@ main (int argc, char *argv[])
 		//LogComponentEnable ("UdpClient", LOG_LEVEL_ALL);
 	        //LogComponentEnable ("PropagationLossModel", LOG_LEVEL_ALL);
 		LogComponentEnable ("ApWifiMac", LOG_LEVEL_ALL);
+		LogComponentEnable ("WifiRemoteStationManager", LOG_LEVEL_ALL);
     }
 	
 

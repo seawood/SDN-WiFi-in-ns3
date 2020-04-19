@@ -162,9 +162,11 @@ ApWifiMac::DisassocSTA(const Mac48Address& from)
 	
 	NS_LOG_DEBUG ("Disassociate STA controller config:" << from);
 	m_stationManager->RecordDisassociated (from, false);
-	
+        NS_LOG_INFO("1");	
+	NS_ASSERT(m_staMgtAssocReqHeaders.find(from) != m_staMgtAssocReqHeaders.end());
 	m_staMgtAssocReqHeaders.erase(from);
-	
+        NS_LOG_INFO("2");	
+
 	for (std::map<uint16_t, Mac48Address>::const_iterator j = m_staList.begin (); j != m_staList.end (); j++)
 	{
 		if (j->second == from)
@@ -1364,9 +1366,11 @@ ApWifiMac::Receive (Ptr<Packet> packet, const WifiMacHeader *hdr)
               packet->RemoveHeader (assocReq);
 			  
              //record MgtAssocRequestHeader
+	     NS_LOG_INFO("MgtAssocRequestHeader Size:" << assocReq.GetSerializedSize());
              Buffer buf (assocReq.GetSerializedSize(), false);
 	     assocReq.Serialize (buf.Begin());
 	     m_staMgtAssocReqHeaders[from] = buf;
+	     NS_LOG_INFO("m_staMgtAssocReqHeaders[from].GetSerializedSize():" << m_staMgtAssocReqHeaders[from].GetSerializedSize());
 	     NS_LOG_INFO("record MgtAssocRequestHeader");
 			  
               CapabilityInformation capabilities = assocReq.GetCapabilities ();
@@ -1747,7 +1751,7 @@ ApWifiMac::Receive (Ptr<Packet> packet, const WifiMacHeader *hdr)
               NS_LOG_DEBUG ("Disassociation received from " << from);
               m_stationManager->RecordDisassociated (from);
 			  
-			  m_staMgtAssocReqHeaders.erase(from);
+              m_staMgtAssocReqHeaders.erase(from);
 			  
               for (std::map<uint16_t, Mac48Address>::const_iterator j = m_staList.begin (); j != m_staList.end (); j++)
                 {

@@ -138,6 +138,5 @@ int main (int argc, char *argv[])
   // and check that the destination and source
   // headers contain the same values.
   NS_ASSERT (sourceHeader.GetData () == destinationHeader.GetData ());
-
   return 0;
 }

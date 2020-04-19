@@ -380,10 +380,12 @@ dp_handle_wifi_disassoc_config (struct datapath *dp,
 		reply.header.type = WIFI_EXT_DISASSOC_CONFIG_REPLY;
 		sta.CopyTo(reply.mac48address);
 		reply.len = mgtHeader.GetSerializedSize();
-		uint8_t *data = (uint8_t*)malloc(reply.len);
-		mgtHeader.Serialize(data, reply.len);
-		reply.data = (uint8_t*)malloc(reply.len);
-		reply.data = data;
+		NS_LOG_INFO("reply.len:" << reply.len);
+		NS_LOG_INFO("GetSize:" << mgtHeader.GetSize());
+		reply.data = (uint8_t*)calloc(reply.len, 1);
+		NS_LOG_INFO("22");
+		mgtHeader.Serialize(reply.data, reply.len);
+		NS_LOG_INFO("33");
 		error = dp_send_message(dp, (struct ofl_msg_header*)&reply, sender);
 	}
 	return error;
