@@ -161,7 +161,7 @@ ApWifiMac::DisassocSTA(const Mac48Address& from)
 	NS_LOG_FUNCTION (this);
 	
 	NS_LOG_DEBUG ("Disassociate STA controller config:" << from);
-	m_stationManager->RecordDisassociated (from);
+	m_stationManager->RecordDisassociated (from, false);
 	
 	m_staMgtAssocReqHeaders.erase(from);
 	
@@ -391,7 +391,7 @@ ApWifiMac::AssocSTA(const Mac48Address& from, const Buffer& mgtHeader)
 				}
 			}
 		}
-		m_stationManager->RecordWaitAssocTxOk (from);
+		m_stationManager->RecordGotAssocTxOk (from, false);
 		if (!isHtStation)
 		{
 			m_nonHtStations.push_back (from);

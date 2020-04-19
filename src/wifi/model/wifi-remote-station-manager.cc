@@ -728,11 +728,11 @@ WifiRemoteStationManager::RecordWaitAssocTxOk (Mac48Address address)
 }
 
 void
-WifiRemoteStationManager::RecordGotAssocTxOk (Mac48Address address)
+WifiRemoteStationManager::RecordGotAssocTxOk (Mac48Address address, bool send)
 {
   NS_ASSERT (!address.IsGroup ());
   LookupState (address)->m_state = WifiRemoteStationState::GOT_ASSOC_TX_OK;
-  if (DynamicCast<ApWifiMac, WifiMac>(m_wifiMac)->GetAssocTrigger())
+  if (DynamicCast<ApWifiMac, WifiMac>(m_wifiMac)->GetAssocTrigger() && send)
   {
 	  m_assocCallback(address);
   }
@@ -746,11 +746,11 @@ WifiRemoteStationManager::RecordGotAssocTxFailed (Mac48Address address)
 }
 
 void
-WifiRemoteStationManager::RecordDisassociated (Mac48Address address)
+WifiRemoteStationManager::RecordDisassociated (Mac48Address address, bool send)
 {
   NS_ASSERT (!address.IsGroup ());
   LookupState (address)->m_state = WifiRemoteStationState::DISASSOC;
-  if (DynamicCast<ApWifiMac, WifiMac>(m_wifiMac)->GetAssocTrigger())
+  if (DynamicCast<ApWifiMac, WifiMac>(m_wifiMac)->GetAssocTrigger() && send)
   {
 	  m_disassocCallback(address);
   }

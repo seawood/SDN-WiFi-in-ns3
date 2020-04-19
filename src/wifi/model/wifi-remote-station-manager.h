@@ -580,7 +580,7 @@ public:
    *
    * \param address the address of the station
    */
-  void RecordGotAssocTxOk (Mac48Address address);
+  void RecordGotAssocTxOk (Mac48Address address, bool send = true);
   /**
    * Records that we missed an ACK for
    * the association response we sent.
@@ -593,7 +593,7 @@ public:
    *
    * \param address the address of the station
    */
-  void RecordDisassociated (Mac48Address address);
+  void RecordDisassociated (Mac48Address address, bool send = true);
 
   /**
    * \param address remote address
