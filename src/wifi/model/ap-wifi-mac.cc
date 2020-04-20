@@ -1279,12 +1279,21 @@ ApWifiMac::Receive (Ptr<Packet> packet, const WifiMacHeader *hdr)
   Mac48Address from = hdr->GetAddr2 ();
   if (hdr->IsData ())
     {
+      NS_LOG_INFO("wifi Data");
       Mac48Address bssid = hdr->GetAddr1 ();
       if (!hdr->IsFromDs ()
           && hdr->IsToDs ()
-          && bssid == GetAddress ()
+          //&& bssid == GetAddress ()
           && m_stationManager->IsAssociated (from))
         {
+	  if(bssid != GetAddress())
+	  {
+		  NS_LOG_INFO("special data");
+	  }
+	  else
+	  {
+		  NS_LOG_INFO("normal data");
+	  }
           Mac48Address to = hdr->GetAddr3 ();
           if (to == GetAddress ())
             {

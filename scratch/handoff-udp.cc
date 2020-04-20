@@ -56,9 +56,9 @@ main (int argc, char *argv[])
 
 	if (verbose)
     {
-		OFSwitch13Helper::EnableDatapathLogs ();
-		LogComponentEnable ("OFSwitch13Interface", LOG_LEVEL_ALL);
-		LogComponentEnable ("OFSwitch13Device", LOG_LEVEL_ALL);
+		//OFSwitch13Helper::EnableDatapathLogs ();
+		//LogComponentEnable ("OFSwitch13Interface", LOG_LEVEL_ALL);
+		//LogComponentEnable ("OFSwitch13Device", LOG_LEVEL_ALL);
 		//LogComponentEnable ("OFSwitch13Port", LOG_LEVEL_ALL);
 		//LogComponentEnable ("OFSwitch13Queue", LOG_LEVEL_ALL);
 		//LogComponentEnable ("OFSwitch13SocketHandler", LOG_LEVEL_ALL);
@@ -69,15 +69,18 @@ main (int argc, char *argv[])
 		//LogComponentEnable ("WifiNetDevice", LOG_LEVEL_ALL);
 		//LogComponentEnable ("CsmaNetDevice", LOG_LEVEL_ALL);
 		//LogComponentEnable ("Simulator", LOG_LEVEL_ALL);
-		LogComponentEnable ("OFSwitch13WifiController", LOG_LEVEL_ALL);
-		LogComponentEnable ("WifiElements", LOG_LEVEL_ALL);
+		//LogComponentEnable ("OFSwitch13WifiController", LOG_LEVEL_ALL);
+		//LogComponentEnable ("WifiElements", LOG_LEVEL_ALL);
 		//LogComponentEnable ("WifiPhy", LOG_LEVEL_ALL);
 		//LogComponentEnable ("SpectrumWifiPhy", LOG_LEVEL_ALL);
 		//LogComponentEnable ("UdpServer", LOG_LEVEL_ALL);
 		//LogComponentEnable ("UdpClient", LOG_LEVEL_ALL);
-	    //LogComponentEnable ("PropagationLossModel", LOG_LEVEL_ALL);
+	        //LogComponentEnable ("PropagationLossModel", LOG_LEVEL_ALL);
 		LogComponentEnable ("ApWifiMac", LOG_LEVEL_ALL);
-		LogComponentEnable ("WifiRemoteStationManager", LOG_LEVEL_ALL);
+		LogComponentEnable ("RegularWifiMac", LOG_LEVEL_ALL);
+		LogComponentEnable ("StaWifiMac", LOG_LEVEL_ALL);
+		LogComponentEnable ("MacLow", LOG_LEVEL_ALL);
+		//LogComponentEnable ("WifiRemoteStationManager", LOG_LEVEL_ALL);
     }
 	
 
@@ -205,7 +208,7 @@ main (int argc, char *argv[])
 	Ipv4AddressHelper ipv4helpr;
 	ipv4helpr.SetBase ("10.1.1.0", "255.255.255.0");
 	Ipv4InterfaceContainer staIpIfaces;
-	staIpIfaces = ipv4helpr.Assign (staDevs);
+	staIpIfaces = ipv4helpr.Assign (staWifiDevs);
 	Ipv4InterfaceContainer hostIpIfaces;
 	hostIpIfaces = ipv4helpr.Assign (hostDevices);
 	
@@ -218,7 +221,7 @@ main (int argc, char *argv[])
 	
 	UdpClientHelper client (hostIpIfaces.GetAddress (0), port);
 	client.SetAttribute ("MaxPackets", UintegerValue (4294967295u));
-	client.SetAttribute ("Interval", TimeValue (Time ("0.01"))); //packets/s
+	client.SetAttribute ("Interval", TimeValue (Time ("1"))); //packets/s
 	uint32_t payloadSize = 972;  //1000 bytes IPv4
 	client.SetAttribute ("PacketSize", UintegerValue (payloadSize));
 	ApplicationContainer clientApp = client.Install (stas.Get (0));
@@ -232,6 +235,7 @@ main (int argc, char *argv[])
 		of13Helper->EnableDatapathStats ("ap-openflow-stats");
 		spectrumPhy.EnablePcap ("apWifi", apWifiDevs);
 		spectrumPhy.EnablePcap ("staWifi", staWifiDevs);
+		csmaHelper.EnablePcap ("host", hostDevices);
     }
 	
 	Simulator::Schedule(Seconds(5), &OFSwitch13WifiController::PrintAssocStatus,
