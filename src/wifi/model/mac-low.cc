@@ -1056,6 +1056,12 @@ MacLow::ReceiveOk (Ptr<Packet> packet, double rxSnr, WifiTxVector txVector, bool
           goto rxPacket;
         }
     }
+  else if (hdr->IsData()) //special data
+	{
+		NS_LOG_DEBUG ("rx unicast/sendAck from=" << hdr.GetAddr2 ());
+		NS_LOG_INFO("work around");
+		goto rxPacket;
+	}
   else
     {
       if (m_cfAckInfo.expectCfAck && hdr.IsCfAck ())
@@ -1253,7 +1259,7 @@ MacLow::NotifyNav (Ptr<const Packet> packet, const WifiMacHeader &hdr)
            * A STA that used information from an RTS frame as the most recent basis to update its NAV setting
            * is permitted to reset its NAV if no PHY-RXSTART.indication is detected from the PHY during a
            * period with a duration of (2 * aSIFSTime) + (CTS_Time) + (2 * aSlotTime) starting at the
-           * PHY-RXEND.indication corresponding to the detection of the RTS frame. The “CTS_Time” shall
+           * PHY-RXEND.indication corresponding to the detection of the RTS frame. The “CTS_Time�shall
            * be calculated using the length of the CTS frame and the data rate at which the RTS frame
            * used for the most recent NAV update was received.
            */
