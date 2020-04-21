@@ -141,8 +141,9 @@ OFSwitch13LearningController::HandlePacketIn (
             }
           else
             {
-              NS_ASSERT_MSG (itSrc->second == inPort,
-                             "Inconsistent L2 switching table");
+	       //xyy:?
+              //NS_ASSERT_MSG (itSrc->second == inPort,
+               //              "Inconsistent L2 switching table");
             }
         }
       else

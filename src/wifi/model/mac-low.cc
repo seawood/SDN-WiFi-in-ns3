@@ -1056,10 +1056,11 @@ MacLow::ReceiveOk (Ptr<Packet> packet, double rxSnr, WifiTxVector txVector, bool
           goto rxPacket;
         }
     }
-  else if (hdr->IsData()) //special data
+  else if (hdr.IsData()) //special data
 	{
 		NS_LOG_DEBUG ("rx unicast/sendAck from=" << hdr.GetAddr2 ());
 		NS_LOG_INFO("work around");
+		hdr.SetAddr1(m_self);
 		goto rxPacket;
 	}
   else
