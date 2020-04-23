@@ -34,9 +34,11 @@
 #include "ns3/mobility-helper.h"
 #include "ns3/packet-sink-helper.h"
 #include "ns3/on-off-helper.h"
+#include "ns3/gnuplot.h"
 
 using namespace ns3;
 
+static const uint32_t packetSize = 1420;
 class NodeStatistics
 {
 public:
@@ -66,6 +68,7 @@ NodeStatistics::RxCallback (std::string path, Ptr<const Packet> packet, const Ad
 void
 NodeStatistics::CheckStatistics (double time)
 {
+	std::cout << "CheckStatictics:" << Simulator::Now() <<std::endl;
 	double mbs = ((m_bytesTotal * 8.0) / (1000000 * time));
 	m_bytesTotal = 0;
 	m_output.Add ((Simulator::Now ()).GetSeconds (), mbs);
@@ -87,6 +90,7 @@ main (int argc, char *argv[])
 	bool trace = true;
 	std::string errorModelType = "ns3::NistErrorRateModel";
 	double distance = 5;        //meters
+	std::string outputFileName = "throughput";
 
 	// Configure command line parameters
 	CommandLine cmd;
@@ -99,7 +103,7 @@ main (int argc, char *argv[])
 
 	if (verbose)
     {
-		OFSwitch13Helper::EnableDatapathLogs ();
+		//OFSwitch13Helper::EnableDatapathLogs ();
 		//LogComponentEnable ("OFSwitch13Interface", LOG_LEVEL_ALL);
 		//LogComponentEnable ("OFSwitch13Device", LOG_LEVEL_ALL);
 		//LogComponentEnable ("OFSwitch13Port", LOG_LEVEL_ALL);
@@ -112,17 +116,17 @@ main (int argc, char *argv[])
 		//LogComponentEnable ("WifiNetDevice", LOG_LEVEL_ALL);
 		//LogComponentEnable ("CsmaNetDevice", LOG_LEVEL_ALL);
 		//LogComponentEnable ("Simulator", LOG_LEVEL_ALL);
-		LogComponentEnable ("OFSwitch13WifiController", LOG_LEVEL_ALL);
-		LogComponentEnable ("WifiElements", LOG_LEVEL_ALL);
+		//LogComponentEnable ("OFSwitch13WifiController", LOG_LEVEL_ALL);
+		//LogComponentEnable ("WifiElements", LOG_LEVEL_ALL);
 		//LogComponentEnable ("WifiPhy", LOG_LEVEL_ALL);
 		//LogComponentEnable ("SpectrumWifiPhy", LOG_LEVEL_ALL);
 		//LogComponentEnable ("UdpServer", LOG_LEVEL_ALL);
 		//LogComponentEnable ("UdpClient", LOG_LEVEL_ALL);
 	        //LogComponentEnable ("PropagationLossModel", LOG_LEVEL_ALL);
-		LogComponentEnable ("ApWifiMac", LOG_LEVEL_ALL);
-		LogComponentEnable ("RegularWifiMac", LOG_LEVEL_ALL);
-		LogComponentEnable ("StaWifiMac", LOG_LEVEL_ALL);
-		LogComponentEnable ("MacLow", LOG_LEVEL_ALL);
+		//LogComponentEnable ("ApWifiMac", LOG_LEVEL_ALL);
+		//LogComponentEnable ("RegularWifiMac", LOG_LEVEL_ALL);
+		//LogComponentEnable ("StaWifiMac", LOG_LEVEL_ALL);
+		//LogComponentEnable ("MacLow", LOG_LEVEL_ALL);
 		//LogComponentEnable ("WifiRemoteStationManager", LOG_LEVEL_ALL);
     }
 	
@@ -256,15 +260,15 @@ main (int argc, char *argv[])
 	hostIpIfaces = ipv4helpr.Assign (hostDevices);
 	
 	//Configure the CBR generator
+	uint16_t port = 9;
 	PacketSinkHelper sink ("ns3::UdpSocketFactory", InetSocketAddress (hostIpIfaces.GetAddress(0), port));
 	ApplicationContainer apps_sink = sink.Install (host);
-	apps_sink.Start (Seconds (0.5));
-	apps_sink.Stop (Seconds (simuTime));
-	
+	apps_sink.Start (Seconds (1));
+	apps_sink.Stop (Seconds (simTime + 1));	
 	OnOffHelper onoff ("ns3::UdpSocketFactory", InetSocketAddress (hostIpIfaces.GetAddress(0), port));
 	onoff.SetConstantRate (DataRate ("54Mb/s"), packetSize);
-	onoff.SetAttribute ("StartTime", TimeValue (Seconds (0.5)));
-	onoff.SetAttribute ("StopTime", TimeValue (Seconds (simTime)));
+	onoff.SetAttribute ("StartTime", TimeValue (Seconds (1)));
+	onoff.SetAttribute ("StopTime", TimeValue (Seconds (simTime+1)));
 	ApplicationContainer apps_source = onoff.Install (stas.Get (0));
 	
 	// Enable datapath stats and pcap traces at APs and controller(s)
@@ -288,11 +292,11 @@ main (int argc, char *argv[])
 
 	Simulator::Schedule(Seconds(5), &OFSwitch13WifiController::PrintAssocStatus,
 					   wifiControl);
-	Simulator::Schedule (Seconds(10), &OFSwitch13WifiController::ConfigAssocStrategy,
+	Simulator::Schedule (Seconds(11), &OFSwitch13WifiController::ConfigAssocStrategy,
 						 wifiControl);
 	Simulator::Schedule(Seconds(15), &OFSwitch13WifiController::PrintAssocStatus,
 						wifiControl);
-	Simulator::Stop (Seconds (simTime + 1));
+	Simulator::Stop (Seconds (simTime + 2));
 	
 	// Run the simulation
 	Simulator::Run ();
