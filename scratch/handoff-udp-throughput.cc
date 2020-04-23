@@ -37,11 +37,7 @@ public:
 	Gnuplot2dDataset GetDatafile ();
 
 private:
-
-	
 	uint32_t m_bytesTotal;
-
-	
 	Gnuplot2dDataset m_output;
 };
 
@@ -51,7 +47,6 @@ NodeStatistics::NodeStatistics ()
 	m_output.SetTitle ("Throughput Mbits/s");
 
 }
-
 
 void
 NodeStatistics::RxCallback (std::string path, Ptr<const Packet> packet, const Address &from)

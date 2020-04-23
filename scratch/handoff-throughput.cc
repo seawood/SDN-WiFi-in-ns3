@@ -32,9 +32,52 @@
 #include <ns3/wifi-module.h>
 #include <ns3/spectrum-module.h>
 #include "ns3/mobility-helper.h"
-#include "ns3/udp-client-server-helper.h"
+#include "ns3/packet-sink-helper.h"
+#include "ns3/on-off-helper.h"
 
 using namespace ns3;
+
+class NodeStatistics
+{
+public:
+	NodeStatistics ();
+
+	void CheckStatistics (double time);
+	void RxCallback (std::string path, Ptr<const Packet> packet, const Address &from);
+	Gnuplot2dDataset GetDatafile ();
+
+private:
+	uint32_t m_bytesTotal;
+	Gnuplot2dDataset m_output;
+};
+
+NodeStatistics::NodeStatistics ()
+{
+	m_bytesTotal = 0;
+	m_output.SetTitle ("Throughput Mbits/s");
+}
+
+void
+NodeStatistics::RxCallback (std::string path, Ptr<const Packet> packet, const Address &from)
+{
+	m_bytesTotal += packet->GetSize ();
+}
+
+void
+NodeStatistics::CheckStatistics (double time)
+{
+	double mbs = ((m_bytesTotal * 8.0) / (1000000 * time));
+	m_bytesTotal = 0;
+	m_output.Add ((Simulator::Now ()).GetSeconds (), mbs);
+	Simulator::Schedule (Seconds (time), &NodeStatistics::CheckStatistics, this, time);
+}
+
+Gnuplot2dDataset
+NodeStatistics::GetDatafile ()
+{
+	return m_output;
+}
+
 
 int
 main (int argc, char *argv[])
@@ -212,22 +255,17 @@ main (int argc, char *argv[])
 	Ipv4InterfaceContainer hostIpIfaces;
 	hostIpIfaces = ipv4helpr.Assign (hostDevices);
 	
-	// setting application
-	uint16_t port = 9;
-	UdpServerHelper server (port);
-	ApplicationContainer serverApp = server.Install (host);
-	serverApp.Start (Seconds (0.0));
-	serverApp.Stop (Seconds (simTime + 1));
+	//Configure the CBR generator
+	PacketSinkHelper sink ("ns3::UdpSocketFactory", InetSocketAddress (hostIpIfaces.GetAddress(0), port));
+	ApplicationContainer apps_sink = sink.Install (host);
+	apps_sink.Start (Seconds (0.5));
+	apps_sink.Stop (Seconds (simuTime));
 	
-	UdpClientHelper client (hostIpIfaces.GetAddress (0), port);
-	client.SetAttribute ("MaxPackets", UintegerValue (4294967295u));
-	client.SetAttribute ("Interval", TimeValue (Time ("1"))); //packets/s
-	uint32_t payloadSize = 972;  //1000 bytes IPv4
-	client.SetAttribute ("PacketSize", UintegerValue (payloadSize));
-	ApplicationContainer clientApp = client.Install (stas.Get (0));
-	clientApp.Start (Seconds (1.0));
-	clientApp.Stop (Seconds (simTime + 1));
-
+	OnOffHelper onoff ("ns3::UdpSocketFactory", InetSocketAddress (hostIpIfaces.GetAddress(0), port));
+	onoff.SetConstantRate (DataRate ("54Mb/s"), packetSize);
+	onoff.SetAttribute ("StartTime", TimeValue (Seconds (0.5)));
+	onoff.SetAttribute ("StopTime", TimeValue (Seconds (simTime)));
+	ApplicationContainer apps_source = onoff.Install (stas.Get (0));
 	
 	// Enable datapath stats and pcap traces at APs and controller(s)
 	if (trace)
@@ -239,6 +277,15 @@ main (int argc, char *argv[])
 		csmaHelper.EnablePcap ("host", hostDevices);
     }
 	
+	//Statistics counters
+	NodeStatistics statistics = NodeStatistics ();
+
+	//Register packet receptions to calculate throughput
+	Config::Connect ("/NodeList/"+std::to_string(host->GetId())+"/ApplicationList/*/$ns3::PacketSink/Rx",
+					 MakeCallback (&NodeStatistics::RxCallback, &statistics));
+	
+	statistics.CheckStatistics (1);
+
 	Simulator::Schedule(Seconds(5), &OFSwitch13WifiController::PrintAssocStatus,
 					   wifiControl);
 	Simulator::Schedule (Seconds(10), &OFSwitch13WifiController::ConfigAssocStrategy,
@@ -249,6 +296,15 @@ main (int argc, char *argv[])
 	
 	// Run the simulation
 	Simulator::Run ();
+	
+	//Plots
+	std::ofstream outfileTh0 (("throughput-" + outputFileName + "-0.plt").c_str ());
+	Gnuplot gnuplot = Gnuplot (("throughput-" + outputFileName + "-0.eps").c_str (), "Throughput");
+	gnuplot.SetTerminal ("post eps color enhanced");
+	gnuplot.SetLegend ("Time (seconds)", "Throughput (Mb/s)");
+	gnuplot.SetTitle ("Throughput (STA to host) vs time");
+	gnuplot.AddDataset (statistics.GetDatafile ());
+	gnuplot.GenerateOutput (outfileTh0);
 	
 	Simulator::Destroy ();
 	return 0;
