@@ -17,6 +17,7 @@
 #include "ns3/wifi-mac-header.h"
 #include "ns3/flow-monitor-helper.h"
 #include "ns3/ipv4-flow-classifier.h"
+#include <ns3/ofswitch13-module.h>
 
 using namespace ns3;
 using namespace std;
@@ -314,11 +315,11 @@ int main (int argc, char *argv[])
 
 	//Define the APs
 	NodeContainer apNodes;
-	wifiApNodes.Create (2);
+	apNodes.Create (2);
 
 	//Define the STAs
 	NodeContainer staNodes;
-	wifiStaNodes.Create (1);
+	staNodes.Create (1);
 	
 	// Create the switch,host node
 	Ptr<Node> switchNode = CreateObject<Node> ();
@@ -407,8 +408,8 @@ int main (int argc, char *argv[])
 	{
 		NetDeviceContainer tmp;
 		tmp.Add (apCsmaDevices.Get (i));
-		tmp.Add (apWifiDevicesDevs.Get(i));
-		of13Helper->InstallSwitch (wifiApNodes.Get (i), tmp);
+		tmp.Add (apWifiDevices.Get(i));
+		of13Helper->InstallSwitch (apNodes.Get (i), tmp);
 	}
 	of13Helper->CreateOpenFlowChannels ();
 	
@@ -416,11 +417,11 @@ int main (int argc, char *argv[])
 	InternetStackHelper stack;
 	stack.Install (hostNode);
 	stack.Install (staNodes);
-	Ipv4AddressHelper address;
-	address.SetBase ("10.1.1.0", "255.255.255.0");
-	Ipv4InterfaceContainer hostIpIfaces = ipv4helpr.Assign (hostCsmaDevices);
+	Ipv4AddressHelper ipv4helper;
+	ipv4helper.SetBase ("10.1.1.0", "255.255.255.0");
+	Ipv4InterfaceContainer hostIpIfaces = ipv4helper.Assign (hostCsmaDevices);
 	Ipv4Address sinkAddress = hostIpIfaces.GetAddress (0);
-	Ipv4InterfaceContainer staIpIfaces = ipv4helpr.Assign (staWifiDevices);
+	Ipv4InterfaceContainer staIpIfaces = ipv4helper.Assign (staWifiDevices);
 	uint16_t port = 9;
 
 	//Configure the CBR generator
