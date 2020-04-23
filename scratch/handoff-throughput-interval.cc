@@ -294,7 +294,7 @@ main (int argc, char *argv[])
 
 	for (double i = 1; i < simTime+1; i+=interval)
 	{
-		Simulator::Schedule(Seconds(i), &OFSwitch13Controller::ConfigAssocStragegy,
+		Simulator::Schedule(Seconds(i), &OFSwitch13WifiController::ConfigAssocStrategy,
 							wifiControl);
 	}
 	
