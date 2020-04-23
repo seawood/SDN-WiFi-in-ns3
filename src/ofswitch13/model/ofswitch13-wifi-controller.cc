@@ -371,7 +371,7 @@ OFSwitch13WifiController::ConfigAssocStrategy (void)
 	}
 	Ipv4Address ap1 = InetSocketAddress::ConvertFrom(disassocAp).GetIpv4();
 	Ipv4Address ap2 = InetSocketAddress::ConvertFrom(assocAp).GetIpv4();
-	NS_LOG_INFO("disassoc AP: " << ap1 << ";sta:" << sta << ";assoc AP:" << ap2);
+	NS_LOG_INFO("Time:" << Simulator::Now() << ";disassoc AP: " << ap1 << ";sta:" << sta << ";assoc AP:" << ap2);
 	DisassocSTA(disassocAp, sta);
 	AssocControlMap[disassocAp] = assocAp;
 }
