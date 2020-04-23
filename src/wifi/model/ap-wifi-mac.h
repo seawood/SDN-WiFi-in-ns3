@@ -61,7 +61,7 @@ public:
   void SetAssocTrigger(void);
   bool GetAssocTrigger(void);
   void DisassocSTA(const Mac48Address& sta);
-  Ptr<Packet> GetMgtHeader(const Mac48Address& sta);
+  Packet GetMgtHeader(const Mac48Address& sta);
   int AssocSTA(const Mac48Address& from, const Ptr<Packet>& pkt);
   /**
    * \param stationManager the station manager attached to this MAC.
@@ -347,7 +347,7 @@ private:
   bool m_enableNonErpProtection;             //!< Flag whether protection mechanism is used or not when non-ERP STAs are present within the BSS
   bool m_disableRifs;                        //!< Flag whether to force RIFS to be disabled within the BSS If non-HT STAs are detected
   
-  std::map<Mac48Address, Ptr<Packet>> m_staMgtAssocReqHeaders;  //!< Record MgtAssocRequestHeader for STAs
+  std::map<Mac48Address, Packet> m_staMgtAssocReqHeaders;  //!< Record MgtAssocRequestHeader for STAs
   bool m_assocTrigger;
 };
 

@@ -372,17 +372,17 @@ dp_handle_wifi_disassoc_config (struct datapath *dp,
 		Mac48Address sta;
 		sta.CopyFrom (msg->addresses[0]->mac48address);
 		Ptr<ApWifiMac> mac = DynamicCast<ApWifiMac, WifiMac>(wifiDev->GetMac());
-		Ptr<Packet> pkt = mac->GetMgtHeader(sta);
+		Packet pkt = mac->GetMgtHeader(sta);
 		mac->DisassocSTA (sta);
 		struct ofl_ext_wifi_msg_assoc_disassoc_config reply;
 		reply.header.header.header.type = OFPT_EXPERIMENTER;
 		reply.header.header.experimenter_id = WIFI_VENDOR_ID;
 		reply.header.type = WIFI_EXT_DISASSOC_CONFIG_REPLY;
 		sta.CopyTo(reply.mac48address);
-		reply.len = pkt->GetSize();
+		reply.len = pkt.GetSize();
 		NS_LOG_INFO("reply.len:" << reply.len);
 		reply.data = (uint8_t*)malloc(reply.len);
-		pkt->CopyData(reply.data, reply.len);
+		pkt.CopyData(reply.data, reply.len);
 		error = dp_send_message(dp, (struct ofl_msg_header*)&reply, sender);
 	}
 	return error;

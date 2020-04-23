@@ -163,7 +163,7 @@ ApWifiMac::DisassocSTA(const Mac48Address& from)
 	NS_LOG_DEBUG ("Disassociate STA controller config:" << from);
 	m_stationManager->RecordDisassociated (from, false);
 	NS_ASSERT(m_staMgtAssocReqHeaders.find(from) != m_staMgtAssocReqHeaders.end());
-	//m_staMgtAssocReqHeaders.erase(from);
+	m_staMgtAssocReqHeaders.erase(from);
 
 	for (std::map<uint16_t, Mac48Address>::const_iterator j = m_staList.begin (); j != m_staList.end (); j++)
 	{
@@ -200,7 +200,7 @@ ApWifiMac::DisassocSTA(const Mac48Address& from)
 	
 }
 
-Ptr<Packet>
+Packet
 ApWifiMac::GetMgtHeader(const Mac48Address& sta)
 {
 	NS_LOG_FUNCTION (this);
@@ -216,12 +216,12 @@ ApWifiMac::AssocSTA(const Mac48Address& from, const Ptr<Packet>& pkt)
 	NS_LOG_INFO("1");
 	pkt->RemoveHeader(assocReq);
 	NS_LOG_INFO("2");
-	//if (m_staMgtAssocReqHeaders.find(from) != m_staMgtAssocReqHeaders.end())
-	//{
-	//	NS_LOG_ERROR("Associate STA controller config failed: alerady associated");
-	//	return 1;
-	//}
-	m_staMgtAssocReqHeaders[from] = pkt;
+	if (m_staMgtAssocReqHeaders.find(from) != m_staMgtAssocReqHeaders.end())
+	{
+		NS_LOG_ERROR("Associate STA controller config failed: alerady associated");
+		return 1;
+	}
+	m_staMgtAssocReqHeaders[from] = *pkt;
 	CapabilityInformation capabilities = assocReq.GetCapabilities ();
 	m_stationManager->AddSupportedPlcpPreamble (from, capabilities.IsShortPreamble ());
 	SupportedRates rates = assocReq.GetSupportedRates ();
@@ -1375,8 +1375,8 @@ ApWifiMac::Receive (Ptr<Packet> packet, const WifiMacHeader *hdr)
               packet->RemoveHeader (assocReq);
 			  
              //record MgtAssocRequestHeader
-			 Ptr<Packet> pkt = Create<Packet>();
-			 pkt->AddHeader(assocReq);
+			 Packet pkt;
+			 pkt.AddHeader(assocReq);
 			 
 			 m_staMgtAssocReqHeaders[from] = pkt;
 			 NS_LOG_INFO("record MgtAssocRequestHeader:" << 
