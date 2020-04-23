@@ -162,10 +162,8 @@ ApWifiMac::DisassocSTA(const Mac48Address& from)
 	
 	NS_LOG_DEBUG ("Disassociate STA controller config:" << from);
 	m_stationManager->RecordDisassociated (from, false);
-        NS_LOG_INFO("1");	
 	NS_ASSERT(m_staMgtAssocReqHeaders.find(from) != m_staMgtAssocReqHeaders.end());
-	m_staMgtAssocReqHeaders.erase(from);
-        NS_LOG_INFO("2");	
+	//m_staMgtAssocReqHeaders.erase(from);
 
 	for (std::map<uint16_t, Mac48Address>::const_iterator j = m_staList.begin (); j != m_staList.end (); j++)
 	{
