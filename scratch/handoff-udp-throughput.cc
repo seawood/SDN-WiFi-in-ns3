@@ -45,7 +45,7 @@ private:
 	Gnuplot2dDataset m_output;
 };
 
-NodeStatistics::NodeStatistics (NetDeviceContainer aps, NetDeviceContainer stas)
+NodeStatistics::NodeStatistics ()
 {
 	m_bytesTotal = 0;
 	m_output.SetTitle ("Throughput Mbits/s");
