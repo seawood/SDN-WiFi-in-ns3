@@ -125,7 +125,7 @@ main (int argc, char *argv[])
 		//LogComponentEnable ("UdpServer", LOG_LEVEL_ALL);
 		//LogComponentEnable ("UdpClient", LOG_LEVEL_ALL);
 	        //LogComponentEnable ("PropagationLossModel", LOG_LEVEL_ALL);
-		//LogComponentEnable ("ApWifiMac", LOG_LEVEL_ALL);
+		LogComponentEnable ("ApWifiMac", LOG_LEVEL_ALL);
 		//LogComponentEnable ("RegularWifiMac", LOG_LEVEL_ALL);
 		//LogComponentEnable ("StaWifiMac", LOG_LEVEL_ALL);
 		//LogComponentEnable ("MacLow", LOG_LEVEL_ALL);
