@@ -400,7 +400,8 @@ dp_handle_wifi_assoc_config (struct datapath *dp,
 		Mac48Address sta;
 		sta.CopyFrom (msg->mac48address);
 		Ptr<ApWifiMac> mac = DynamicCast<ApWifiMac, WifiMac>(wifiDev->GetMac());
-		Ptr<Packet> pkt = Create<Packet>(msg->data, msg->len);
+		Packet pkt(msg->data, msg->len);
+		NS_LOG_INFO("msg->len:" << msg->len);
 		error = mac->AssocSTA(sta, pkt);
 	}
 	return error;

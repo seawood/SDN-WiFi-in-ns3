@@ -62,7 +62,7 @@ public:
   bool GetAssocTrigger(void);
   void DisassocSTA(const Mac48Address& sta);
   Packet GetMgtHeader(const Mac48Address& sta);
-  int AssocSTA(const Mac48Address& from, const Ptr<Packet>& pkt);
+  int AssocSTA(const Mac48Address& from, Packet pkt);
   /**
    * \param stationManager the station manager attached to this MAC.
    */

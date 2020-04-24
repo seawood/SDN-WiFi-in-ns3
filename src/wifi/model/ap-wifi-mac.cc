@@ -208,20 +208,20 @@ ApWifiMac::GetMgtHeader(const Mac48Address& sta)
 }
 
 int
-ApWifiMac::AssocSTA(const Mac48Address& from, const Ptr<Packet>& pkt)
+ApWifiMac::AssocSTA(const Mac48Address& from, Packet pkt)
 {
 	NS_LOG_FUNCTION(this);
 	NS_LOG_DEBUG ("Associate STA controller config:" << from);
+	m_staMgtAssocReqHeaders[from] = pkt;
 	MgtAssocRequestHeader assocReq;
 	NS_LOG_INFO("1");
-	pkt->RemoveHeader(assocReq);
+	pkt.RemoveHeader(assocReq);
 	NS_LOG_INFO("2");
 	if (m_staMgtAssocReqHeaders.find(from) != m_staMgtAssocReqHeaders.end())
 	{
 		NS_LOG_ERROR("Associate STA controller config failed: alerady associated");
 		return 1;
 	}
-	m_staMgtAssocReqHeaders[from] = *pkt;
 	CapabilityInformation capabilities = assocReq.GetCapabilities ();
 	m_stationManager->AddSupportedPlcpPreamble (from, capabilities.IsShortPreamble ());
 	SupportedRates rates = assocReq.GetSupportedRates ();
@@ -1380,7 +1380,7 @@ ApWifiMac::Receive (Ptr<Packet> packet, const WifiMacHeader *hdr)
 			 
 			 m_staMgtAssocReqHeaders[from] = pkt;
 			 NS_LOG_INFO("record MgtAssocRequestHeader:" << 
-						 assocReq.GetSerializedSize() << ";" <<pkt->GetSize());
+						 assocReq.GetSerializedSize() << ";" <<pkt.GetSize());
 			  
               CapabilityInformation capabilities = assocReq.GetCapabilities ();
               m_stationManager->AddSupportedPlcpPreamble (from, capabilities.IsShortPreamble ());
