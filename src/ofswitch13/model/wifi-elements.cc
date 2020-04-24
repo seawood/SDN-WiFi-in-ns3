@@ -255,6 +255,10 @@ WifiNetworkStatus::UpdateDisassocStas (const Address& apAddr, const Mac48Address
 	NS_ASSERT (m_associationMap.find(apAddr) != m_associationMap.end());
 	NS_ASSERT (m_associationMap[apAddr].find(staAddr) != m_associationMap[apAddr].end());
 	m_associationMap[apAddr].erase(staAddr);
+	if (m_associationMap[apAddr].size() == 0)
+	{
+		m_associationMap.erase(apAddr);
+	}
 }
 
 void 

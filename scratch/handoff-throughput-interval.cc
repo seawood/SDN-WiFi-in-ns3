@@ -294,9 +294,11 @@ main (int argc, char *argv[])
 
 	for (double i = 1; i < simTime+1; i+=interval)
 	{
+		std::cout << "i:" << i <<std::endl;
 		Simulator::Schedule(Seconds(i), &OFSwitch13WifiController::ConfigAssocStrategy,
 							wifiControl);
 	}
+	Simulator::Stop(Seconds(simTime+2));
 	
 	// Run the simulation
 	Simulator::Run ();
