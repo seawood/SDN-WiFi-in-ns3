@@ -1161,7 +1161,7 @@ StaWifiMac::PhyCapabilitiesChanged (void)
 void
 StaWifiMac::PrintBssid (void)
 {
-	NS_LOG_INFO ("PrintBssid:" << m_bssid);
+	NS_LOG_INFO ("PrintBssid:" << GetBssid());
 }
 
 } //namespace ns3
