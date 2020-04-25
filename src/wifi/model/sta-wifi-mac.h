@@ -133,6 +133,15 @@ public:
    */
   void SetWifiPhy (const Ptr<WifiPhy> phy);
 
+  /**
+   * This method is called after wait beacon timeout or wait probe request timeout has
+   * occurred. This will trigger association process from beacons or probe responses
+   * gathered while scanning.
+   * changed from private to public: to achieve STA driven handoff 
+   */
+  void ScanningTimeout (void);
+  
+  void PrintBssid (void);
 
 private:
   /**
@@ -234,12 +243,7 @@ private:
    * active probing flag.
    */
   void StartScanning (void);
-  /**
-   * This method is called after wait beacon timeout or wait probe request timeout has
-   * occurred. This will trigger association process from beacons or probe responses
-   * gathered while scanning.
-   */
-  void ScanningTimeout (void);
+  
   /**
    * Return whether we are associated with an AP.
    *
