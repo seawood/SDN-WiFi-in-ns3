@@ -320,12 +320,12 @@ main (int argc, char *argv[])
 	NS_LOG_INFO ("*******Address Info************");
 	for (uint32_t i = 0 ; i < aps.GetN(); ++i)
 	{
-		Ptr<WifiNetDevice> dev = aps.Get(i).GetObject<WifiNetDevice>();
+		Ptr<WifiNetDevice> dev = aps.Get(i)->GetObject<WifiNetDevice>();
 		NS_LOG_INFO("AP(" << i << "):" << dev->GetMac()->GetAddress());
 	}
 	for (uint32_t i = 0 ; i < stas.GetN(); ++i)
 	{
-		Ptr<WifiNetDevice> dev = stas.Get(i).GetObject<WifiNetDevice>();
+		Ptr<WifiNetDevice> dev = stas.Get(i)->GetObject<WifiNetDevice>();
 		NS_LOG_INFO("STA(" << i << "):Mac" << dev->GetMac()->GetAddress() << 
 					";IP:" << hostIpIfaces.GetAddress(i));
 	}
