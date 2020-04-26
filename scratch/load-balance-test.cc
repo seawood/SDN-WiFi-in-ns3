@@ -35,9 +35,12 @@
 #include "ns3/packet-sink-helper.h"
 #include "ns3/on-off-helper.h"
 #include "ns3/gnuplot.h"
+#include "ns3/flow-monitor-helper.h"
+#include "ns3/ipv4-flow-classifier.h"
 
 using namespace ns3;
 
+NS_LOG_COMPONENT_DEFINE ("LoadBalanceTest");
 static const uint32_t packetSize = 1420;
 class NodeStatistics
 {
@@ -128,6 +131,7 @@ main (int argc, char *argv[])
 		//LogComponentEnable ("StaWifiMac", LOG_LEVEL_ALL);
 		//LogComponentEnable ("MacLow", LOG_LEVEL_ALL);
 		//LogComponentEnable ("WifiRemoteStationManager", LOG_LEVEL_ALL);
+		LogComponentEnable ("LoadBalanceTest", LOG_LEVEL_ALL);
     }
 	
 
@@ -266,7 +270,7 @@ main (int argc, char *argv[])
 	std::set<Ipv4Address> staIpv4;
 	for (uint32_t i = 0 ; i < staIpIfaces.GetN(); ++i)
 	{
-		staIpv4.Insert (staIpIfaces.GetAddress(i));
+		staIpv4.insert (staIpIfaces.GetAddress(i));
 	}
 	//Configure the CBR generator
 	uint16_t port = 9;
@@ -319,7 +323,7 @@ main (int argc, char *argv[])
 	for (std::map<FlowId, FlowMonitor::FlowStats>::const_iterator i = stats.begin (); i != stats.end (); ++i)
     {
 		Ipv4FlowClassifier::FiveTuple t = classifier->FindFlow (i->first);
-		if (staIpv4.find((Ipv4Address(t.sourceAddress)) != staIpv4.end() && Address(t.destinationAddress) == hostIpIfaces.GetAddress(0)))
+		if (staIpv4.find((Ipv4Address(t.sourceAddress))) != staIpv4.end() && Address(t.destinationAddress) == hostIpIfaces.GetAddress(0))
         {
 			NS_LOG_INFO ("Flow " << i->first  << " (" << t.sourceAddress << " -> " << t.destinationAddress << ")\n");
 			NS_LOG_INFO ("  Tx Bytes:   " << i->second.txBytes << "\n");
