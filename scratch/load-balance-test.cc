@@ -318,15 +318,13 @@ main (int argc, char *argv[])
 	// Run the simulation
 	Simulator::Run ();
 	NS_LOG_INFO ("*******Address Info************");
-	for (uint32_t i = 0 ; i < aps.GetN(); ++i)
+	for (uint32_t i = 0 ; i < apWifiDevs.GetN(); ++i)
 	{
-		Ptr<WifiNetDevice> dev = aps.Get(i)->GetObject<WifiNetDevice>();
-		NS_LOG_INFO("AP(" << i << "):" << dev->GetMac()->GetAddress());
+		NS_LOG_INFO("AP(" << i << "):" << apWifiDevs.Get(i)->GetMac()->GetAddress());
 	}
 	for (uint32_t i = 0 ; i < stas.GetN(); ++i)
 	{
-		Ptr<WifiNetDevice> dev = stas.Get(i)->GetObject<WifiNetDevice>();
-		NS_LOG_INFO("STA(" << i << "):Mac" << dev->GetMac()->GetAddress() << 
+		NS_LOG_INFO("STA(" << i << "):Mac" << staWifiDevs.Get(i)->GetMac()->GetAddress() << 
 					";IP:" << hostIpIfaces.GetAddress(i));
 	}
 	
