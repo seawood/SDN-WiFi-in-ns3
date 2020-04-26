@@ -237,12 +237,12 @@ main (int argc, char *argv[])
 	internet.Install (switchNode);
 
 	// Set IPv4 addresses for STAs
-	Ipv4AddressHelper ipv4helpr;
-	ipv4helpr.SetBase ("10.1.1.0", "255.255.255.0");
+	Ipv4AddressHelper ipv4helper;
+	ipv4helper.SetBase ("10.1.1.0", "255.255.255.0");
 	Ipv4InterfaceContainer staIpIfaces;
-	staIpIfaces = ipv4helpr.Assign (staWifiDevs);
+	staIpIfaces = ipv4helper.Assign (staWifiDevs);
 	Ipv4InterfaceContainer hostIpIfaces;
-	hostIpIfaces = ipv4helpr.Assign (hostDevices);
+	hostIpIfaces = ipv4helper.Assign (hostDevices);
 	ipv4helper.Assign (apWifiDevs);
 	ipv4helper.Assign (apDevices);
 	ipv4helper.Assign (switchPorts);
@@ -278,7 +278,7 @@ main (int argc, char *argv[])
 	
 	statistics.CheckStatistics (1);
 
-	StaWifiMac *stamac = GetPointer(Dynamic<StaWifiMac>(staWifiDevs.Get(0)->GetMac()));
+	StaWifiMac *stamac = GetPointer(DynamicCast<StaWifiMac>(DynamicCast<WifiNetDevice>(staWifiDevs.Get(0))->GetMac()));
 	Simulator::Schedule (Seconds(5), &StaWifiMac::PrintBssid, stamac);
 	Simulator::Schedule (Seconds(11), &StaWifiMac::ScanningTimeout, stamac);
 	Simulator::Schedule (Seconds(15), &StaWifiMac::PrintBssid, stamac);
