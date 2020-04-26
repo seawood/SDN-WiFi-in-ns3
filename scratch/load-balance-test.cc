@@ -317,6 +317,18 @@ main (int argc, char *argv[])
 	
 	// Run the simulation
 	Simulator::Run ();
+	NS_LOG_INFO ("*******Address Info************");
+	for (uint32_t i = 0 ; i < aps.GetN(); ++i)
+	{
+		Ptr<WifiNetDevice> dev = aps.Get(i).GetObject<WifiNetDevice>();
+		NS_LOG_INFO("AP(" << i << "):" << dev->GetMac()->GetAddress());
+	}
+	for (uint32_t i = 0 ; i < stas.GetN(); ++i)
+	{
+		Ptr<WifiNetDevice> dev = stas.Get(i).GetObject<WifiNetDevice>();
+		NS_LOG_INFO("STA(" << i << "):Mac" << dev->GetMac()->GetAddress() << 
+					";IP:" << hostIpIfaces.GetAddress(i));
+	}
 	
 	Ptr<Ipv4FlowClassifier> classifier = DynamicCast<Ipv4FlowClassifier> (flowmon.GetClassifier ());
 	std::map<FlowId, FlowMonitor::FlowStats> stats = monitor->GetFlowStats ();
