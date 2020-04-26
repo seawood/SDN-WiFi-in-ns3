@@ -320,12 +320,12 @@ main (int argc, char *argv[])
 	NS_LOG_INFO ("*******Address Info************");
 	for (uint32_t i = 0 ; i < apWifiDevs.GetN(); ++i)
 	{
-		NS_LOG_INFO("AP(" << i << "):" << apWifiDevs.Get(i)->GetMac()->GetAddress());
+		NS_LOG_INFO("AP(" << i << "):" << DynamicCast<WifiNetDevice>(apWifiDevs.Get(i))->GetMac()->GetAddress());
 	}
 	for (uint32_t i = 0 ; i < stas.GetN(); ++i)
 	{
-		NS_LOG_INFO("STA(" << i << "):Mac" << staWifiDevs.Get(i)->GetMac()->GetAddress() << 
-					";IP:" << hostIpIfaces.GetAddress(i));
+		NS_LOG_INFO("STA(" << i << "):Mac" << DynamicCast<WifiNetDevice>(staWifiDevs.Get(i))->GetMac()->GetAddress() << 
+					";IP:" << staIpIfaces.GetAddress(i));
 	}
 	
 	Ptr<Ipv4FlowClassifier> classifier = DynamicCast<Ipv4FlowClassifier> (flowmon.GetClassifier ());
