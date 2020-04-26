@@ -138,14 +138,14 @@ main (int argc, char *argv[])
 	NodeContainer aps;
 	aps.Create (2);
 	NodeContainer stas;
-	stas.Create (1);
+	stas.Create (5);
 	
 	// Create the switch node
 	Ptr<Node> switchNode = CreateObject<Node> ();
 
 	// Use the CsmaHelper to connect AP nodes to the switch node
 	CsmaHelper csmaHelper;
-	csmaHelper.SetChannelAttribute ("DataRate", DataRateValue (DataRate ("20Mbps")));
+	csmaHelper.SetChannelAttribute ("DataRate", DataRateValue (DataRate ("50Mbps")));
 	csmaHelper.SetChannelAttribute ("Delay", TimeValue (MilliSeconds (2)));
 	NetDeviceContainer apDevices;
 	NetDeviceContainer switchPorts;
@@ -155,7 +155,7 @@ main (int argc, char *argv[])
 	apDevices.Add (link1.Get (0));
 	switchPorts.Add (link1.Get (1));
 	
-	csmaHelper.SetChannelAttribute ("DataRate", DataRateValue (DataRate ("40Mbps")));
+	csmaHelper.SetChannelAttribute ("DataRate", DataRateValue (DataRate ("100Mbps")));
 	NodeContainer pair2 (aps.Get(1), switchNode);
 	NetDeviceContainer link2 = csmaHelper.Install (pair2);
 	apDevices.Add (link2.Get (0));
@@ -212,24 +212,25 @@ main (int argc, char *argv[])
 	
 	Ssid ssid = Ssid ("wifi1");
 	wifiMac.SetType ("ns3::ApWifiMac","Ssid", SsidValue (ssid));
-	apWifiDevs.Add(wifi.Install (spectrumPhy, wifiMac, aps.Get(0)));
-	apWifiDevs.Add(wifi.Install (spectrumPhy, wifiMac, aps.Get(1)));
+	apWifiDevs.Add(wifi.Install (spectrumPhy, wifiMac, aps));
 	wifiMac.SetType ("ns3::StaWifiMac",
 					 "ActiveProbing", BooleanValue (true),
 					 "Ssid", SsidValue (ssid));
-	staWifiDevs.Add (wifi.Install (spectrumPhy, wifiMac, stas.Get(0)));
+	staWifiDevs.Add (wifi.Install (spectrumPhy, wifiMac, stas));
 	
 	//mobility configuration
 	MobilityHelper mobility;
 	
 	Ptr<ListPositionAllocator> positionAlloc = CreateObject<ListPositionAllocator> ();
+	positionAlloc->Add (Vector (distance, distance, 0.0));
+	positionAlloc->Add (Vector (distance*3, distance, 0.0));
 	positionAlloc->Add (Vector (0.0, 0.0, 0.0));
-	positionAlloc->Add (Vector (distance*2, 0.0, 0.0));
 	positionAlloc->Add (Vector (distance, 0.0, 0.0));
+	positionAlloc->Add (Vector (distance*1.5, 0.0, 0.0));
+	positionAlloc->Add (Vector (distance*3, 0.0, 0.0));
+	positionAlloc->Add (Vector (distance*4, 0.0, 0.0));
 	mobility.SetPositionAllocator (positionAlloc);
-	
 	mobility.SetMobilityModel ("ns3::ConstantPositionMobilityModel");
-	
 	mobility.Install (aps);
 	mobility.Install (stas);
 
@@ -262,7 +263,11 @@ main (int argc, char *argv[])
 	staIpIfaces = ipv4helpr.Assign (staWifiDevs);
 	Ipv4InterfaceContainer hostIpIfaces;
 	hostIpIfaces = ipv4helpr.Assign (hostDevices);
-	
+	std::set<Ipv4Address> staIpv4;
+	for (uint32_t i = 0 ; i < staIpIfaces.GetN(); ++i)
+	{
+		staIpv4.Insert (staIpIfaces.GetAddress(i));
+	}
 	//Configure the CBR generator
 	uint16_t port = 9;
 	PacketSinkHelper sink ("ns3::UdpSocketFactory", InetSocketAddress (hostIpIfaces.GetAddress(0), port));
@@ -273,7 +278,7 @@ main (int argc, char *argv[])
 	onoff.SetConstantRate (DataRate ("60Mb/s"), packetSize);
 	onoff.SetAttribute ("StartTime", TimeValue (Seconds (1)));
 	onoff.SetAttribute ("StopTime", TimeValue (Seconds (simTime+1)));
-	ApplicationContainer apps_source = onoff.Install (stas.Get (0));
+	ApplicationContainer apps_source = onoff.Install (stas);
 	
 	// Enable datapath stats and pcap traces at APs and controller(s)
 	if (trace)
@@ -296,14 +301,34 @@ main (int argc, char *argv[])
 
 	Simulator::Schedule(Seconds(5), &OFSwitch13WifiController::PrintAssocStatus,
 					   wifiControl);
-	Simulator::Schedule (Seconds(11), &OFSwitch13WifiController::ConfigAssocStrategy,
-						 wifiControl);
-	Simulator::Schedule(Seconds(15), &OFSwitch13WifiController::PrintAssocStatus,
-						wifiControl);
+	//Simulator::Schedule (Seconds(11), &OFSwitch13WifiController::ConfigAssocStrategy,
+		//				 wifiControl);
+	//Simulator::Schedule(Seconds(15), &OFSwitch13WifiController::PrintAssocStatus,
+		//				wifiControl);
 	Simulator::Stop (Seconds (simTime + 2));
+	
+	// calculate per STA throughput
+	FlowMonitorHelper flowmon;
+	Ptr<FlowMonitor> monitor = flowmon.InstallAll ();
 	
 	// Run the simulation
 	Simulator::Run ();
+	
+	Ptr<Ipv4FlowClassifier> classifier = DynamicCast<Ipv4FlowClassifier> (flowmon.GetClassifier ());
+	std::map<FlowId, FlowMonitor::FlowStats> stats = monitor->GetFlowStats ();
+	for (std::map<FlowId, FlowMonitor::FlowStats>::const_iterator i = stats.begin (); i != stats.end (); ++i)
+    {
+		Ipv4FlowClassifier::FiveTuple t = classifier->FindFlow (i->first);
+		if (staIpv4.find((Ipv4Address(t.sourceAddress)) != staIpv4.end() && Address(t.destinationAddress) == hostIpIfaces.GetAddress(0)))
+        {
+			NS_LOG_INFO ("Flow " << i->first  << " (" << t.sourceAddress << " -> " << t.destinationAddress << ")\n");
+			NS_LOG_INFO ("  Tx Bytes:   " << i->second.txBytes << "\n");
+			NS_LOG_INFO ("  Rx Bytes:   " << i->second.rxBytes << "\n");
+			NS_LOG_UNCOND ("  Throughput of " << t.sourceAddress << ":"  << i->second.rxBytes * 8.0 / (i->second.timeLastRxPacket.GetSeconds () - i->second.timeFirstTxPacket.GetSeconds ()) / 1024 / 1024  << " Mbps\n");
+			NS_LOG_INFO ("  Mean delay:   " << i->second.delaySum.GetSeconds () / i->second.rxPackets << "\n");
+			NS_LOG_INFO ("  Mean jitter:   " << i->second.jitterSum.GetSeconds () / (i->second.rxPackets - 1) << "\n");
+        }
+    }
 	
 	//Plots
 	std::ofstream outfileTh0 (("throughput-" + outputFileName + "-0.plt").c_str ());
