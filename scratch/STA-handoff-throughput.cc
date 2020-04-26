@@ -229,12 +229,27 @@ main (int argc, char *argv[])
 	mobility.Install (aps);
 	mobility.Install (stas);
 	
+	// Create the controller node
+	Ptr<Node> controllerNode = CreateObject<Node> ();
+
+	// Configure the OpenFlow network domain
+	Ptr<OFSwitch13InternalHelper> of13Helper = CreateObject<OFSwitch13InternalHelper> ();
+	Ptr<OFSwitch13WifiController> wifiControl = CreateObject<OFSwitch13WifiController> ();
+	of13Helper->InstallController (controllerNode, wifiControl);
+	of13Helper->InstallSwitch (switchNode, switchPorts);
+	for (size_t i = 0; i < aps.GetN(); i++)
+	{
+		NetDeviceContainer tmp;
+		tmp.Add (apDevices.Get (i));
+		tmp.Add (apWifiDevs.Get(i));
+		of13Helper->InstallSwitch (aps.Get (i), tmp);
+	}
+	of13Helper->CreateOpenFlowChannels ();
+	
 	// Install the TCP/IP stack into STA nodes
 	InternetStackHelper internet;
 	internet.Install (stas);
 	internet.Install (host);
-	internet.Install (aps);
-	internet.Install (switchNode);
 
 	// Set IPv4 addresses for STAs
 	Ipv4AddressHelper ipv4helper;
@@ -243,9 +258,6 @@ main (int argc, char *argv[])
 	staIpIfaces = ipv4helper.Assign (staWifiDevs);
 	Ipv4InterfaceContainer hostIpIfaces;
 	hostIpIfaces = ipv4helper.Assign (hostDevices);
-	ipv4helper.Assign (apWifiDevs);
-	ipv4helper.Assign (apDevices);
-	ipv4helper.Assign (switchPorts);
 	
 	//Configure the CBR generator
 	uint16_t port = 9;
@@ -262,11 +274,11 @@ main (int argc, char *argv[])
 	// Enable datapath stats and pcap traces at APs and controller(s)
 	if (trace)
     {
+		of13Helper->EnableOpenFlowPcap ("openflow");
+		of13Helper->EnableDatapathStats ("ap-openflow-stats");
 		spectrumPhy.EnablePcap ("apWifi", apWifiDevs);
 		spectrumPhy.EnablePcap ("staWifi", staWifiDevs);
 		csmaHelper.EnablePcap ("host", hostDevices);
-		csmaHelper.EnablePcap ("apCsma", apDevices);
-		csmaHelper.EnablePcap ("switchCsma", switchPorts);
     }
 	
 	//Statistics counters
