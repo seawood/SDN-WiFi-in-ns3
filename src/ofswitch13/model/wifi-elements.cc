@@ -113,6 +113,7 @@ WifiNetworkStatus::UpdateChannelQuality(const Address& apAddr,
 		m_STAsChannelQuality[addr48].insert(std::make_pair(apAddr, newChannelReport));
 		NS_LOG_DEBUG ("update CQM with new AP:" << m_STAsChannelQuality[addr48][apAddr].packets);
 	}
+	//PrintChannelQuality();
 	
 }
 
@@ -142,7 +143,7 @@ WifiNetworkStatus::UpdateApsInterference (const Address& dstAp,
 		newChannelReport.rxPower_std = report->rxPower_std;
 		m_APsInterference[srcAp][dstAp] = newChannelReport;
 	}
-	PrintChannelQuality();
+	//PrintChannelQuality();
 }
 
 void
@@ -282,5 +283,28 @@ WifiNetworkStatus::GetDisassocApSTA(Address& ap, Mac48Address& sta)
 	NS_LOG_FUNCTION(this);
 	ap = m_associationMap.begin()->first;
 	sta = *(m_associationMap.begin()->second.begin());
+}
+
+STAsCQMap*
+WifiNetworkStatus::GetSTAsCQMap(void)
+{
+	NS_LOG_FUNCTION (this);
+	return &m_STAsChannelQuality;
+}
+
+Address 
+WifiNetworkStatus::GetAssocAp (const Mac48Address& sta)
+{
+	NS_LOG_FUNCTION (this);
+	Address ap;
+	for (auto itr = m_associationMap.begin(); itr != m_associationMap.end(); itr++)
+	{
+		if (itr->second.find(sta) != itr->second.end())
+		{
+			ap = itr->first;
+			break;
+		}
+	}
+	return ap;
 }
 } //namespace ns3

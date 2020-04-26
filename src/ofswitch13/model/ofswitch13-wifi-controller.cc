@@ -376,6 +376,40 @@ OFSwitch13WifiController::ConfigAssocStrategy (void)
 	AssocControlMap[disassocAp] = assocAp;
 }
 
+void
+OFSwitch13WifiController::PrintChannelquality(void)
+{
+	NS_LOG_FUNCTION (this);
+	m_wifiNetworkStatus->PrintChannelquality();
+}
+void
+OFSwitch13WifiController::ConfigAssocLBStrategy (void)
+{
+	NS_LOG_FUNCTION (this);
+	WifiNetworkStatus::STAsCQMap* cq = m_wifiNetworkStatus->GetSTAsCQMap();
+	for (auto itr = cq->begin(); itr != cq->end(); ++itr)
+	{
+		Mac48Address &sta = itr->first;
+		Address bestRSSIAp;
+		double rssi = 0;
+		for(auto item = itr->second.begin(); item != itr->second.end(); ++item)
+		{
+			if (item->second.rxPower_avg > rssi)
+				bestRSSIAp = item->first;
+		}
+		Address assocAp = m_wifiNetworkStatus->GetAssocAp(sta);
+		if (assocAp != bestRSSIAp)
+		{
+			AssocControlMap[assocAp] = bestRSSIAp;
+			DisassocSTA(assocAp, sta);
+			Ipv4Address ap1 = InetSocketAddress::ConvertFrom(assocAp).GetIpv4();
+			Ipv4Address ap2 = InetSocketAddress::ConvertFrom(bestRSSIAp).GetIpv4();
+			NS_LOG_INFO("Time:" << Simulator::Now() << ";disassoc AP: " << ap1 << ";sta:" << sta << ";assoc AP:" << ap2);
+		}
+	}
+}
+
+
 } // namespace ns3
 
 #endif  //NS3_OFSWITCH13

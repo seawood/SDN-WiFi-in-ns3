@@ -67,6 +67,11 @@ public:
 	void UpdateDisassocStas (const Address& apAddr, const Mac48Address& staAddr);
 	void PrintAssocStatus(void);
 	void GetDisassocApSTA(Address& ap, Mac48Address& sta);
+	typedef std::map<Mac48Address, std::map<Address, struct ChannelReport>> STAsCQMap;
+	typedef std::map<Address, std::map<Address, struct ChannelReport>> APsIfMap;
+	
+	STAsCQMap* GetSTAsCQMap(void);
+	Address GetAssocAp (const Mac48Address& sta);
 private:
 	void InitializeFrequencyUnused ();
 	
@@ -81,8 +86,8 @@ private:
 		double rxPower_avg;   //average ?double
 		double rxPower_std;   //standard deviation
 	};
-	std::map<Mac48Address, std::map<Address, struct ChannelReport>> m_STAsChannelQuality;
-	std::map<Address, std::map<Address, struct ChannelReport>> m_APsInterference;
+	STAsCQMap m_STAsChannelQuality;
+	APsIfMap m_APsInterference;
 	
 	std::map<Address, std::set<Mac48Address>> m_associationMap;
 }; // class WifiNetworkStatus
