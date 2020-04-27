@@ -88,7 +88,7 @@ NodeStatistics::GetDatafile ()
 int
 main (int argc, char *argv[])
 {
-	double simTime = 20;        //Seconds
+	double simTime = 30;        //Seconds
 	bool verbose = true;
 	bool trace = true;
 	std::string errorModelType = "ns3::NistErrorRateModel";
@@ -229,9 +229,9 @@ main (int argc, char *argv[])
 	positionAlloc->Add (Vector (distance, distance, 0.0));
 	positionAlloc->Add (Vector (distance*3, distance, 0.0));
 	positionAlloc->Add (Vector (0.0, 0.0, 0.0));
+	positionAlloc->Add (Vector (distance*0.5, 0.0, 0.0));
 	positionAlloc->Add (Vector (distance, 0.0, 0.0));
-	positionAlloc->Add (Vector (distance*1.5, 0.0, 0.0));
-	positionAlloc->Add (Vector (distance*3, 0.0, 0.0));
+	positionAlloc->Add (Vector (distance*2, 0.0, 0.0));
 	positionAlloc->Add (Vector (distance*4, 0.0, 0.0));
 	mobility.SetPositionAllocator (positionAlloc);
 	mobility.SetMobilityModel ("ns3::ConstantPositionMobilityModel");
@@ -280,7 +280,7 @@ main (int argc, char *argv[])
 	apps_sink.Stop (Seconds (simTime + 1));	
 	OnOffHelper onoff ("ns3::UdpSocketFactory", InetSocketAddress (hostIpIfaces.GetAddress(0), port));
 	onoff.SetConstantRate (DataRate ("100Mb/s"), packetSize);
-	onoff.SetAttribute ("StartTime", TimeValue (Seconds (1)));
+	onoff.SetAttribute ("StartTime", TimeValue (Seconds (16)));
 	onoff.SetAttribute ("StopTime", TimeValue (Seconds (simTime+1)));
 	ApplicationContainer apps_source = onoff.Install (stas);
 	
