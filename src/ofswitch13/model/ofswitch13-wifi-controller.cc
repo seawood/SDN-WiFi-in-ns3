@@ -395,7 +395,10 @@ OFSwitch13WifiController::ConfigAssocLBStrategy (void)
 		for(auto item = itr->second.begin(); item != itr->second.end(); ++item)
 		{
 			if (item->second.rxPower_avg > rssi)
+			{
 				bestRSSIAp = item->first;
+				rssi = item->second.rxPower_avg;
+			}
 		}
 		Address assocAp = m_wifiNetworkStatus->GetAssocAp(sta);
 		if (assocAp != bestRSSIAp)
