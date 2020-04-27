@@ -106,31 +106,31 @@ main (int argc, char *argv[])
 
 	if (verbose)
     {
-		//OFSwitch13Helper::EnableDatapathLogs ();
-		//LogComponentEnable ("OFSwitch13Interface", LOG_LEVEL_ALL);
-		//LogComponentEnable ("OFSwitch13Device", LOG_LEVEL_ALL);
-		//LogComponentEnable ("OFSwitch13Port", LOG_LEVEL_ALL);
-		//LogComponentEnable ("OFSwitch13Queue", LOG_LEVEL_ALL);
-		//LogComponentEnable ("OFSwitch13SocketHandler", LOG_LEVEL_ALL);
-		//LogComponentEnable ("OFSwitch13Controller", LOG_LEVEL_ALL);
-		//LogComponentEnable ("OFSwitch13LearningController", LOG_LEVEL_ALL);
-		//LogComponentEnable ("OFSwitch13Helper", LOG_LEVEL_ALL);
-		//LogComponentEnable ("OFSwitch13InternalHelper", LOG_LEVEL_ALL);
-		//LogComponentEnable ("WifiNetDevice", LOG_LEVEL_ALL);
+		OFSwitch13Helper::EnableDatapathLogs ();
+		LogComponentEnable ("OFSwitch13Interface", LOG_LEVEL_ALL);
+		LogComponentEnable ("OFSwitch13Device", LOG_LEVEL_ALL);
+		LogComponentEnable ("OFSwitch13Port", LOG_LEVEL_ALL);
+		LogComponentEnable ("OFSwitch13Queue", LOG_LEVEL_ALL);
+		LogComponentEnable ("OFSwitch13SocketHandler", LOG_LEVEL_ALL);
+		LogComponentEnable ("OFSwitch13Controller", LOG_LEVEL_ALL);
+		LogComponentEnable ("OFSwitch13LearningController", LOG_LEVEL_ALL);
+		LogComponentEnable ("OFSwitch13Helper", LOG_LEVEL_ALL);
+		LogComponentEnable ("OFSwitch13InternalHelper", LOG_LEVEL_ALL);
+		LogComponentEnable ("WifiNetDevice", LOG_LEVEL_ALL);
 		//LogComponentEnable ("CsmaNetDevice", LOG_LEVEL_ALL);
 		//LogComponentEnable ("Simulator", LOG_LEVEL_ALL);
-		//LogComponentEnable ("OFSwitch13WifiController", LOG_LEVEL_ALL);
-		//LogComponentEnable ("WifiElements", LOG_LEVEL_ALL);
-		//LogComponentEnable ("WifiPhy", LOG_LEVEL_ALL);
+		LogComponentEnable ("OFSwitch13WifiController", LOG_LEVEL_ALL);
+		LogComponentEnable ("WifiElements", LOG_LEVEL_ALL);
+		LogComponentEnable ("WifiPhy", LOG_LEVEL_ALL);
 		//LogComponentEnable ("SpectrumWifiPhy", LOG_LEVEL_ALL);
 		//LogComponentEnable ("UdpServer", LOG_LEVEL_ALL);
 		//LogComponentEnable ("UdpClient", LOG_LEVEL_ALL);
-	    //LogComponentEnable ("PropagationLossModel", LOG_LEVEL_ALL);
-		//LogComponentEnable ("ApWifiMac", LOG_LEVEL_ALL);
-		//LogComponentEnable ("RegularWifiMac", LOG_LEVEL_ALL);
-		//LogComponentEnable ("StaWifiMac", LOG_LEVEL_ALL);
-		//LogComponentEnable ("MacLow", LOG_LEVEL_ALL);
-		//LogComponentEnable ("WifiRemoteStationManager", LOG_LEVEL_ALL);
+	        //LogComponentEnable ("PropagationLossModel", LOG_LEVEL_ALL);
+		LogComponentEnable ("ApWifiMac", LOG_LEVEL_ALL);
+		LogComponentEnable ("RegularWifiMac", LOG_LEVEL_ALL);
+		LogComponentEnable ("StaWifiMac", LOG_LEVEL_ALL);
+		LogComponentEnable ("MacLow", LOG_LEVEL_ALL);
+		LogComponentEnable ("WifiRemoteStationManager", LOG_LEVEL_ALL);
 		LogComponentEnable ("LoadBalanceTest", LOG_LEVEL_ALL);
     }
 	
@@ -172,18 +172,18 @@ main (int argc, char *argv[])
 	switchPorts.Add(link.Get(0));
 	hostDevices.Add(link.Get(1));
 	
-	//Config::SetDefault ("ns3::WifiPhy::CcaMode1Threshold", DoubleValue (-62.0));
-	
+	Config::SetDefault ("ns3::WifiPhy::CcaMode1Threshold", DoubleValue (-62.0));
+        Config::SetDefault ("ns3::WifiPhy::ChannelWidth", UintegerValue (160));
+
 	YansWifiChannelHelper channel = YansWifiChannelHelper::Default ();
 	YansWifiPhyHelper phy = YansWifiPhyHelper::Default ();
 	phy.SetChannel (channel.Create ());
 	phy.Set ("GuardInterval", TimeValue (NanoSeconds (800)));
-	phy.SetChannelWidth (160);
 	
 	WifiHelper wifi;
 	wifi.SetStandard (WIFI_PHY_STANDARD_80211ax_5GHZ);
-	wifi.SetRemoteStationManager ("ns3::ConstantRateWifiManager","DataMode", StringValue ("heMcs2"),
-								  "ControlMode", StringValue ("heMcs2"));
+	wifi.SetRemoteStationManager ("ns3::ConstantRateWifiManager","DataMode", StringValue ("HeMcs11"),
+								  "ControlMode", StringValue ("HeMcs11"));
 	
 	//mac configuration
 	WifiMacHelper wifiMac;
@@ -267,8 +267,8 @@ main (int argc, char *argv[])
     {
 		of13Helper->EnableOpenFlowPcap ("openflow");
 		of13Helper->EnableDatapathStats ("ap-openflow-stats");
-		spectrumPhy.EnablePcap ("apWifi", apWifiDevs);
-		spectrumPhy.EnablePcap ("staWifi", staWifiDevs);
+		phy.EnablePcap ("apWifi", apWifiDevs);
+		phy.EnablePcap ("staWifi", staWifiDevs);
 		csmaHelper.EnablePcap ("host", hostDevices);
     }
 	

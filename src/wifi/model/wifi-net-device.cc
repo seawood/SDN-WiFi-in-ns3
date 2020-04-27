@@ -524,6 +524,7 @@ WifiNetDevice::SendFrom (Ptr<Packet> packet, const Address& source, const Addres
 void
 WifiNetDevice::SetPromiscReceiveCallback (PromiscReceiveCallback cb)
 {
+  NS_LOG_FUNCTION(this);
   m_promiscRx = cb;
   m_mac->SetPromisc ();
 }
