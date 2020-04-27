@@ -380,7 +380,7 @@ void
 OFSwitch13WifiController::PrintChannelquality(void)
 {
 	NS_LOG_FUNCTION (this);
-	m_wifiNetworkStatus->PrintChannelquality();
+	m_wifiNetworkStatus->PrintChannelQuality();
 }
 void
 OFSwitch13WifiController::ConfigAssocLBStrategy (void)
@@ -389,7 +389,7 @@ OFSwitch13WifiController::ConfigAssocLBStrategy (void)
 	WifiNetworkStatus::STAsCQMap* cq = m_wifiNetworkStatus->GetSTAsCQMap();
 	for (auto itr = cq->begin(); itr != cq->end(); ++itr)
 	{
-		Mac48Address &sta = itr->first;
+		Mac48Address sta = itr->first;
 		Address bestRSSIAp;
 		double rssi = 0;
 		for(auto item = itr->second.begin(); item != itr->second.end(); ++item)

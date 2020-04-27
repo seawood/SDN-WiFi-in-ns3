@@ -285,7 +285,7 @@ WifiNetworkStatus::GetDisassocApSTA(Address& ap, Mac48Address& sta)
 	sta = *(m_associationMap.begin()->second.begin());
 }
 
-STAsCQMap*
+WifiNetworkStatus::STAsCQMap*
 WifiNetworkStatus::GetSTAsCQMap(void)
 {
 	NS_LOG_FUNCTION (this);

@@ -67,6 +67,12 @@ public:
 	void UpdateDisassocStas (const Address& apAddr, const Mac48Address& staAddr);
 	void PrintAssocStatus(void);
 	void GetDisassocApSTA(Address& ap, Mac48Address& sta);
+
+        struct ChannelReport {
+        	uint64_t packets;     //number of received packets
+        	double rxPower_avg;   //average ?double
+        	double rxPower_std;   //standard deviation
+        };
 	typedef std::map<Mac48Address, std::map<Address, struct ChannelReport>> STAsCQMap;
 	typedef std::map<Address, std::map<Address, struct ChannelReport>> APsIfMap;
 	
@@ -81,11 +87,6 @@ private:
 	
 	std::set<Mac48Address> m_apsMac48address;
 	
-	struct ChannelReport {
-		uint64_t packets;     //number of received packets
-		double rxPower_avg;   //average ?double
-		double rxPower_std;   //standard deviation
-	};
 	STAsCQMap m_STAsChannelQuality;
 	APsIfMap m_APsInterference;
 	
