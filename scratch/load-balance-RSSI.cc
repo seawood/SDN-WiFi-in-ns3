@@ -149,7 +149,7 @@ main (int argc, char *argv[])
 
 	// Use the CsmaHelper to connect AP nodes to the switch node
 	CsmaHelper csmaHelper;
-	csmaHelper.SetChannelAttribute ("DataRate", DataRateValue (DataRate ("200Mbps")));
+	csmaHelper.SetChannelAttribute ("DataRate", DataRateValue (DataRate ("100Mbps")));
 	csmaHelper.SetChannelAttribute ("Delay", TimeValue (MilliSeconds (2)));
 	NetDeviceContainer apDevices;
 	NetDeviceContainer switchPorts;
@@ -159,7 +159,7 @@ main (int argc, char *argv[])
 	apDevices.Add (link1.Get (0));
 	switchPorts.Add (link1.Get (1));
 	
-	csmaHelper.SetChannelAttribute ("DataRate", DataRateValue (DataRate ("500Mbps")));
+	csmaHelper.SetChannelAttribute ("DataRate", DataRateValue (DataRate ("200Mbps")));
 	NodeContainer pair2 (aps.Get(1), switchNode);
 	NetDeviceContainer link2 = csmaHelper.Install (pair2);
 	apDevices.Add (link2.Get (0));
@@ -180,12 +180,8 @@ main (int argc, char *argv[])
 	// spectrum channel configuration
 	Ptr<MultiModelSpectrumChannel> spectrumChannel
 		= CreateObject<MultiModelSpectrumChannel> ();
-	Ptr<RandomPropagationLossModel> lossModel
-		= CreateObject<RandomPropagationLossModel> ();
-	Ptr<UniformRandomVariable> x = CreateObject<UniformRandomVariable>();
-	x -> SetAttribute ("Min", DoubleValue(0.0));
-	x -> SetAttribute ("Max", DoubleValue(20.0));
-	lossModel -> SetAttribute ("Variable", PointerValue(x));
+	Ptr<FriisPropagationLossModel> lossModel
+		= CreateObject<FriisPropagationLossModel> ();
 	//lossModel->SetFrequency (5.180e9);
 	spectrumChannel->AddPropagationLossModel (lossModel);
 	Ptr<ConstantSpeedPropagationDelayModel> delayModel
@@ -229,10 +225,10 @@ main (int argc, char *argv[])
 	positionAlloc->Add (Vector (distance, distance, 0.0));
 	positionAlloc->Add (Vector (distance*3, distance, 0.0));
 	positionAlloc->Add (Vector (0.0, 0.0, 0.0));
-	positionAlloc->Add (Vector (distance*0.5, 0.0, 0.0));
+	positionAlloc->Add (Vector (distance*0.2, 0.0, 0.0));
+	positionAlloc->Add (Vector (distance, 0.4, 0.0));
+	positionAlloc->Add (Vector (distance*0.6, 0.0, 0.0));
 	positionAlloc->Add (Vector (distance, 0.0, 0.0));
-	positionAlloc->Add (Vector (distance*2, 0.0, 0.0));
-	positionAlloc->Add (Vector (distance*4, 0.0, 0.0));
 	mobility.SetPositionAllocator (positionAlloc);
 	mobility.SetMobilityModel ("ns3::ConstantPositionMobilityModel");
 	mobility.Install (aps);
@@ -279,7 +275,7 @@ main (int argc, char *argv[])
 	apps_sink.Start (Seconds (1));
 	apps_sink.Stop (Seconds (simTime + 1));	
 	OnOffHelper onoff ("ns3::UdpSocketFactory", InetSocketAddress (hostIpIfaces.GetAddress(0), port));
-	onoff.SetConstantRate (DataRate ("100Mb/s"), packetSize);
+	onoff.SetConstantRate (DataRate ("2Mb/s"), packetSize);
 	onoff.SetAttribute ("StartTime", TimeValue (Seconds (16)));
 	onoff.SetAttribute ("StopTime", TimeValue (Seconds (simTime+1)));
 	ApplicationContainer apps_source = onoff.Install (stas);
