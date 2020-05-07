@@ -214,8 +214,11 @@ OFSwitch13Port::NotifyConstructionCompleted ()
 		wifiDev->SetOpenFlowReceiveCallback(
 			MakeCallback (&OFSwitch13Port::Receive, this));
 		Ptr<SpectrumWifiPhy> phy = DynamicCast<SpectrumWifiPhy, WifiPhy>(wifiDev->GetPhy());
+		if (phy != nullptr)
+		{
 		phy->SetChannelQualityTriggeredCallback(
 			MakeCallback(&OFSwitch13Device::ReportChannelQualityTriggered, m_openflowDev));
+		}
 		Ptr<WifiRemoteStationManager> manager = wifiDev->GetRemoteStationManager();
 		manager->SetAssocCallback(MakeCallback(&OFSwitch13Device::ReportAssoc, m_openflowDev));
 		manager->SetDisassocCallback(MakeCallback(&OFSwitch13Device::ReportDisassoc, m_openflowDev));
