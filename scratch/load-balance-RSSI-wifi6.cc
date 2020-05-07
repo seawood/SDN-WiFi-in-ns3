@@ -125,7 +125,7 @@ main (int argc, char *argv[])
 		//LogComponentEnable ("SpectrumWifiPhy", LOG_LEVEL_ALL);
 		//LogComponentEnable ("UdpServer", LOG_LEVEL_ALL);
 		//LogComponentEnable ("UdpClient", LOG_LEVEL_ALL);
-	        //LogComponentEnable ("PropagationLossModel", LOG_LEVEL_ALL);
+	    //LogComponentEnable ("PropagationLossModel", LOG_LEVEL_ALL);
 		LogComponentEnable ("ApWifiMac", LOG_LEVEL_ALL);
 		LogComponentEnable ("RegularWifiMac", LOG_LEVEL_ALL);
 		LogComponentEnable ("StaWifiMac", LOG_LEVEL_ALL);
@@ -175,10 +175,25 @@ main (int argc, char *argv[])
 	Config::SetDefault ("ns3::WifiPhy::CcaMode1Threshold", DoubleValue (-62.0));
         Config::SetDefault ("ns3::WifiPhy::ChannelWidth", UintegerValue (160));
 
-	YansWifiChannelHelper channel = YansWifiChannelHelper::Default ();
-	YansWifiPhyHelper phy = YansWifiPhyHelper::Default ();
-	phy.SetChannel (channel.Create ());
-	phy.Set ("GuardInterval", TimeValue (NanoSeconds (800)));
+	// spectrum channel configuration
+	Ptr<MultiModelSpectrumChannel> channel
+		= CreateObject<MultiModelSpectrumChannel> ();
+	Ptr<FriisPropagationLossModel> lossModel
+		= CreateObject<FriisPropagationLossModel> ();
+	//lossModel->SetFrequency (5.180e9);
+	channel->AddPropagationLossModel (lossModel);
+	Ptr<ConstantSpeedPropagationDelayModel> delayModel
+		= CreateObject<ConstantSpeedPropagationDelayModel> ();
+	channel->SetPropagationDelayModel (delayModel);
+	
+	// spectrum phy configuration
+	SpectrumWifiPhyHelper phy = SpectrumWifiPhyHelper::Default ();
+	phy.SetChannel (channel);
+	phy.SetErrorRateModel (errorModelType);
+	phy.Set ("TxPowerStart", DoubleValue (100)); // dBm  (1.26 mW)
+	phy.Set ("TxPowerEnd", DoubleValue (100));
+	phy.Set ("ShortGuardEnabled", BooleanValue (false));
+	//phy.Set ("ChannelWidth", UintegerValue (20));
 	
 	WifiHelper wifi;
 	wifi.SetStandard (WIFI_PHY_STANDARD_80211ax_5GHZ);
