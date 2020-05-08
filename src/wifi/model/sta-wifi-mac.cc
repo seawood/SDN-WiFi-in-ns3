@@ -525,12 +525,14 @@ StaWifiMac::Receive (Ptr<Packet> packet, const WifiMacHeader *hdr)
           NotifyRxDrop (packet);
           return;
         }
+      /**
       if (hdr->GetAddr2 () != GetBssid ())
        {
           NS_LOG_LOGIC ("Received data frame not from the BSS we are associated with: ignore");
           NotifyRxDrop (packet);
           return;
         }
+	**/
       if (hdr->IsQosData ())
         {
           if (hdr->IsQosAmsdu ())
