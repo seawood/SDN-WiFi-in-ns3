@@ -88,11 +88,11 @@ NodeStatistics::GetDatafile ()
 int
 main (int argc, char *argv[])
 {
-	double simTime = 4;        //Seconds
+	double simTime = 3;        //Seconds
 	bool verbose = true;
 	bool trace = true;
 	std::string errorModelType = "ns3::NistErrorRateModel";
-	double distance = 5;        //meters
+	double distance = 10;        //meters
 	std::string outputFileName = "throughput";
 
 	// Configure command line parameters
@@ -106,7 +106,7 @@ main (int argc, char *argv[])
 
 	if (verbose)
     {
-		OFSwitch13Helper::EnableDatapathLogs ();
+		//OFSwitch13Helper::EnableDatapathLogs ();
 		//LogComponentEnable ("OFSwitch13Interface", LOG_LEVEL_ALL);
 		//LogComponentEnable ("OFSwitch13Device", LOG_LEVEL_ALL);
 		//LogComponentEnable ("OFSwitch13Port", LOG_LEVEL_ALL);
@@ -119,8 +119,8 @@ main (int argc, char *argv[])
 		//LogComponentEnable ("WifiNetDevice", LOG_LEVEL_ALL);
 		//LogComponentEnable ("CsmaNetDevice", LOG_LEVEL_ALL);
 		//LogComponentEnable ("Simulator", LOG_LEVEL_ALL);
-		LogComponentEnable ("OFSwitch13WifiController", LOG_LEVEL_ALL);
-		LogComponentEnable ("WifiElements", LOG_LEVEL_ALL);
+		//LogComponentEnable ("OFSwitch13WifiController", LOG_LEVEL_ALL);
+		//LogComponentEnable ("WifiElements", LOG_LEVEL_ALL);
 		//LogComponentEnable ("WifiPhy", LOG_LEVEL_ALL);
 		//LogComponentEnable ("SpectrumWifiPhy", LOG_LEVEL_ALL);
 		//LogComponentEnable ("UdpServer", LOG_LEVEL_ALL);
@@ -150,7 +150,7 @@ main (int argc, char *argv[])
 	// Use the CsmaHelper to connect AP nodes to the switch node
 	CsmaHelper csmaHelper;
 	csmaHelper.SetChannelAttribute ("DataRate", DataRateValue (DataRate ("500Mbps")));
-	csmaHelper.SetChannelAttribute ("Delay", TimeValue (MilliSeconds (2)));
+	csmaHelper.SetChannelAttribute ("Delay", TimeValue (MilliSeconds (0.1)));
 	NetDeviceContainer apDevices;
 	NetDeviceContainer switchPorts;
 	
@@ -284,7 +284,7 @@ main (int argc, char *argv[])
 		//of13Helper->EnableDatapathStats ("ap-openflow-stats");
 		phy.EnablePcap ("apWifi", apWifiDevs.Get(0));
 		//phy.EnablePcap ("staWifi", staWifiDevs);
-		csmaHelper.EnablePcap ("host", hostDevices);
+		//csmaHelper.EnablePcap ("host", hostDevices);
     }
 	
 	//Statistics counters
