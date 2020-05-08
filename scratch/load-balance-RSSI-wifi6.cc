@@ -88,7 +88,7 @@ NodeStatistics::GetDatafile ()
 int
 main (int argc, char *argv[])
 {
-	double simTime = 20;        //Seconds
+	double simTime = 4;        //Seconds
 	bool verbose = true;
 	bool trace = true;
 	std::string errorModelType = "ns3::NistErrorRateModel";
@@ -107,30 +107,30 @@ main (int argc, char *argv[])
 	if (verbose)
     {
 		OFSwitch13Helper::EnableDatapathLogs ();
-		LogComponentEnable ("OFSwitch13Interface", LOG_LEVEL_ALL);
-		LogComponentEnable ("OFSwitch13Device", LOG_LEVEL_ALL);
-		LogComponentEnable ("OFSwitch13Port", LOG_LEVEL_ALL);
-		LogComponentEnable ("OFSwitch13Queue", LOG_LEVEL_ALL);
-		LogComponentEnable ("OFSwitch13SocketHandler", LOG_LEVEL_ALL);
-		LogComponentEnable ("OFSwitch13Controller", LOG_LEVEL_ALL);
-		LogComponentEnable ("OFSwitch13LearningController", LOG_LEVEL_ALL);
-		LogComponentEnable ("OFSwitch13Helper", LOG_LEVEL_ALL);
-		LogComponentEnable ("OFSwitch13InternalHelper", LOG_LEVEL_ALL);
-		LogComponentEnable ("WifiNetDevice", LOG_LEVEL_ALL);
+		//LogComponentEnable ("OFSwitch13Interface", LOG_LEVEL_ALL);
+		//LogComponentEnable ("OFSwitch13Device", LOG_LEVEL_ALL);
+		//LogComponentEnable ("OFSwitch13Port", LOG_LEVEL_ALL);
+		//LogComponentEnable ("OFSwitch13Queue", LOG_LEVEL_ALL);
+		//LogComponentEnable ("OFSwitch13SocketHandler", LOG_LEVEL_ALL);
+		//LogComponentEnable ("OFSwitch13Controller", LOG_LEVEL_ALL);
+		//LogComponentEnable ("OFSwitch13LearningController", LOG_LEVEL_ALL);
+		//LogComponentEnable ("OFSwitch13Helper", LOG_LEVEL_ALL);
+		//LogComponentEnable ("OFSwitch13InternalHelper", LOG_LEVEL_ALL);
+		//LogComponentEnable ("WifiNetDevice", LOG_LEVEL_ALL);
 		//LogComponentEnable ("CsmaNetDevice", LOG_LEVEL_ALL);
 		//LogComponentEnable ("Simulator", LOG_LEVEL_ALL);
 		LogComponentEnable ("OFSwitch13WifiController", LOG_LEVEL_ALL);
 		LogComponentEnable ("WifiElements", LOG_LEVEL_ALL);
-		LogComponentEnable ("WifiPhy", LOG_LEVEL_ALL);
+		//LogComponentEnable ("WifiPhy", LOG_LEVEL_ALL);
 		//LogComponentEnable ("SpectrumWifiPhy", LOG_LEVEL_ALL);
 		//LogComponentEnable ("UdpServer", LOG_LEVEL_ALL);
 		//LogComponentEnable ("UdpClient", LOG_LEVEL_ALL);
 	    //LogComponentEnable ("PropagationLossModel", LOG_LEVEL_ALL);
-		LogComponentEnable ("ApWifiMac", LOG_LEVEL_ALL);
-		LogComponentEnable ("RegularWifiMac", LOG_LEVEL_ALL);
-		LogComponentEnable ("StaWifiMac", LOG_LEVEL_ALL);
-		LogComponentEnable ("MacLow", LOG_LEVEL_ALL);
-		LogComponentEnable ("WifiRemoteStationManager", LOG_LEVEL_ALL);
+		//LogComponentEnable ("ApWifiMac", LOG_LEVEL_ALL);
+		//LogComponentEnable ("RegularWifiMac", LOG_LEVEL_ALL);
+		//LogComponentEnable ("StaWifiMac", LOG_LEVEL_ALL);
+		//LogComponentEnable ("MacLow", LOG_LEVEL_ALL);
+		//LogComponentEnable ("WifiRemoteStationManager", LOG_LEVEL_ALL);
 		LogComponentEnable ("LoadBalanceTest", LOG_LEVEL_ALL);
     }
 	
@@ -281,9 +281,9 @@ main (int argc, char *argv[])
 	if (trace)
     {
 		of13Helper->EnableOpenFlowPcap ("openflow");
-		of13Helper->EnableDatapathStats ("ap-openflow-stats");
-		phy.EnablePcap ("apWifi", apWifiDevs);
-		phy.EnablePcap ("staWifi", staWifiDevs);
+		//of13Helper->EnableDatapathStats ("ap-openflow-stats");
+		phy.EnablePcap ("apWifi", apWifiDevs.Get(0));
+		//phy.EnablePcap ("staWifi", staWifiDevs);
 		csmaHelper.EnablePcap ("host", hostDevices);
     }
 	
@@ -296,7 +296,7 @@ main (int argc, char *argv[])
 	
 	statistics.CheckStatistics (1);
 
-	
+        /**	
 	Simulator::Schedule (Seconds (3), &OFSwitch13WifiController::ChannelQualityReportStrategy,
 						 wifiControl);
 	Simulator::Schedule(Seconds(5), &OFSwitch13WifiController::PrintAssocStatus,
@@ -307,6 +307,7 @@ main (int argc, char *argv[])
 						 wifiControl);
 	Simulator::Schedule(Seconds(15), &OFSwitch13WifiController::PrintAssocStatus,
 					     wifiControl);
+	 **/
 	Simulator::Stop (Seconds (simTime + 2));
 	
 	// calculate per STA throughput
