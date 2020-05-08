@@ -149,7 +149,7 @@ main (int argc, char *argv[])
 
 	// Use the CsmaHelper to connect AP nodes to the switch node
 	CsmaHelper csmaHelper;
-	csmaHelper.SetChannelAttribute ("DataRate", DataRateValue (DataRate ("50Mbps")));
+	csmaHelper.SetChannelAttribute ("DataRate", DataRateValue (DataRate ("500Mbps")));
 	csmaHelper.SetChannelAttribute ("Delay", TimeValue (MilliSeconds (2)));
 	NetDeviceContainer apDevices;
 	NetDeviceContainer switchPorts;
@@ -159,7 +159,7 @@ main (int argc, char *argv[])
 	apDevices.Add (link1.Get (0));
 	switchPorts.Add (link1.Get (1));
 	
-	csmaHelper.SetChannelAttribute ("DataRate", DataRateValue (DataRate ("100Mbps")));
+	csmaHelper.SetChannelAttribute ("DataRate", DataRateValue (DataRate ("500Mbps")));
 	NodeContainer pair2 (aps.Get(1), switchNode);
 	NetDeviceContainer link2 = csmaHelper.Install (pair2);
 	apDevices.Add (link2.Get (0));
@@ -173,8 +173,7 @@ main (int argc, char *argv[])
 	hostDevices.Add(link.Get(1));
 	
 	Config::SetDefault ("ns3::WifiPhy::CcaMode1Threshold", DoubleValue (-62.0));
-        Config::SetDefault ("ns3::WifiPhy::ChannelWidth", UintegerValue (160));
-
+    
 	// spectrum channel configuration
 	Ptr<MultiModelSpectrumChannel> channel
 		= CreateObject<MultiModelSpectrumChannel> ();
@@ -192,8 +191,9 @@ main (int argc, char *argv[])
 	phy.SetErrorRateModel (errorModelType);
 	phy.Set ("TxPowerStart", DoubleValue (100)); // dBm  (1.26 mW)
 	phy.Set ("TxPowerEnd", DoubleValue (100));
-	phy.Set ("ShortGuardEnabled", BooleanValue (false));
-	//phy.Set ("ChannelWidth", UintegerValue (20));
+	//phy.Set ("ShortGuardEnabled", BooleanValue (false));
+	phy.Set ("ChannelWidth", UintegerValue (160));
+	phy.Set ("GuardInterval", TimeValue (NanoSeconds (800)));
 	
 	WifiHelper wifi;
 	wifi.SetStandard (WIFI_PHY_STANDARD_80211ax_5GHZ);
