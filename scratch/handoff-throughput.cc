@@ -145,8 +145,8 @@ main (int argc, char *argv[])
 
 	// Use the CsmaHelper to connect AP nodes to the switch node
 	CsmaHelper csmaHelper;
-	csmaHelper.SetChannelAttribute ("DataRate", DataRateValue (DataRate ("100Mbps")));
-	csmaHelper.SetChannelAttribute ("Delay", TimeValue (MilliSeconds (2)));
+	//csmaHelper.SetChannelAttribute ("DataRate", DataRateValue (DataRate ("100Mbps")));
+	//csmaHelper.SetChannelAttribute ("Delay", TimeValue (MilliSeconds (2)));
 	NetDeviceContainer apDevices;
 	NetDeviceContainer switchPorts;
 	for (size_t i = 0; i < aps.GetN (); i++)
@@ -165,20 +165,13 @@ main (int argc, char *argv[])
 	hostDevices.Add(link.Get(1));
 	
 	Config::SetDefault ("ns3::WifiPhy::CcaMode1Threshold", DoubleValue (-62.0));
-	//Config::SetDefault ("ns3::WifiPhy::Frequency", UintegerValue (2417));
-	//Config::SetDefault ("ns3::WifiPhy::ChannelWidth", UintegerValue (20));
-	//Config::SetDefault ("ns3::WifiPhy::ChannelNumber", UintegerValue (2));
-	
+		
 	// spectrum channel configuration
 	Ptr<MultiModelSpectrumChannel> spectrumChannel
 		= CreateObject<MultiModelSpectrumChannel> ();
-	Ptr<RandomPropagationLossModel> lossModel
-		= CreateObject<RandomPropagationLossModel> ();
-	Ptr<UniformRandomVariable> x = CreateObject<UniformRandomVariable>();
-	x -> SetAttribute ("Min", DoubleValue(0.0));
-	x -> SetAttribute ("Max", DoubleValue(20.0));
-	lossModel -> SetAttribute ("Variable", PointerValue(x));
-	//lossModel->SetFrequency (5.180e9);
+	Ptr<FriisPropagationLossModel> lossModel
+		= CreateObject<FriisPropagationLossModel> ();
+		//lossModel->SetFrequency (5.180e9);
 	spectrumChannel->AddPropagationLossModel (lossModel);
 	Ptr<ConstantSpeedPropagationDelayModel> delayModel
 		= CreateObject<ConstantSpeedPropagationDelayModel> ();
@@ -190,21 +183,18 @@ main (int argc, char *argv[])
 	spectrumPhy.SetErrorRateModel (errorModelType);
 	spectrumPhy.Set ("TxPowerStart", DoubleValue (100)); // dBm  (1.26 mW)
 	spectrumPhy.Set ("TxPowerEnd", DoubleValue (100));
-	spectrumPhy.Set ("ShortGuardEnabled", BooleanValue (false));
-	spectrumPhy.Set ("ChannelWidth", UintegerValue (20));
+	spectrumPhy.Set ("ChannelWidth", UintegerValue (160));
+	spectrumPhy.Set ("GuardInterval", TimeValue (NanoSeconds (800)));
 
 	WifiHelper wifi;
-	//wifi.SetStandard (WIFI_PHY_STANDARD_80211ac);
-	//StringValue DataRate = StringValue("HtMcs0");
-	//double datarate = 6.5; //?
-	//wifi.SetRemoteStationManager ("ns3::ConstantRateWifiManager","DataMode", DataRate,
-	//							  "ControlMode", DataRate);
+	wifi.SetStandard (WIFI_PHY_STANDARD_80211ax_5GHZ);
+	wifi.SetRemoteStationManager ("ns3::ConstantRateWifiManager","DataMode", StringValue ("HeMcs11"),
+								  "ControlMode", StringValue ("HeMcs11"));
 	
 	//mac configuration
 	WifiMacHelper wifiMac;
 	NetDeviceContainer apWifiDevs;
 	NetDeviceContainer staWifiDevs;
-	spectrumPhy.Set ("Frequency", UintegerValue (2412));
 	
 	Ssid ssid = Ssid ("wifi1");
 	wifiMac.SetType ("ns3::ApWifiMac","Ssid", SsidValue (ssid));
