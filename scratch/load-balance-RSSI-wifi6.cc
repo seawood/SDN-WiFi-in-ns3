@@ -119,8 +119,8 @@ main (int argc, char *argv[])
 		//LogComponentEnable ("WifiNetDevice", LOG_LEVEL_ALL);
 		//LogComponentEnable ("CsmaNetDevice", LOG_LEVEL_ALL);
 		//LogComponentEnable ("Simulator", LOG_LEVEL_ALL);
-		//LogComponentEnable ("OFSwitch13WifiController", LOG_LEVEL_ALL);
-		//LogComponentEnable ("WifiElements", LOG_LEVEL_ALL);
+		LogComponentEnable ("OFSwitch13WifiController", LOG_LEVEL_ALL);
+		LogComponentEnable ("WifiElements", LOG_LEVEL_ALL);
 		//LogComponentEnable ("WifiPhy", LOG_LEVEL_ALL);
 		//LogComponentEnable ("SpectrumWifiPhy", LOG_LEVEL_ALL);
 		//LogComponentEnable ("UdpServer", LOG_LEVEL_ALL);
@@ -149,7 +149,7 @@ main (int argc, char *argv[])
 
 	// Use the CsmaHelper to connect AP nodes to the switch node
 	CsmaHelper csmaHelper;
-	csmaHelper.SetChannelAttribute ("DataRate", DataRateValue (DataRate ("500Mbps")));
+	csmaHelper.SetChannelAttribute ("DataRate", DataRateValue (DataRate ("30Mbps")));
 	csmaHelper.SetChannelAttribute ("Delay", TimeValue (MilliSeconds (0.1)));
 	NetDeviceContainer apDevices;
 	NetDeviceContainer switchPorts;
@@ -159,7 +159,6 @@ main (int argc, char *argv[])
 	apDevices.Add (link1.Get (0));
 	switchPorts.Add (link1.Get (1));
 	
-	csmaHelper.SetChannelAttribute ("DataRate", DataRateValue (DataRate ("500Mbps")));
 	NodeContainer pair2 (aps.Get(1), switchNode);
 	NetDeviceContainer link2 = csmaHelper.Install (pair2);
 	apDevices.Add (link2.Get (0));
@@ -272,11 +271,16 @@ main (int argc, char *argv[])
 	apps_sink.Start (Seconds (1));
 	apps_sink.Stop (Seconds (simTime + 1));	
 	OnOffHelper onoff ("ns3::UdpSocketFactory", InetSocketAddress (hostIpIfaces.GetAddress(0), port));
-	onoff.SetConstantRate (DataRate ("60Mb/s"), packetSize);
+	onoff.SetConstantRate (DataRate ("20Mb/s"), packetSize);
 	onoff.SetAttribute ("StartTime", TimeValue (Seconds (1)));
 	onoff.SetAttribute ("StopTime", TimeValue (Seconds (simTime+1)));
-	ApplicationContainer apps_source = onoff.Install (stas);
-	
+	onoff.Install (stas.Get(0));
+	onoff.Install (stas.Get(1));
+	onoff.Install (stas.Get(2));
+	onoff.SetConstantRate (DataRate("10Mb/s"), packetSize);
+	onoff.Install (stas.Get(3));
+	onoff.Install (stas.Get(4));
+						   	
 	// Enable datapath stats and pcap traces at APs and controller(s)
 	if (trace)
     {
@@ -296,17 +300,16 @@ main (int argc, char *argv[])
 	
 	statistics.CheckStatistics (1);
 
-        /**	
-	Simulator::Schedule (Seconds (3), &OFSwitch13WifiController::ChannelQualityReportStrategy,
+   	Simulator::Schedule (Seconds (3), &OFSwitch13WifiController::ChannelQualityReportStrategy,
 						 wifiControl);
 	Simulator::Schedule(Seconds(5), &OFSwitch13WifiController::PrintAssocStatus,
 						wifiControl);
 	Simulator::Schedule(Seconds(6), &OFSwitch13WifiController::PrintChannelquality,
 						wifiControl);
-	Simulator::Schedule (Seconds(11), &OFSwitch13WifiController::ConfigAssocLBStrategy,
-						 wifiControl);
-	Simulator::Schedule(Seconds(15), &OFSwitch13WifiController::PrintAssocStatus,
-					     wifiControl);
+	//Simulator::Schedule (Seconds(11), &OFSwitch13WifiController::ConfigAssocLBStrategy,
+	//					 wifiControl);
+	//Simulator::Schedule(Seconds(15), &OFSwitch13WifiController::PrintAssocStatus,
+	//				     wifiControl);
 	 **/
 	Simulator::Stop (Seconds (simTime + 2));
 	
