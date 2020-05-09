@@ -1056,6 +1056,7 @@ MacLow::ReceiveOk (Ptr<Packet> packet, double rxSnr, WifiTxVector txVector, bool
           goto rxPacket;
         }
     }
+  //comment the following 7 lines for STA-handoff-throughput.cc
   else if (hdr.IsData()) //special data
 	{
 		NS_LOG_DEBUG ("rx unicast/sendAck from=" << hdr.GetAddr2 ());

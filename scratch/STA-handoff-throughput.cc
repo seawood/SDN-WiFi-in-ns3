@@ -123,10 +123,10 @@ main (int argc, char *argv[])
 		//LogComponentEnable ("UdpServer", LOG_LEVEL_ALL);
 		//LogComponentEnable ("UdpClient", LOG_LEVEL_ALL);
 	     //LogComponentEnable ("PropagationLossModel", LOG_LEVEL_ALL);
-		//LogComponentEnable ("ApWifiMac", LOG_LEVEL_ALL);
-		//LogComponentEnable ("RegularWifiMac", LOG_LEVEL_ALL);
+		LogComponentEnable ("ApWifiMac", LOG_LEVEL_ALL);
+		LogComponentEnable ("RegularWifiMac", LOG_LEVEL_ALL);
 		LogComponentEnable ("StaWifiMac", LOG_LEVEL_ALL);
-		//LogComponentEnable ("MacLow", LOG_LEVEL_ALL);
+		LogComponentEnable ("MacLow", LOG_LEVEL_ALL);
 		//LogComponentEnable ("WifiRemoteStationManager", LOG_LEVEL_ALL);
     }
 	
@@ -146,7 +146,7 @@ main (int argc, char *argv[])
 	// Use the CsmaHelper to connect AP nodes to the switch node
 	CsmaHelper csmaHelper;
 	csmaHelper.SetChannelAttribute ("DataRate", DataRateValue (DataRate ("100Mbps")));
-	csmaHelper.SetChannelAttribute ("Delay", TimeValue (MilliSeconds (0.1)));
+	csmaHelper.SetChannelAttribute ("Delay", TimeValue (MilliSeconds (2)));
 	NetDeviceContainer apDevices;
 	NetDeviceContainer switchPorts;
 	for (size_t i = 0; i < aps.GetN (); i++)
@@ -266,7 +266,7 @@ main (int argc, char *argv[])
 	apps_sink.Start (Seconds (1));
 	apps_sink.Stop (Seconds (simTime + 1));	
 	OnOffHelper onoff ("ns3::UdpSocketFactory", InetSocketAddress (hostIpIfaces.GetAddress(0), port));
-	onoff.SetConstantRate (DataRate ("10Mb/s"), packetSize);
+	onoff.SetConstantRate (DataRate ("54Mb/s"), packetSize);
 	onoff.SetAttribute ("StartTime", TimeValue (Seconds (1)));
 	onoff.SetAttribute ("StopTime", TimeValue (Seconds (simTime+1)));
 	ApplicationContainer apps_source = onoff.Install (stas.Get (0));
