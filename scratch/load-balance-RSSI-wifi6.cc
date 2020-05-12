@@ -92,7 +92,7 @@ main (int argc, char *argv[])
 	bool verbose = true;
 	bool trace = true;
 	std::string errorModelType = "ns3::NistErrorRateModel";
-	double distance = 10;        //meters
+	double distance = 20;        //meters
 	std::string outputFileName = "throughput";
 
 	// Configure command line parameters
@@ -106,7 +106,7 @@ main (int argc, char *argv[])
 
 	if (verbose)
     {
-		//OFSwitch13Helper::EnableDatapathLogs ();
+		OFSwitch13Helper::EnableDatapathLogs ();
 		//LogComponentEnable ("OFSwitch13Interface", LOG_LEVEL_ALL);
 		//LogComponentEnable ("OFSwitch13Device", LOG_LEVEL_ALL);
 		//LogComponentEnable ("OFSwitch13Port", LOG_LEVEL_ALL);
@@ -149,8 +149,8 @@ main (int argc, char *argv[])
 
 	// Use the CsmaHelper to connect AP nodes to the switch node
 	CsmaHelper csmaHelper;
-	csmaHelper.SetChannelAttribute ("DataRate", DataRateValue (DataRate ("30Mbps")));
-	csmaHelper.SetChannelAttribute ("Delay", TimeValue (MilliSeconds (0.1)));
+	csmaHelper.SetChannelAttribute ("DataRate", DataRateValue (DataRate ("15Mbps")));
+	//csmaHelper.SetChannelAttribute ("Delay", TimeValue (MilliSeconds (0.1)));
 	NetDeviceContainer apDevices;
 	NetDeviceContainer switchPorts;
 	
@@ -159,6 +159,7 @@ main (int argc, char *argv[])
 	apDevices.Add (link1.Get (0));
 	switchPorts.Add (link1.Get (1));
 	
+	csmaHelper.SetChannelAttribute ("DataRate", DataRateValue (DataRate("10Mbps")));
 	NodeContainer pair2 (aps.Get(1), switchNode);
 	NetDeviceContainer link2 = csmaHelper.Install (pair2);
 	apDevices.Add (link2.Get (0));
@@ -276,10 +277,10 @@ main (int argc, char *argv[])
 	onoff.SetAttribute ("StopTime", TimeValue (Seconds (simTime+1)));
 	onoff.Install (stas.Get(0));
 	onoff.Install (stas.Get(1));
-	onoff.Install (stas.Get(2));
+	//onoff.Install (stas.Get(2));
 	onoff.SetConstantRate (DataRate("10Mb/s"), packetSize);
 	onoff.Install (stas.Get(3));
-	onoff.Install (stas.Get(4));
+	//onoff.Install (stas.Get(4));
 						   	
 	// Enable datapath stats and pcap traces at APs and controller(s)
 	if (trace)
@@ -310,7 +311,6 @@ main (int argc, char *argv[])
 	//					 wifiControl);
 	//Simulator::Schedule(Seconds(15), &OFSwitch13WifiController::PrintAssocStatus,
 	//				     wifiControl);
-	 **/
 	Simulator::Stop (Seconds (simTime + 2));
 	
 	// calculate per STA throughput
